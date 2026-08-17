@@ -176,17 +176,20 @@ function page(card, locale) {
   const bn = locale === 'bn';
 
   /*
-    The keyboard, drawn the way the site draws it: a field with the Bangla in
-    it, the suggestion strip iOS puts above the keys, and enough of the keys
-    to be unmistakable. Two rows, not four. At the size a card is seen, the
-    bottom rows are texture and the strip is the part that says which keyboard
-    this is.
+    The keyboard, whole. Drawing two letter rows and stopping made it read as
+    a keyboard sliced in half rather than a keyboard simplified, so this is the
+    app's own layout: three letter rows with shift and backspace inside the
+    third, then the command row. A keyboard missing its bottom row is the one
+    thing on a card nobody has to be told is wrong.
   */
-  const ROWS = ['qwertyuiop', 'asdfghjkl'];
-  const keys = ROWS.map(
-    (row) =>
-      `<div class="krow">${[...row].map((k) => `<span class="key">${k}</span>`).join('')}</div>`,
-  ).join('');
+  const key = (label, cls = '') => `<span class="key ${cls}">${label}</span>`;
+  const letters = (row) => [...row].map((k) => key(k)).join('');
+  const keys = [
+    `<div class="krow">${letters('qwertyuiop')}</div>`,
+    `<div class="krow">${letters('asdfghjkl')}</div>`,
+    `<div class="krow">${key('⇧', 'wide')}${letters('zxcvbnm')}${key('⌫', 'wide')}</div>`,
+    `<div class="krow">${key('123', 'wide')}${key('☺', 'wide')}${key('', 'space')}${key('↵', 'wide')}</div>`,
+  ].join('');
 
   const device = card.tagline
     ? `<div class="tagline" lang="bn">ভাষা হোক <b>আরও</b> উন্মুক্ত</div>`
@@ -243,8 +246,8 @@ function page(card, locale) {
       overflow:hidden;
     }
     .field {
-      padding:26px 26px 22px; background:rgba(0,0,0,0.22);
-      font-family:'Anek Bangla',sans-serif; font-size:36px; font-weight:500;
+      padding:22px 24px 20px; background:rgba(0,0,0,0.22);
+      font-family:'Anek Bangla',sans-serif; font-size:33px; font-weight:500;
       line-height:1.5; letter-spacing:0; color:#EAF5F4; white-space:nowrap;
     }
     .caret {
@@ -253,20 +256,25 @@ function page(card, locale) {
     }
     .bar { display:grid; grid-template-columns:repeat(3,1fr); border-block:1px solid #16333f; }
     .cell {
-      display:grid; place-items:center; padding:16px 8px;
+      display:grid; place-items:center; padding:13px 8px;
       font-family:'Anek Bangla',sans-serif; font-size:24px; color:#9DB6BB;
       white-space:nowrap;
     }
     .cell + .cell { box-shadow:-1px 0 0 #16333f; }
     .cell.on { color:#EAF5F4; font-weight:600; }
     .cell.emoji { font-family:'Schibsted Grotesk',sans-serif; font-size:30px; }
-    .keys { display:grid; gap:9px; padding:18px 14px 22px; }
-    .krow { display:flex; justify-content:center; gap:8px; }
+    .keys { display:grid; gap:7px; padding:14px 11px 18px; }
+    .krow { display:flex; justify-content:center; gap:6px; }
     .key {
-      flex:1; display:grid; place-items:center; height:42px; border-radius:8px;
-      background:rgba(234,245,244,0.12); box-shadow:0 1px 0 rgba(0,0,0,0.45);
-      font-size:20px; color:rgba(234,245,244,0.85);
+      flex:1; min-width:0; display:grid; place-items:center; height:36px;
+      border-radius:7px; background:rgba(234,245,244,0.12);
+      box-shadow:0 1px 0 rgba(0,0,0,0.45);
+      font-size:17px; line-height:1; color:rgba(234,245,244,0.85);
     }
+    /* The command keys are wider than a letter and sit darker, as they do on
+       the system. */
+    .key.wide { flex:1.6; background:rgba(234,245,244,0.07); font-size:15px; }
+    .key.space { flex:5; }
     .tagline {
       font-family:'Tiro Bangla',serif; font-size:62px; line-height:1.5;
       letter-spacing:0; padding-block:0.06em; text-align:center;

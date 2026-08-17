@@ -1,0 +1,57 @@
+# Builds the site and publishes it to GitHub Pages.
+#
+# The custom domain is what makes this work: Pages serves a project repo at
+# unmukto-org.github.io/obadh-website/, a subpath, and every link in this build
+# starts from the root. public/CNAME points it at obadh.unmukto.org instead, so
+# the site is served where SITE_URL, the canonical tags and the sitemap already
+# say it is.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. A queued run is allowed to finish rather than being
+# cancelled, so a push never leaves the site half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # SITE_URL is read by src/config.ts and ends up in the canonical tags,
+      # og:url, the sitemap and the JSON-LD. It has to match the domain below.
+      - run: npm run build
+        env:
+          SITE_URL: https://obadh.unmukto.org
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

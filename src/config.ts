@@ -58,7 +58,7 @@ export const LINKS = {
     engine: 'https://github.com/nsssayom/obadh_engine',
     ios: 'https://github.com/nsssayom/obadh-ios',
     macos: 'https://github.com/nsssayom/obadh-macos',
-    website: 'https://github.com/nsssayom/obadh-website',
+    website: 'https://github.com/unmukto-org/obadh-website',
   },
   crate: 'https://crates.io/crates/obadh_engine',
 } as const;

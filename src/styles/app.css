@@ -22,18 +22,36 @@
 */
 @theme {
   /* --- the four planes --------------------------------------------------- */
+  /*
+    The ladder out of the ground. Cards used to sit 1.2:1 against the page,
+    close enough that the hairline was the only thing saying "card", a row of
+    them read as four slightly different rectangles rather than four objects.
+
+    The card plane is 2.15:1 now, and it keeps its chroma. A first attempt went
+    lighter still and washed out: lightness had been bought by spending
+    saturation, which put the card in the same value range as the ink and the
+    objects on it, and the whole card went milky. Lift is worth less than the
+    contrast INSIDE the card.
+  */
   --color-ground: #061a22;
-  --color-veil: #08202a;
-  --color-raise: #0a2530;
-  --color-card: #0d2b37;
-  --color-card-hi: #123846;
+  --color-veil: #0a2530;
+  --color-raise: #163e4b;
+  --color-card: #14556a;
+  --color-card-hi: #1d6c84;
 
   /* --- ink --------------------------------------------------------------- */
   --color-ink: #eaf5f4;
-  --color-muted: #9db6bb;
-  --color-faint: #7d959b;
-  --color-hair: #16333f;
-  --color-hair-strong: #204a59;
+  /*
+    Lifting the card plane put every muted run on a lighter background, and the
+    old greys fell under AA there, body copy on a card measured 3.3:1. The
+    ramp is lighter to match the plane it sits on.
+  */
+  --color-muted: #c2d6da;
+  --color-faint: #c3d8dc;
+  /* A hairline dark enough for the ground disappears on a card, so both
+     borders are a tint of the ink instead of a fixed colour. */
+  --color-hair: color-mix(in srgb, #fff 11%, transparent);
+  --color-hair-strong: color-mix(in srgb, #fff 20%, transparent);
 
   /* --- the brand, from the app icon -------------------------------------- */
   /* On night, the accent has to be the bright end of the family: the deep teal
@@ -45,6 +63,14 @@
   --color-glow: #3cbfbc;
   /* What goes on top of a bright teal fill. */
   --color-on-brand: #04161c;
+
+  /*
+    Brand and ember name OBJECTS, fills, icons, the button. Text needs more
+    light than a fill does to clear AA on the lifted card, so the two ink tints
+    below are what eyebrows and links use. Same hues, legible weight.
+  */
+  --color-brand-ink: #8fe8e3;
+  --color-ember-ink: #ffc79c;
 
   /* One warm note, used only where something needs to feel welcoming rather
      than correct: the community band, and the small "coming" chips. */
@@ -243,7 +269,7 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   /* Bangla has no case, so an eyebrow in Bangla carries weight and colour
@@ -312,12 +338,12 @@
 
   .btn-ghost:hover {
     border-color: var(--color-brand);
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   /*
     A flat fill one shade off the ground, and a hairline. That hairline is what
-    makes a card read as raised — not a gradient down its face.
+    makes a card read as raised, not a gradient down its face.
   */
   .card {
     background: var(--color-card);
@@ -325,8 +351,32 @@
     border-radius: var(--radius-card);
   }
 
+  /*
+    The four on the home page, which are the first cards anyone sees and so
+    carry the weight of saying what a card is here: a lifted plane, a lit top
+    edge, and the ground darkening under it.
+  */
+  .value-card {
+    /* The objects are drawn on this, so their darker tone is mixed with it. */
+    --glyph-behind: var(--color-card);
+    border-color: color-mix(in srgb, #fff 12%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent),
+      0 22px 45px -28px #000;
+  }
+
+  /*
+    Two colours across the row, and the split is by ROLE rather than by card:
+    the labels are warm, the objects are teal. Ember on one card of four read
+    as an accident, either every card carries the accent or none does, and a
+    different hue per card would be a rainbow.
+  */
+  .value-card .eyebrow {
+    color: var(--color-ember-ink);
+  }
+
   .link {
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
     text-underline-offset: 0.2em;
   }
 
@@ -341,7 +391,7 @@
     display: inline-flex;
     align-items: baseline;
     gap: 0.4em;
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
     font-weight: 600;
     text-decoration: none;
   }
@@ -405,7 +455,7 @@
   }
 
   .prose a {
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   .prose :is(ul, ol) {
@@ -425,13 +475,13 @@
     inset-inline-start: 1rem;
     inset-block-start: -100%;
     z-index: 40;
-    background: var(--color-card-hi);
+    background: var(--color-ground);
     border: 1px solid var(--color-brand);
     border-radius: 999px;
     padding: 0.75rem 1.25rem;
     font-size: var(--text-sm);
     text-decoration: none;
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   .skip-link:focus {

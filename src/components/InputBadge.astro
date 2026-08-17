@@ -1,12 +1,12 @@
 ---
 /**
- * The word "Bangla" in the headline, set as an input-source badge — the little
+ * The word "Bangla" in the headline, set as an input-source badge, the little
  * rounded plate macOS puts in the menu bar to tell you which keyboard you are
  * typing on. Here it is the Bangla one, and the script is cut out of it.
  *
  * A real knockout, not a fake one. The plate is painted through an SVG mask
  * whose white rectangle is punched by black text, so what shows through the
- * letters is whatever the page has behind them — the ground, the alpona, the
+ * letters is whatever the page has behind them, the ground, the alpona, the
  * lift under the hero. Setting the letters to the ground colour instead would
  * look identical over flat colour and wrong over anything else.
  *
@@ -65,7 +65,7 @@ const id = `badge-${Math.random().toString(36).slice(2, 8)}`;
     height: 1.02em;
     width: calc(1.02em * (132 / 52));
     vertical-align: -0.16em;
-    /* The plate takes the colour of the words either side of it — it is one of
+    /* The plate takes the colour of the words either side of it, it is one of
        them, set as a badge rather than as type. The accent stays on the second
        line, where the sentence turns. */
     color: var(--color-ink);

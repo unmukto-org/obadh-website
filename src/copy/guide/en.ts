@@ -21,7 +21,7 @@ export const guide: GuideContent = {
     people type from, so the page opens with the filter, the index and the
     three rules the tables rest on, and gets out of the way. Nothing here sells
     phonetic typing to a person who has typed this way since school, and
-    nothing here explains how the engine is put together — that is /about/.
+    nothing here explains how the engine is put together, that is /about/.
   */
   standfirst: '176 pairs, straight out of the engine. Filter them, or read the group you need.',
 
@@ -56,7 +56,7 @@ export const guide: GuideContent = {
       heading: 'Spellings that catch people out',
       short: 'Traps',
       body: [
-        'Every one of these gives you real Bangla, which is what makes them awkward. Nothing has gone wrong; you have been handed a different letter from the one you meant.',
+        'Every one of these gives you real Bangla. That is what makes them awkward: nothing has gone wrong, you have just been handed a different letter from the one you meant.',
         'Length is a capital, never a repeat: <code>aa</code> is <span lang="bn">আআ</span>. And lowercase <code>boi</code> is <span lang="bn">বই</span> where uppercase <code>bOI</code> is <span lang="bn">বৈ</span>.',
       ],
     },
@@ -127,8 +127,8 @@ export const guide: GuideContent = {
       heading: '<span lang="bn">য-ফলা</span> and <span lang="bn">ব-ফলা</span>',
       short: 'Phola',
       body: [
-        'The two phola marks are <code>y</code> and <code>w</code>, and they act as phola only when a consonant comes before them. <code>z</code> and <code>b</code> stay the whole letters <span lang="bn">য</span> and <span lang="bn">ব</span>, which is what lets you write <span lang="bn">য্য</span> as <code>zy</code>.',
-        'The ya-phola composes onto a whole cluster, which is what makes loanwords work: <code>plYan</code> is <span lang="bn">প্ল্যান</span>. Four bases refuse it: <code>r</code>, <code>R</code>, <code>Rh</code> and <code>Ng</code>.',
+        'The two phola marks are <code>y</code> and <code>w</code>, and they act as phola only when a consonant comes before them. <code>z</code> and <code>b</code> stay the whole letters <span lang="bn">য</span> and <span lang="bn">ব</span>, so you can write <span lang="bn">য্য</span> as <code>zy</code>.',
+        'The ya-phola composes onto a whole cluster, so loanwords work: <code>plYan</code> is <span lang="bn">প্ল্যান</span>. Four bases refuse it: <code>r</code>, <code>R</code>, <code>Rh</code> and <code>Ng</code>.',
       ],
     },
 
@@ -234,8 +234,8 @@ export const guide: GuideContent = {
     heading: 'If you are coming from Avro',
     short: 'From Avro',
     body: [
-      'Most people reading this learned to type Bangla on Avro Phonetic, and most of what you know transfers unchanged, including <code>x</code>, <code>q</code>, <code>v</code>, <code>f</code>, <code>S</code>, <code>gg</code>, <code>ng</code> and <code>NG</code>, the <code>$</code> taka sign, the <code>^</code> chandrabindu, the <code>,,</code> hasant, and a full stop at the end of a sentence. Consonants that meet still bind, <code>o</code> still writes the inherent vowel, and a doubled <code>r</code> still writes the reph. Avro settled most of it, and what Avro settled is now simply how Bangla is typed.',
-      'Four things are spelled differently. An alias is added to the scheme only where there is a phonetic, orthographic or ergonomic reason for it, which is why the list is this short.',
+      'Most people reading this learned to type Bangla on Avro Phonetic, and most of what you know transfers unchanged, including <code>x</code>, <code>q</code>, <code>v</code>, <code>f</code>, <code>S</code>, <code>gg</code>, <code>ng</code> and <code>NG</code>, the <code>$</code> taka sign, the <code>^</code> chandrabindu, the <code>,</code> hasant, and a full stop at the end of a sentence. Consonants that meet still bind, <code>o</code> still writes the inherent vowel, and a doubled <code>r</code> still writes the reph. Avro settled most of it, and what Avro settled is now simply how Bangla is typed.',
+      'Four things are spelled differently. An alias is added to the scheme only where there is a phonetic, orthographic or ergonomic reason for it, so the list is short.',
       '<strong>Long vowels are capitals, not doubled letters.</strong> Avro Phonetic maps <code>ee</code> to <span lang="bn">ঈ</span> and <code>oo</code> to <span lang="bn">উ</span>. Obadh reads a doubled vowel as two vowels, so <span lang="bn">ঈ</span> is <code>I</code> and <span lang="bn">ঊ</span> is <code>U</code>. This is the habit worth changing first: it is the one that bites inside the first sentence.',
       '<strong>The diphthongs are capitals too.</strong> <code>OI</code> is <span lang="bn">ঐ</span> and <code>OU</code> is <span lang="bn">ঔ</span>. Lowercase <code>oi</code> is two vowels in a row, so <code>boi</code> is <span lang="bn">বই</span> and <code>bOI</code> is <span lang="bn">বৈ</span>.',
       '<strong>On its own, <code>w</code> is <span lang="bn">ওয়</span>.</strong> That is what loanwords want: <code>waTar</code> is <span lang="bn">ওয়াটার</span>. Avro Phonetic maps a bare <code>w</code> to <span lang="bn">ও</span>. After a consonant the two agree, and <code>kw</code> is <span lang="bn">ক্ব</span> in both.',

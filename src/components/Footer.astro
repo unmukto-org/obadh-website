@@ -15,6 +15,7 @@ const f = t.footer;
 const pages = [
   { route: '/download/', label: t.nav.download },
   { route: '/guide/', label: t.nav.guide },
+  { route: '/developers/', label: t.nav.developers },
   { route: '/about/', label: t.nav.about },
   { route: '/faq/', label: t.nav.faq },
   { route: '/contribute/', label: t.nav.contribute },
@@ -50,7 +51,7 @@ const source = [
           pages.map((page) => (
             <li>
               <a
-                class="text-sm text-muted no-underline transition-colors hover:text-brand"
+                class="text-sm text-muted no-underline transition-colors hover:text-brand-ink"
                 href={localizedPath(page.route, locale)}
               >
                 {page.label}
@@ -68,7 +69,7 @@ const source = [
           source.map((item) => (
             <li>
               <a
-                class="text-sm text-muted no-underline transition-colors hover:text-brand"
+                class="text-sm text-muted no-underline transition-colors hover:text-brand-ink"
                 href={item.href}
               >
                 {item.label}

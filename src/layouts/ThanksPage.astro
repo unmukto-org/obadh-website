@@ -1,0 +1,82 @@
+---
+/**
+ * Where the Mac button lands after it has started the disk image.
+ *
+ * Someone here is watching a download bar with nothing to do for ten seconds,
+ * which is the one moment on this site where install steps are wanted rather
+ * than tolerated. So the page is the steps, and nothing else.
+ *
+ * noindex: it means nothing to anyone who did not arrive by pressing the
+ * button, and a search result landing here would be a dead end.
+ */
+import Base from './Base.astro';
+import PageHead from '../components/PageHead.astro';
+import type { ThanksContent } from '../copy/types';
+import { LINKS, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  content: ThanksContent;
+}
+
+const { locale, content } = Astro.props;
+const c = content;
+---
+
+<Base
+  locale={locale}
+  route="/thanks/"
+  title={c.meta.title}
+  description={c.meta.description}
+  noindex
+>
+  <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
+
+  <div class="shell pb-24">
+    <ol class="grid gap-4 pt-10 sm:grid-cols-2">
+      {
+        c.steps.map((step, index) => (
+          <li
+            class="card step grid content-start gap-2 p-7"
+            data-reveal
+            style={`--reveal-delay: ${index * 60}ms`}
+          >
+            <p class="step__n font-mono text-sm">{index + 1}</p>
+            <h2 class="text-lg font-semibold tracking-tight">{step.heading}</h2>
+            <p class="text-sm text-muted" set:html={step.body} />
+          </li>
+        ))
+      }
+    </ol>
+
+    <section class="card mt-5 grid gap-2 p-7" data-reveal>
+      <h2 class="text-lg font-semibold tracking-tight">{c.check.heading}</h2>
+      <p class="text-sm text-muted" set:html={c.check.body} />
+    </section>
+
+    <div class="mt-10 grid gap-3" data-reveal>
+      <p class="text-sm text-faint">{c.retry.note}</p>
+      <p>
+        <a class="btn btn-ghost" href={LINKS.macDmg}>{c.retry.label}</a>
+      </p>
+    </div>
+
+    <ul class="mt-12 grid gap-2" data-reveal>
+      {
+        c.next.map((link) => (
+          <li>
+            <a class="arrow" href={localizedPath(link.href, locale)}>
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .step__n {
+    color: var(--color-brand-ink);
+  }
+</style>

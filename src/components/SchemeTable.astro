@@ -10,7 +10,7 @@
  * A real <table>, because it is a table: two columns of paired values that a
  * screen reader should announce as pairs. On a narrow screen the rows lay
  * themselves out as blocks instead of scrolling sideways, which is why every
- * element carries its ARIA role explicitly — `display: grid` on a row would
+ * element carries its ARIA role explicitly, `display: grid` on a row would
  * otherwise take the table apart for anyone reading it rather than seeing it.
  */
 import { SCHEME_ROWS, type SchemeGroup } from '../data/scheme';
@@ -36,7 +36,7 @@ const rows = SCHEME_ROWS.filter((row) => row.group === group);
           /*
             A column header is re-announced on every cell, and there are 176
             rows. Chrome folds the uppercase transform into the accessible
-            name, which made those three headers TYPE, YOU GET and NOTE —
+            name, which made those three headers TYPE, YOU GET and NOTE,
             short capitals are exactly what a screen reader spells out letter
             by letter. The label is the header in its own case; the page is
             unchanged.
@@ -53,8 +53,7 @@ const rows = SCHEME_ROWS.filter((row) => row.group === group);
       {
         rows.map((row) => {
           const note = notes?.[row.roman] ?? row.note;
-          return (
-            <tr role="row" data-row>
+          return (<tr role="row" data-row>
               <td role="cell" class="scheme__roman">
                 {/* Enabled by the page script, and only where there is a
                     clipboard to write to. A control that does nothing should
@@ -81,8 +80,7 @@ const rows = SCHEME_ROWS.filter((row) => row.group === group);
                 {row.bangla}
               </td>
               <td role="cell" class="scheme__note" set:html={note} />
-            </tr>
-          );
+            </tr>);
         })
       }
     </tbody>
@@ -117,7 +115,7 @@ const rows = SCHEME_ROWS.filter((row) => row.group === group);
   /*
     The header rides under the site header, so the two column labels are still
     there thirty-six rows into the consonants. It needs an opaque ground of its
-    own, because the rows scroll under it — and its rule is drawn as a shadow,
+    own, because the rows scroll under it, and its rule is drawn as a shadow,
     because a collapsed border belongs to the table and stays behind.
   */
   .scheme th {

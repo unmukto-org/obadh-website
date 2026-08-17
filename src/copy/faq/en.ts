@@ -13,7 +13,7 @@ import type { FaqContent } from '../types';
  * Two rules this page kept getting wrong. It does not explain the architecture:
  * the Rust engine, the C ABI and the lexicon internals are on /about/, where a
  * person who came looking for them will find them. And it does not explain
- * phonetic typing — whoever is reading this has typed Bangla by sound for
+ * phonetic typing, whoever is reading this has typed Bangla by sound for
  * years. What belongs here is what is specific to Obadh and checkable against
  * the repositories.
  */
@@ -40,7 +40,7 @@ export const faq: FaqContent = {
         {
           id: 'cost',
           question: 'Is Obadh free?',
-          lead: 'Yes — no price, no ads, no subscription, and no account to make.',
+          lead: 'Yes. The keyboard is free to use, with no ads and no account to make.',
           answer: [
             'The engine, the apps built on it and the scripts that build them are all MIT licensed, so anyone can read the source, change it, or ship their own version, including for a platform Obadh has not reached yet. <a href="/about/#the-license">What the license lets you do</a> is on the about page.',
           ],
@@ -66,7 +66,7 @@ export const faq: FaqContent = {
           question: 'Why does the iOS keyboard ask for Full Access, and what if I say no?',
           lead: 'For two things: the tap you feel under your finger, and the settings you chose in the Obadh app.',
           answer: [
-            'Say no and the keyboard still works — you type, the Bangla appears, corrections and suggestions come. What you lose is the haptics, any setting you change in the app, and the words it would have learned from you. The <a href="/download/#turning-it-on">install steps</a> say where the switch is.',
+            'Say no and the keyboard still works. You type, the Bangla appears, corrections and suggestions come. What you lose is the haptics, any setting you change in the app, and the words it would have learned from you. The <a href="/download/#turning-it-on">install steps</a> say where the switch is.',
           ],
         },
       ],
@@ -81,7 +81,7 @@ export const faq: FaqContent = {
           question: 'Can I type in Obadh the way I type in Avro?',
           lead: 'Almost. Four things are spelled differently: long vowels, the diphthongs, a bare <code>w</code>, and <span lang="bn">খণ্ড ত</span>.',
           answer: [
-            'The guide keeps all four in <a href="/guide/#from-avro">one section</a>, and <a href="/guide/#traps">the ones people trip on</a> sit near the top of the page rather than at the end of it.',
+            'The guide keeps all four in <a href="/guide/#from-avro">one section</a>, and <a href="/guide/#traps">the ones people trip on</a> are near the top of the page.',
           ],
         },
         {
@@ -130,7 +130,7 @@ export const faq: FaqContent = {
           question: 'What about English words mixed into Bangla?',
           lead: 'Just type them. <code>aYp</code> gives <span lang="bn">অ্যাপ</span>, <code>waTar</code> gives <span lang="bn">ওয়াটার</span>, <code>box</code> gives <span lang="bn">বক্স</span>.',
           answer: [
-            'Autocorrect knows 1,776 English words in the spellings people really write, and <a href="/guide/#loanwords">loanwords</a> have a section of their own in the guide. If the English should stay in Latin letters, switch keyboards and come back — a word you left half-finished is still where you left it.',
+            'Autocorrect knows 1,776 English words in the spellings people really write, and <a href="/guide/#loanwords">loanwords</a> have a section of their own in the guide. If the English should stay in Latin letters, switch keyboards and come back; a word you left half-finished is still where you left it.',
           ],
         },
         {
@@ -144,7 +144,7 @@ export const faq: FaqContent = {
         {
           id: 'any-app',
           question: 'Can I use Obadh in any app?',
-          lead: 'Yes — messages, mail, notes, browsers, editors, anywhere the system lets a keyboard in.',
+          lead: 'Yes. Messages, mail, notes, browsers, editors, anywhere the system lets a keyboard in.',
           answer: [
             'Obadh installs as a system input method, not as an app you type inside, so there is nothing to open first and nothing to paste out of. Two exceptions belong to iOS rather than to Obadh: secure fields always bring up the system keyboard, and an app is allowed to refuse third-party keyboards outright, which some banking apps do.',
           ],
@@ -169,7 +169,7 @@ export const faq: FaqContent = {
           question: 'When will there be a Linux, Windows or Android version?',
           lead: 'No dates, and none of the four has been started in the open yet.',
           answer: [
-            'iPhone, iPad and Mac are what you can install today. Each of the others needs an input method written against its own framework, which is <a href="/download/#other-platforms">the whole of the job</a>. In the meantime, on Linux, OpenBangla Keyboard is free software and carries Avro Phonetic alongside Probhat, Munir Optima and Jatiya.',
+            'iPhone, iPad and Mac are what you can install today. Each of the others needs an input method written against its own framework, and that is <a href="/download/#other-platforms">most of the work</a>. In the meantime, on Linux, OpenBangla Keyboard is free software and carries Avro Phonetic alongside Probhat, Munir Optima and Jatiya.',
           ],
         },
         {

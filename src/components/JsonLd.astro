@@ -36,13 +36,14 @@ const inLanguage = LOCALE_TAG[locale];
 
 const projectId = `${SITE_URL}/#project`;
 const websiteId = `${SITE_URL}/#website`;
-const personId = `${SITE_URL}/#sayom`;
+const collectiveId = `${SITE_URL}/#unmukto`;
 
 /**
- * The author's own site. It is not in LINKS because no page links to it: it is
- * here so the Person resolves to an identity that already exists elsewhere.
+ * The collective that builds Obadh, and the parent of this domain. Declared as
+ * an Organization rather than a Person: the project is the collective's, and
+ * the site does not attribute it to an individual.
  */
-const AUTHOR_URL = 'https://sayom.me/';
+const COLLECTIVE_URL = SITE.authorUrl;
 
 /**
  * A crumb names a place, so it carries the label the header uses rather than
@@ -81,7 +82,7 @@ const graph: Record<string, unknown>[] = [
     alternateName: SITE.nameBn,
     url: `${SITE_URL}/`,
     logo: absoluteUrl('/icons/app-512.png'),
-    founder: { '@id': personId },
+    parentOrganization: { '@id': collectiveId },
     // The two shipping apps belong here: they are what the site is about. The
     // crate is the same project under another name, published behind the
     // repository it is cut from.
@@ -94,10 +95,12 @@ const graph: Record<string, unknown>[] = [
     ],
   },
   {
-    '@type': 'Person',
-    '@id': personId,
+    '@type': 'Organization',
+    '@id': collectiveId,
     name: SITE.author,
-    url: AUTHOR_URL,
+    url: COLLECTIVE_URL,
+    description:
+      'An open source collective that builds and maintains free software for the Bangla language and for Bangladesh.',
     sameAs: [LINKS.github.org],
   },
 ];

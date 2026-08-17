@@ -6,7 +6,7 @@
  *   node scripts/verify-copy.mjs
  *
  * src/data/pairs.ts covers the pairs a page prints as a pair. This covers the
- * ones a sentence makes in passing — "`kt` gives ক্ত", "`ee` is এএ" — which is
+ * ones a sentence makes in passing ("`kt` gives ক্ত", "`ee` is এএ") which is
  * where a wrong claim hides best, because it reads like prose rather than like
  * a table row. One of those was wrong on the first pass.
  *

@@ -2,7 +2,7 @@
 /**
  * The keyboard, drawn.
  *
- * Not a screenshot — a screenshot of a keyboard at this size is a grey smear,
+ * Not a screenshot, a screenshot of a keyboard at this size is a grey smear,
  * and the two things worth showing are the suggestion strip and the fact that
  * the keys carry Bangla. Both are drawn here at a size you can actually read.
  *
@@ -12,7 +12,7 @@
  */
 interface Props {
   /**
-   * The field mid-sentence, ending on the word being composed — so the strip
+   * The field mid-sentence, ending on the word being composed, so the strip
    * underneath is offering a correction for a word you can see in the field.
    */
   line: string;
@@ -53,13 +53,9 @@ const rows = [
 
         <div class="phone__keys">
           {
-            rows.map((row) => (
-              <div class="phone__row">
-                {row.map((key) => (
-                  <span class="phone__key">{key}</span>
-                ))}
-              </div>
-            ))
+            rows.map((row) => (<div class="phone__row">
+                {row.map((key) => (<span class="phone__key">{key}</span>))}
+              </div>))
           }
           <div class="phone__row">
             <span class="phone__key phone__key--wide"></span>

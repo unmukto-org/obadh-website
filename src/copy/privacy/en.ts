@@ -3,8 +3,8 @@ import type { ArticleContent } from '../types';
 /*
   The question a person arrives with is "does this keyboard read what I type?",
   and the heading and the standfirst answer it before anything else. Every
-  section under them says what you get — what it keeps, what it reads, how to
-  erase it, how to check — never what the software is made of.
+  section under them says what you get, what it keeps, what it reads, how to
+  erase it, how to check, never what the software is made of.
 
   This is the privacy position of a project, not the policy of two Apple apps.
   iPhone, iPad and Mac are what you can install today, and the answer is meant to be the
@@ -18,9 +18,9 @@ import type { ArticleContent } from '../types';
 */
 export const privacy: ArticleContent = {
   meta: {
-    title: 'Obadh privacy — nothing you type leaves your device',
+    title: 'Obadh privacy: nothing you type leaves your device',
     description:
-      'Nothing you type leaves your device. No account, no analytics, no networking code anywhere in it — what stays on your phone, how to erase it, how to check.',
+      'Nothing you type leaves your device. No account, no analytics, no networking code anywhere in it. What stays on your phone, how to erase it, how to check.',
     ogImage: 'privacy.png',
     ogImageAlt: 'The Roman string ami tOmay bhalObasi above the Bangla it composes, আমি তোমায় ভালোবাসি',
   },
@@ -37,7 +37,7 @@ export const privacy: ArticleContent = {
   sections: [
     {
       body: [
-        'A keyboard sees your passwords, your messages, and the questions you would not ask out loud. Suspicion of one is reasonable, and a privacy page is not evidence — checking is. Every claim below names the file it rests on.',
+        'A keyboard sees your passwords, your messages, and the questions you would not ask out loud. Suspicion of one is reasonable, and a privacy page is not evidence. Checking is. Every claim below names the file it rests on.',
         'Obadh is on iPhone, iPad and Mac today; Linux, Android, Windows and ChromeOS are coming. A platform is named below only where a file path or a permission differs from one to the next. The answer does not.',
       ],
     },
@@ -57,7 +57,7 @@ export const privacy: ArticleContent = {
       heading: 'Everything happens on your device',
       id: 'what-obadh-sends',
       body: [
-        'None of it could send anything if it wanted to. The engine is the same Rust on every platform, and its whole dependency list is a serialization library, a finite-state transducer library, memory mapping and a hash function. The layer above it adds no networking either: not the iOS keyboard extension, not the iOS app, not the macOS input method — no <code>URLSession</code>, no sockets, no third-party SDK that might carry its own, and no HTTP client anywhere in any of it.',
+        'None of it could send anything if it wanted to. The engine is the same Rust on every platform, and its whole dependency list is a serialization library, a finite-state transducer library, memory mapping and a hash function. The layer above it adds no networking either: not the iOS keyboard extension, not the iOS app, not the macOS input method. No <code>URLSession</code>, no sockets, no third-party SDK that might carry its own, and no HTTP client anywhere in any of it.',
         'Transliteration, autocorrect, next-word suggestions and emoji search all run inside the app on your device, against data files bundled in it: an autocorrect lexicon of 8.8 MB and a next-word model of another 29 MB, both shipped with the download. That is most of why the app is the size it is, and it is why all of it still works in airplane mode.',
       ],
     },
@@ -75,8 +75,8 @@ export const privacy: ArticleContent = {
       heading: 'Everything it keeps on your iPhone, in one list',
       id: 'on-iphone-and-ipad',
       body: [
-        'The <strong>personal suggestion snapshot</strong> is a compact binary the engine exports, holding what it has learned about which words tend to follow which: counts over short runs — up to three words of context and the word that came next — plus the spelling of any word the shipped word list has no token for. It sits in the container the app and the keyboard share, at <code>Library/Application Support/ObadhKeyboard/personal-autosuggest.snapshot</code>. It is bounded in size, and it is validated on load against a fingerprint of the shipped model, so a snapshot built from a different generation of the data is discarded rather than imported.',
-        'The <strong>learned-word store</strong> holds words you have typed that the built-in lexicon does not know — names, slang, brands — and any word at all, known or not, whose correction you refused by tapping your own spelling. It is there to stop autocorrect fixing a word you have shown it you mean.',
+        'The <strong>personal suggestion snapshot</strong> is a compact binary the engine exports, holding what it has learned about which words tend to follow which: counts over short runs (up to three words of context and the word that came next), plus the spelling of any word the shipped word list has no token for. It sits in the container the app and the keyboard share, at <code>Library/Application Support/ObadhKeyboard/personal-autosuggest.snapshot</code>. It is bounded in size, and it is validated on load against a fingerprint of the shipped model, so a snapshot built from a different generation of the data is discarded instead of imported.',
+        'The <strong>learned-word store</strong> holds words you have typed that the built-in lexicon does not know (names, slang, brands) and any word at all, known or not, whose correction you refused by tapping your own spelling. It is there to stop autocorrect fixing a word you have shown it you mean.',
         'It does not believe you the first time. Each word accumulates evidence and is protected only once that evidence crosses a threshold, so a one-off typo cannot immunize itself. Refusing a correction protects the word at once; ordinary use takes three commits. Evidence halves after thirty days without use, so a word you have stopped typing fades out on its own. The store lives in the shared preferences under the key <code>keyboard.learnedWords</code>, holds at most 500 words, and keeps a score and a timestamp for each one.',
         'Your settings sit in the same shared preferences: haptics on or off, which language emoji search opens in, whether corrections may be inserted automatically, and when the keyboard last confirmed it had Full Access. The emoji panel remembers which skin tone you picked for a given emoji, and up to 32 recents, each with a timestamp and a use count that fades, which is how it decides what to drop.',
         'That is the complete list: no record of sentences, no history of what you typed in which app, and no timestamp anywhere except the ones named above.',
@@ -146,7 +146,7 @@ export const privacy: ArticleContent = {
       // site. If it is ever built, this section is rewritten before the code ships.
       body: [
         'Autocorrect and next-word suggestions would get better if they could learn from how people actually write, and the only version of that worth building is one where nobody’s text leaves their device. Federated learning is the approach the project intends to take: models improve from updates computed on the device, and the writing itself stays where it was written.',
-        'None of it is built. There is no such code in any of the repositories today, nothing on your device is participating in anything, and there is no date. It is on this page because a plan that affects privacy should be visible before it exists rather than after, and because it comes with a condition: if it cannot be built so that no text, and nothing reconstructible into text, ever leaves the device, it does not ship. This page will describe it before the code is released.',
+        'None of it is built. There is no such code in any of the repositories today, nothing on your device is participating in anything, and there is no date. It is on this page because a plan that affects privacy should be visible before it exists, and because it comes with a condition: if it cannot be built so that no text, and nothing reconstructible into text, ever leaves the device, it does not ship. This page will describe it before the code is released.',
       ],
     },
 

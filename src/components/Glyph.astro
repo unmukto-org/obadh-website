@@ -3,7 +3,7 @@
  * The four objects on the value cards.
  *
  * Not line icons, and not gradients either. Each one is built from two FLAT
- * tones — a lit face and a darker side — which is how a screen-printed folk
+ * tones (a lit face and a darker side) which is how a screen-printed folk
  * figure is built and how anything reads as an object without looking like a
  * stock illustration. Gradients on these made the whole page look cheap.
  *
@@ -11,7 +11,7 @@
  * two tones, so they look like a set rather than four drawings.
  */
 interface Props {
-  name: 'speed' | 'accurate' | 'private' | 'free';
+  name: 'speed' | 'accurate' | 'native' | 'private' | 'free';
   size?: number;
   class?: string;
 }
@@ -31,8 +31,7 @@ const { name, size = 96, class: className = '' } = Astro.props;
 >
 
   {
-    name === 'speed' && (
-      <>
+    name === 'speed' && (<>
         {/* A bolt, and the air moving past it. */}
         <path
           d="M13 34h16M7 50h14M13 66h18"
@@ -41,39 +40,29 @@ const { name, size = 96, class: className = '' } = Astro.props;
           stroke-linecap="round"
         />
         <path d="M62 6 34 52h16l-6 38 30-48H58l4-36Z" fill="var(--glyph-face)" />
-      </>
-    )
+      </>)
   }
 
   {
-    name === 'accurate' && (
-      <>
-        {/* A tick, seated in a ring that is open where the tick leaves it. */}
-        <circle
-          cx="48"
-          cy="50"
-          r="30"
-          stroke="var(--glyph-side)"
-          stroke-width="9"
-          stroke-linecap="round"
-          stroke-dasharray="150 40"
-          transform="rotate(-42 48 50)"
-        />
+    name === 'accurate' && (<>
+        {/* A tick, seated in a closed ring. The ring used to be broken where
+            the tick left it, with a loose dot beyond the gap standing in for
+            the end of the stroke, at this size that dot read as a speck of
+            dirt rather than as part of the object, and the other three glyphs
+            are all closed shapes. */}
+        <circle cx="48" cy="50" r="30" stroke="var(--glyph-side)" stroke-width="9" />
         <path
-          d="M33 51l11 11 22-25"
+          d="M35 51l9 10 19-22"
           stroke="var(--glyph-face)"
           stroke-width="10"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
-        <circle cx="76" cy="24" r="5" fill="var(--glyph-face)" />
-      </>
-    )
+      </>)
   }
 
   {
-    name === 'private' && (
-      <>
+    name === 'private' && (<>
         {/* A padlock, shut. The shackle is behind the body, which is why it is
             drawn first and stops at the shoulder. */}
         <path
@@ -85,13 +74,38 @@ const { name, size = 96, class: className = '' } = Astro.props;
         <rect x="22" y="43" width="52" height="42" rx="13" fill="var(--glyph-face)" />
         <circle cx="48" cy="61" r="6" fill="var(--glyph-hole)" />
         <rect x="45" y="63" width="6" height="12" rx="3" fill="var(--glyph-hole)" />
-      </>
-    )
+      </>)
   }
 
   {
-    name === 'free' && (
-      <>
+    name === 'native' && (<>
+        {/* A device, with the keyboard part of it rather than sitting on top:
+            one object, one outline, the keys cut from the same face as the
+            screen. That is the whole claim the card makes. */}
+        <rect x="14" y="10" width="68" height="76" rx="14" fill="var(--glyph-side)" />
+        <rect x="22" y="18" width="52" height="30" rx="5" fill="var(--glyph-face)" />
+        <path
+          d="M30 28h22M30 38h14"
+          stroke="var(--glyph-hole)"
+          stroke-width="4"
+          stroke-linecap="round"
+        />
+        <rect x="22" y="56" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="33" y="56" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="44" y="56" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="55" y="56" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="66" y="56" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="22" y="67" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="33" y="67" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="44" y="67" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="55" y="67" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="66" y="67" width="8" height="7" rx="2" fill="var(--glyph-face)" />
+        <rect x="33" y="78" width="30" height="7" rx="3" fill="var(--glyph-face)" />
+      </>)
+  }
+
+  {
+    name === 'free' && (<>
         {/* An open box: lid tilted back, so you can see there is nothing in it
             you were not told about. */}
         <path d="M48 46 16 60v20l32 14 32-14V60L48 46Z" fill="var(--glyph-side)" />
@@ -108,8 +122,7 @@ const { name, size = 96, class: className = '' } = Astro.props;
           stroke-width="6"
           stroke-linecap="round"
         />
-      </>
-    )
+      </>)
   }
 </svg>
 
@@ -117,9 +130,22 @@ const { name, size = 96, class: className = '' } = Astro.props;
   .glyph {
     /* Two tones and the ground the object is cut out of. Tokens rather than
        literals, so the objects follow the palette. */
-    --glyph-face: var(--color-brand);
-    --glyph-side: color-mix(in srgb, var(--color-brand) 45%, var(--color-ground));
-    --glyph-hole: var(--color-ground);
+    /*
+      Two flat tones, and both are set here rather than inherited, so a card
+      that wants a different colour hands one down as --glyph-accent.
+
+      The darker side is mixed against whatever the object is SITTING on, not
+      against the page. Mixing it with the ground made the side vanish as soon
+      as the card under it was lifted, the objects lost their form and read as
+      flat silhouettes.
+    */
+    --glyph-face: var(--glyph-accent, var(--color-brand));
+    --glyph-side: color-mix(in srgb,
+      var(--glyph-accent, var(--color-brand)) 45%,
+      var(--glyph-behind, var(--color-ground)));
+    /* A cut-out shows what is behind the object, which is the card it sits on
+       and not the page, the same reason --glyph-side mixes against it. */
+    --glyph-hole: var(--glyph-behind, var(--color-ground));
     display: block;
     max-width: 100%;
     height: auto;

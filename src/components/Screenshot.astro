@@ -31,8 +31,7 @@ const { src, alt, caption, width, motion } = Astro.props;
 <figure class="shot">
   <div class="shot__plinth" style={`--shot-w: ${width}px`}>
     {
-      motion ? (
-        /*
+      motion ? (/*
           A toggle, not a one-way door. The GIF used to replace the button
           outright: it could not be stopped, and the element that had focus
           left the document under the reader's feet. Pressing it again puts
@@ -48,10 +47,7 @@ const { src, alt, caption, width, motion } = Astro.props;
         >
           <Image src={motion.poster} alt={alt} width={width} densities={[1, 2]} loading="lazy" />
           <span class="shot__play-label">{motion.playLabel}</span>
-        </button>
-      ) : (
-        <Image src={src} alt={alt} width={width} densities={[1, 2]} loading="lazy" />
-      )
+        </button>) : (<Image src={src} alt={alt} width={width} densities={[1, 2]} loading="lazy" />)
     }
   </div>
   <figcaption class="shot__caption small">{caption}</figcaption>
@@ -126,7 +122,7 @@ const { src, alt, caption, width, motion } = Astro.props;
 
   .shot__play:hover .shot__play-label {
     border-color: var(--color-brand);
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   /* Playing. The chip is the only thing that says so, so it says it plainly. */
@@ -145,7 +141,7 @@ const { src, alt, caption, width, motion } = Astro.props;
 
 <script>
   // A GIF starts playing the moment it is decoded and has no way to honor
-  // prefers-reduced-motion, so it is only fetched when someone asks for it —
+  // prefers-reduced-motion, so it is only fetched when someone asks for it,
   // and it stops when they ask again. The <img> stays put: only its source
   // changes, so nothing moves, focus stays on the button, and the still frame
   // is still there to come back to.

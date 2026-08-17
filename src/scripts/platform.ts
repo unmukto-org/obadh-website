@@ -14,7 +14,7 @@
  * Between strings: the user agent is asked first and the platform hints only
  * answer if it said nothing. Every real browser names its system in the user
  * agent, while `userAgentData.platform` keeps reporting the true machine
- * through a user-agent override — so trusting the hint first would ignore what
+ * through a user-agent override, so trusting the hint first would ignore what
  * the reader's browser is telling us.
  */
 export type Platform =

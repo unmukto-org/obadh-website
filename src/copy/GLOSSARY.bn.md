@@ -92,19 +92,19 @@ needs to stop pronouncing the run as Bangla.
   reader spell them out in the wrong one. The two artifact sizes are decimal MB and the WASM
   figure is the file this site serves, `public/wasm/obadh_engine_bg.wasm`; the engine README's
   Performance Snapshot still says 280 KB, which is three minor releases stale.
-- **Not wrapped at all.** Roman input to the engine, which is `<code>` and nothing else — the
+- **Not wrapped at all.** Roman input to the engine, which is `<code>` and nothing else, the
   mono face carries no Bengali, and `.latin` on top of it would fight the code styling.
 - **Not wrapped, because it cannot be.** `requirement`, `action.label`, `action.note`,
   `PlatformRow.name`/`.line`/`.stateLabel`, `Composer`'s `hint`, `caption` and `noscript`, and
   `ogImageAlt` are rendered as plain text, not `set:html`. Markup in them ships as visible
   angle brackets. Latin runs in those fields stay bare; keep them short. On the home page
-  only `features.items[].body` and `avro.body[]` take `set:html` — every heading and lede
+  only `features.items[].body` and `avro.body[]` take `set:html`, every heading and lede
   there is plain text, which is why `845,461` sits bare in `open.lede`.
 - **Single Roman letters in a scheme-table note** stay bare, matching the English note column
   they sit beside in `src/data/scheme.ts`.
 
 **Platform names take Bangla; operating systems keep their identifier.** আইফোন, আইপ্যাড, ম্যাক,
-লিনাক্স, অ্যান্ড্রয়েড, উইন্ডোজ, ক্রোমওএস — but `iOS 18`, `iPadOS 18`, `macOS 15`. অ্যাপ স্টোর,
+লিনাক্স, অ্যান্ড্রয়েড, উইন্ডোজ, ক্রোমওএস, but `iOS 18`, `iPadOS 18`, `macOS 15`. অ্যাপ স্টোর,
 প্লে স্টোর and ডিসকর্ড are Bangla; they are places people talk about, not identifiers.
 
 **Headings and FAQ questions are spoken sentences**, so an English term inside one is written in
@@ -117,7 +117,7 @@ the FAQPage structured data, which is a second reason they stay clean.
 - **আপনি throughout**, on every page, including imperatives: লিখুন, দেখুন, খুলুন, বেছে নিন.
 - **People get the honorific**: তিনি, তাঁরা, যাঁরা, লিখেছেন, বলেন. That includes the reader,
   the four people behind Avro, contributors, and whoever builds Obadh. মানুষ as an indefinite
-  general subject keeps the plain verb — মানুষ লেখে, মানুষ যা বলে — but a definite group of
+  general subject keeps the plain verb (মানুষ লেখে, মানুষ যা বলে) but a definite group of
   people takes the honorific, including the readers of Bangla themselves.
 - **One anchor text per page, and the anchor carries পাতা.** The genitive form goes inside the
   link, the way the English side puts "page" inside it: ডাউনলোডের পাতায়, লেখার নিয়মের পাতায়,

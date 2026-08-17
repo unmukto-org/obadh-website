@@ -1,6 +1,5 @@
 ---
 import Base from './Base.astro';
-import Composer from '../components/Composer.astro';
 import Glyph from '../components/Glyph.astro';
 import HeroType from '../components/HeroType.astro';
 import InputBadge from '../components/InputBadge.astro';
@@ -39,7 +38,7 @@ const schema = [
     isAccessibleForFree: true,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     inLanguage: ['bn', 'en'],
-    author: { '@id': 'https://obadh.unmukto.org/#sayom' },
+    author: { '@id': 'https://obadh.unmukto.org/#unmukto' },
   },
 ];
 ---
@@ -59,7 +58,7 @@ const schema = [
   <!-- ----------------------------------------------------------------- hero -- -->
   <section class="relative isolate overflow-x-clip pt-14 pb-16 sm:pt-20 lg:pt-24">
     {/*
-      An alpona — the Bengali courtyard drawing, made freehand with rice paste
+      An alpona, the Bengali courtyard drawing, made freehand with rice paste
       for a festival, by anyone, belonging to no institution. Set far enough
       back to be atmosphere rather than decoration, and large enough that its
       outer rings run off both edges, so it reads as ground rather than as a
@@ -73,7 +72,7 @@ const schema = [
     {/*
       The alpona's centre is the sun. The light and the drawing are children of
       one box so they share a centre by construction rather than by two sets of
-      offsets that have to be kept in step — move the box and the sunrise moves
+      offsets that have to be kept in step, move the box and the sunrise moves
       with it.
     */}
     <div class="hero-sunrise" aria-hidden="true">
@@ -93,7 +92,7 @@ const schema = [
             >{c.hero.badgeWord}</span
           >{leadAfter}
         </span>
-        <span class="block text-brand">{c.hero.headingAccent}</span>
+        <span class="block text-brand-ink">{c.hero.headingAccent}</span>
       </h1>
 
       <p class="lede max-w-xl" data-reveal style="--reveal-delay: 70ms">{c.hero.lede}</p>
@@ -117,8 +116,7 @@ const schema = [
     <div class="shell">
       <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {
-          c.values.map((value, index) => (
-            <li
+          c.values.map((value, index) => (<li
               class="card value-card grid content-start justify-items-center gap-3 px-6 py-9 text-center sm:[grid-row:span_4] sm:grid-rows-subgrid"
               id={value.id}
               data-reveal
@@ -128,8 +126,7 @@ const schema = [
               <h2 class="text-lg font-semibold tracking-tight text-balance">{value.heading}</h2>
               <Glyph name={value.icon} size={104} class="value-card__glyph my-2" />
               <p class="text-sm text-muted">{value.body}</p>
-            </li>
-          ))
+            </li>))
         }
       </ul>
     </div>
@@ -201,19 +198,6 @@ const schema = [
     </div>
   </section>
 
-  <!-- ----------------------------------------------------------------- demo -- -->
-  <section class="section bg-veil" id="try">
-    <div class="shell shell-narrow grid justify-items-center gap-4 text-center">
-      <p class="eyebrow" data-reveal>{c.demo.label}</p>
-      <h2 class="max-w-[18ch] text-2xl font-semibold tracking-tight" data-reveal>
-        {c.demo.heading}
-      </h2>
-      <div class="mt-6 w-full" data-reveal style="--reveal-delay: 80ms">
-        <Composer label={c.demo.boxLabel} noscript={c.demo.noscript} />
-      </div>
-    </div>
-  </section>
-
   <!-- ----------------------------------------------------------------- avro -- -->
   <!--
     The one lit section on the site, and the place where keeping Avro's scheme
@@ -267,16 +251,14 @@ const schema = [
             { href: LINKS.github.engine, label: 'obadh_engine' },
             { href: LINKS.github.ios, label: 'obadh-ios' },
             { href: LINKS.github.macos, label: 'obadh-macos' },
-          ].map((repo) => (
-            <li>
+          ].map((repo) => (<li>
               <a
-                class="inline-flex min-h-11 items-center rounded-full border border-hair px-4 text-muted no-underline transition-colors hover:border-brand hover:text-brand"
+                class="inline-flex min-h-11 items-center rounded-full border border-hair px-4 text-muted no-underline transition-colors hover:border-brand hover:text-brand-ink"
                 href={repo.href}
               >
                 {repo.label}
               </a>
-            </li>
-          ))
+            </li>))
         }
       </ul>
 
@@ -287,7 +269,7 @@ const schema = [
 
 <style>
   /*
-    One alpona, entering from the left with most of itself off the page — an
+    One alpona, entering from the left with most of itself off the page, an
     arc of ornament rather than a medallion pasted on, with the light coming
     up out of the middle of it.
 
@@ -297,7 +279,7 @@ const schema = [
   */
   .hero-sunrise {
     position: absolute;
-    /* Centred on the page's top-left corner — the header is transparent and
+    /* Centred on the page's top-left corner, the header is transparent and
        sits above this, so a quarter of the drawing fans out of the corner and
        runs up behind the wordmark. -4.5rem is the header's own height, which
        the hero starts below. */
@@ -318,12 +300,10 @@ const schema = [
     position: absolute;
     inset: -150%;
     border-radius: 50%;
-    background: radial-gradient(
-      closest-side,
+    background: radial-gradient(closest-side,
       color-mix(in srgb, var(--color-deep) 46%, transparent) 0%,
       color-mix(in srgb, var(--color-deep) 22%, transparent) 34%,
-      transparent 68%
-    );
+      transparent 68%);
   }
 
   .hero-sunrise__art {
@@ -337,7 +317,7 @@ const schema = [
     /*
       The mask clears the middle and nothing else. The drawing's centre is its
       densest, most saturated point and it lands exactly where the wordmark
-      sits, so that much has to go — but there is no fade on the way out. The
+      sits, so that much has to go, but there is no fade on the way out. The
       alpona ends on its own outer petals, which is where it is meant to end;
       fading it there trimmed the one edge that gives it a shape.
     */
@@ -488,7 +468,7 @@ const schema = [
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    /* The words at the top, and the phone taking whatever height is left —
+    /* The words at the top, and the phone taking whatever height is left,
        which is what makes it hang off the bottom edge rather than float in the
        middle of an over-tall box. */
     .bento__tile--phone {

@@ -1,0 +1,203 @@
+---
+/**
+ * /developers/ introduces the engine as something to build on.
+ *
+ * Every version, feature name and API name on this page comes out of
+ * obadh_engine itself. The one section describing something unbuilt says so in
+ * its heading and carries a state chip, so nothing here can be mistaken for a
+ * thing you can install today.
+ */
+import Base from './Base.astro';
+import PageHead from '../components/PageHead.astro';
+import type { DevelopersContent } from '../copy/types';
+import { LINKS, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  content: DevelopersContent;
+}
+
+const { locale, content } = Astro.props;
+const c = content;
+
+/*
+  A sample may carry Bangla inside a string literal, and an unmarked Bangla run
+  on an English page is read out by an English voice. Escape the code, then
+  mark the Bangla runs. Splitting on a Bengali codepoint range is safe here
+  because nothing is split inside a word: the run is matched whole.
+*/
+const BENGALI = /([\u0980-\u09ff\u200c\u200d]+)/g;
+const escape = (text: string) =>
+  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const marked = (code: string) =>
+  escape(code).replace(BENGALI, '<span lang="bn">$1</span>');
+---
+
+<Base
+  locale={locale}
+  route="/developers/"
+  title={c.meta.title}
+  description={c.meta.description}
+  ogTitle={c.meta.ogTitle}
+  ogDescription={c.meta.ogDescription}
+>
+  <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
+
+  <div class="shell pb-24">
+    <!-- ------------------------------------------------------------ rust -- -->
+    <section class="pt-10" id="rust">
+      <div class="grid gap-3" data-reveal>
+        <h2 class="text-2xl font-semibold tracking-tight">{c.rust.heading}</h2>
+        <p class="max-w-2xl text-muted">{c.rust.lede}</p>
+      </div>
+
+      <ul class="grid gap-3 pt-8 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          c.rust.facts.map((fact, index) => (
+            <li
+              class="card grid content-start gap-1 p-5"
+              data-reveal
+              style={`--reveal-delay: ${index * 50}ms`}
+            >
+              <p class="eyebrow">{fact.term}</p>
+              <p class="text-sm">{fact.value}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="grid gap-4 pt-8">
+        {
+          c.rust.blocks.map((block) => (
+            <figure class="code" data-reveal>
+              <figcaption class="code__label">
+                <span>{block.label}</span>
+                <span class="code__lang">{block.lang}</span>
+              </figcaption>
+              <pre><code set:html={marked(block.code)} /></pre>
+            </figure>
+          ))
+        }
+      </div>
+
+      <p class="flex flex-wrap gap-x-6 gap-y-2 pt-6" data-reveal>
+        {c.rust.actions.map((action) => <a class="arrow" href={action.href}>{action.label}</a>)}
+      </p>
+    </section>
+
+    <!-- -------------------------------------------------- other languages -- -->
+    <section class="pt-20" id="other-languages">
+      <div class="grid gap-3" data-reveal>
+        <h2 class="text-2xl font-semibold tracking-tight">{c.bindings.heading}</h2>
+        <p class="max-w-2xl text-muted">{c.bindings.lede}</p>
+      </div>
+
+      <ul class="grid gap-3 pt-8">
+        {
+          c.bindings.rows.map((row, index) => (
+            <li
+              class="card grid gap-2 p-6 sm:grid-cols-[14rem_minmax(0,1fr)] sm:gap-6"
+              data-reveal
+              style={`--reveal-delay: ${index * 50}ms`}
+            >
+              <div class="grid content-start gap-1">
+                <p class="font-semibold">{row.name}</p>
+                <p class="font-mono text-xs text-brand-ink">{row.feature}</p>
+              </div>
+              <p class="text-sm text-muted" set:html={row.body} />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- -------------------------------------------------------- javascript -- -->
+    <section class="pt-20" id="javascript">
+      <div class="grid gap-3" data-reveal>
+        <p class="planned">{c.javascript.state}</p>
+        <h2 class="text-2xl font-semibold tracking-tight">{c.javascript.heading}</h2>
+        <p class="max-w-2xl text-muted">{c.javascript.lede}</p>
+      </div>
+
+      <div class="prose max-w-2xl pt-6" data-reveal>
+        {c.javascript.body.map((paragraph) => <p set:html={paragraph} />)}
+      </div>
+
+      <p class="pt-4" data-reveal>
+        <a class="arrow" href={c.javascript.action.href}>{c.javascript.action.label}</a>
+      </p>
+    </section>
+
+    <!-- ------------------------------------------------------------ repos -- -->
+    <section class="pt-20" id="repositories">
+      <h2 class="text-2xl font-semibold tracking-tight" data-reveal>{c.repos.heading}</h2>
+
+      <ul class="grid gap-3 pt-8">
+        {
+          c.repos.rows.map((repo) => (
+            <li class="grid gap-1 rounded-card border border-hair p-5 sm:grid-cols-[16rem_minmax(0,1fr)] sm:items-baseline sm:gap-6">
+              <a class="link font-mono text-sm" href={LINKS.github[repo.repo]}>
+                {repo.name}
+              </a>
+              <p class="text-sm text-muted">{repo.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .code {
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, #000 26%, var(--color-veil));
+    overflow: hidden;
+  }
+
+  .code__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 1.1rem;
+    border-block-end: 1px solid var(--color-hair);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+
+  .code__lang {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--color-faint);
+  }
+
+  /* Wide code scrolls inside its own box, never the page. */
+  .code pre {
+    margin: 0;
+    padding: 1.1rem;
+    overflow-x: auto;
+  }
+
+  .code code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--color-ink);
+    white-space: pre;
+  }
+
+  /* The one thing on this page that does not exist yet, said before it is
+     described rather than after. */
+  .planned {
+    justify-self: start;
+    border: 1px solid color-mix(in srgb, var(--color-ember) 45%, transparent);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-ember-ink);
+  }
+</style>

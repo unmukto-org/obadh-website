@@ -17,13 +17,13 @@ export interface HeroLine {
    * The suggestion bar at each keystroke, or 0 where it has nothing to offer.
    *
    * The bar's first slot is always the word as composed, which `steps` already
-   * carries, so it is not repeated here. `c` is the second text candidate —
-   * the correction the engine's autocorrect returns — and `e` is up to three
+   * carries, so it is not repeated here. `c` is the second text candidate,
+   * the correction the engine's autocorrect returns, and `e` is up to three
    * emoji from the keyboard's own table, which share the third slot.
    */
   bar: ({ c?: string; e?: string[] } | 0)[];
   /**
-   * The one tap in the line, at keystroke `at` — which is the last one when
+   * The one tap in the line, at keystroke `at`, which is the last one when
    * an emoji is taken, and the space that commits the word when a correction
    * is. `take` is the word or emoji itself, so the slot holding it can be
    * flashed, and `after` is the whole field the moment it lands.

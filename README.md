@@ -16,14 +16,14 @@ There is no light mode and no theme switch. The ground is Obadh's own deep teal 
 it is nearly black, and the bright teal from the app icon is the single accent. A palette tuned
 once is worth more than two half-tuned ones.
 
-Four planes and nothing else — `ground` is the page, `veil` and `raise` are the alternating bands
+Four planes and nothing else, `ground` is the page, `veil` and `raise` are the alternating bands
 that give a long page rhythm without rules drawn between its parts, and `card` is anything that
 sits on top. Depth is the hairline, not a shadow: on a dark ground a drop shadow is nearly
 invisible anyway.
 
 **One gradient on the whole site**, and it is the wide lift low in the home hero. Everything else
 is flat. An earlier pass had gradients on the headline, the Bangla, the buttons, every card face
-and four separate section washes at once, and the effect of that is cheapness rather than depth —
+and four separate section washes at once, and the effect of that is cheapness rather than depth,
 so if you are about to add a second one, don't.
 
 Two things that do not survive the dark ground and are handled explicitly: the QR on `/download/`
@@ -60,7 +60,7 @@ against what this site says, so each one is a sentence here that is not yet true
   field in the structured data, is waiting on two files. This is the shortest item on the list
   and the largest.
 - **A tagged release and a notarized DMG.** `git tag` in `obadh-macos` is empty, and
-  `dist/Obadh-0.1.0.dmg` fails `xcrun stapler validate` — it came from the `--unsigned` path
+  `dist/Obadh-0.1.0.dmg` fails `xcrun stapler validate`, it came from the `--unsigned` path
   that `scripts/package.sh` labels a local check. The word *notarized* appears in the home
   hero, on `/download/` and in the Mac platform row. It becomes true when `package.sh` runs
   with a Developer ID certificate and `stapler validate` passes.
@@ -112,9 +112,9 @@ The script normalises the file, splits every path into its subpaths, measures ea
 browser, drops the background, the frame and anything outside the artwork's own square, recolours,
 and writes the result out. Three colour modes:
 
-- **`--mono`** — what the site ships. One tone, written as a mask so the page supplies the colour.
-- **`--motifs`** — finds the parts of each ring and alternates the folk palette between them.
-- Neither — retunes the source's own fills onto the folk palette by hue and rasterises. For
+- **`--mono`**, what the site ships. One tone, written as a mask so the page supplies the colour.
+- **`--motifs`**, finds the parts of each ring and alternates the folk palette between them.
+- Neither, retunes the source's own fills onto the folk palette by hue and rasterises. For
   artwork that already has colour separation in it.
 
 #### How it is quieted
@@ -124,15 +124,15 @@ deliberate and the reverse of the obvious approach: dropping the opacity fades t
 with everything else, and this drawing ends on that rim. Low contrast keeps it a background;
 fading it just loses its edges.
 
-The mask over it in `HomePage.astro` is an **annulus, not a disc** — a mandala's centre is its
-densest point, and here that point lands exactly where the wordmark sits — and it has no outer
+The mask over it in `HomePage.astro` is an **annulus, not a disc**, a mandala's centre is its
+densest point, and here that point lands exactly where the wordmark sits, and it has no outer
 fade at all.
 
 #### `--motifs`, and how a ring is taken apart
 
 Worth keeping even though the site is currently mono, because the analysis is the useful part.
 
-Most of these drawings are traced line art. A whole band — all sixteen rim petals — is frequently a
+Most of these drawings are traced line art. A whole band (all sixteen rim petals) is frequently a
 *single contour*, and its inner detail is nested inside it as even-odd holes, so nothing in it is
 separately fillable. But the arithmetic says which is which: **arc length ÷ π·width** is exactly
 1.00 for a plain circle and 8× for a band that wanders.
@@ -159,7 +159,7 @@ Every one of these produced a plausible-looking but wrong result rather than an 
 - **Referenced `id`s must survive the cleanup.** Stripping every `id` dangles each `href="#…"` and
   `clip-path: url(#…)`, and the cut bands vanish while the rest of the drawing stays.
 - **Prefixed elements have to go before their namespace declarations do.** Strip `xmlns:sodipodi`
-  and leave a `<sodipodi:namedview>` behind and the file is no longer well-formed XML — the browser
+  and leave a `<sodipodi:namedview>` behind and the file is no longer well-formed XML, the browser
   refuses to parse it, and a mask that will not parse masks everything away.
 - **Measure every drawn leaf, at any depth.** These files nest paths in groups, and a cut band is a
   set of `<use>` elements; a selector that only sees top-level `<path>` crops the artwork down to
@@ -173,13 +173,13 @@ Every one of these produced a plausible-looking but wrong result rather than an 
 
 ### The rail, and why it is gone
 
-The site used to draw one horizontal stroke at the matra height of the Bangla it accompanied —
+The site used to draw one horizontal stroke at the matra height of the Bangla it accompanied,
 broken over Roman text, whole over Bangla, where it was not near the matra but *was* the matra
 extended leftward over the keystrokes that produced it.
 
 It is not on the site any more. At every real size it read as a line struck through the words
 rather than as the matra continuing, and it made the typing box look broken. What replaced it is
-the brand gradient on the Bangla itself: the same idea — this run is the output — carried by the
+the brand gradient on the Bangla itself: the same idea (this run is the output) carried by the
 colour of the letters instead of a rule over them. `scripts/measure-rail.mjs` still prints the
 metrics if the device is ever wanted back.
 
@@ -187,7 +187,7 @@ metrics if the device is ever wanted back.
 
 The keyboard, working, as the three surfaces it actually is: a field where the Bangla lands with
 the composing word underlined as marked text, the iOS suggestion bar under it, and the keys, which
-light as they are pressed — shift included, so you can watch it go down for the capital that makes
+light as they are pressed, shift included, so you can watch it go down for the capital that makes
 a long vowel. The keys are the app's own layout, from `KeyboardLayout.swift` in obadh-ios: three
 letter rows with shift and backspace inside the third, then `123`, the emoji key, space and return.
 
@@ -201,37 +201,37 @@ You write only the Roman. Everything else is read out of the shipped artifacts, 
 of them was got wrong by hand first:
 
 - **What each line composes**, and what it looks like after every keystroke, from the engine binary.
-- **The text candidates in the bar**, from the engine's own autocorrect — `obadh-autocorrect
+- **The text candidates in the bar**, from the engine's own autocorrect, `obadh-autocorrect
   suggest-fst` against `data/autocorrect/models/bn.fst`. So the pair offered for a mistyped word is
   the pair the keyboard would offer.
 - **The emoji**, from `emoji-bn.bin` in the obadh-ios repository: the same memory-mapped table the
   keyboard searches, word to up to three emoji, decoded straight from the binary. Picking them by
-  hand got five of seventeen wrong against it — চা is 🍵 and not ☕, বই is 📚 and not 📖 — and
+  hand got five of seventeen wrong against it (চা is 🍵 and not ☕, বই is 📚 and not 📖) and
   invented six more for words the keyboard has no emoji for at all.
 
 **Punctuation** is typed like anything else, and the engine composes it too: a plain `.` becomes a
 দাঁড়ি, digits become ০–৯, `,` `?` `!` and quotes pass through, and a dot between digits stays a dot
-(১২.৫). None of it is on the letters page, so it lights `123` — which is where you would have gone
+(১২.৫). None of it is on the letters page, so it lights `123`, which is where you would have gone
 to find it. Two rules follow, both enforced by the build: a word is stripped of its punctuation
 before the emoji table or the lexicon is asked, since neither has a key ending in a dari; and a line
 that ends in punctuation cannot end by *taking* an emoji, because the tap replaces the word being
-composed and the dari has already committed it. Corrections are the opposite — typing punctuation is
+composed and the dari has already committed it. Corrections are the opposite, typing punctuation is
 what commits an autocorrection on the phone, so those lines end on the punctuation mark and keep it.
 
 Some lines are **mistyped on purpose**, so the bar has a real correction to offer and the demo can
 take it. `"fix": "manus"` mistypes the last word; `"fix": {"manuSh": "manus"}` names a word anywhere
 in the line, and then the correction lands **on the space that commits it** and the typing carries on
-over the corrected word — which is where autocorrect actually happens on a phone, and the more
+over the corrected word, which is where autocorrect actually happens on a phone, and the more
 convincing of the two. Past that point the line is composed from the *right* spelling, because
 carrying on from the misspelling would un-correct the word as soon as the next letter went down. A line whose last word has an emoji types that word **twice**, and the second one is
-tapped away into the emoji — because tapping an emoji *replaces* the composed word (the typed text
+tapped away into the emoji, because tapping an emoji *replaces* the composed word (the typed text
 was the emoji's query), so typing it once and tapping would leave the sentence a word short.
 
 `skipWords` in the JSON steps the emoji lookup over words where the table is right and the sentence
 is not: না is ❌ because it means "no", but in ফুল ফুটুক না ফুটুক it is a negation and a red cross
 reads as an error.
 
-The set of lines is fetched from `/hero-lines.json` rather than inlined — 120 KB of JSON in the
+The set of lines is fetched from `/hero-lines.json` rather than inlined, 120 KB of JSON in the
 markup is more than the rest of the home page put together and cannot be cached. The first line is
 server-rendered, so the hero is complete before any script runs, and the rest arrive after.
 
@@ -289,8 +289,8 @@ platforms has to be the one showing.
 ## Never split Bangla into per-character elements
 
 Bengali shapes across characters. `া` and `ো` are combining marks belonging to the consonant
-before them, and conjuncts are formed from sequences. Give each code point its own element — the
-usual way to animate text letter by letter — and the browser has nothing to shape, so
+before them, and conjuncts are formed from sequences. Give each code point its own element, the
+usual way to animate text letter by letter, and the browser has nothing to shape, so
 `আমার সোনার বাংলা` renders as `আম ◌ার স ◌োনার`, every mark orphaned onto a dotted circle.
 Grapheme clusters are not enough either, because shaping crosses cluster boundaries.
 

@@ -8,7 +8,7 @@
  * line stands, a caret opens between হোক and উন্মুক্ত, and the added word is
  * written in above it by hand.
  *
- * That mark is the whole tribute — the line was already right, and this is one
+ * That mark is the whole tribute, the line was already right, and this is one
  * word added to it rather than a replacement for it. Nothing goes under it and
  * there is no caption. If a caption feels necessary, the caption is wrong.
  *
@@ -49,6 +49,16 @@ const { label } = Astro.props;
 </div>
 
 <style>
+  /*
+    How far the line has been written. A registered property so it can be
+    animated: an unregistered custom property would jump rather than sweep.
+  */
+  @property --drawn {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 100%;
+  }
+
   @property --written {
     syntax: '<percentage>';
     inherits: true;
@@ -69,6 +79,54 @@ const { label } = Astro.props;
     padding-block: 0.66em 0.06em;
     color: var(--color-ink);
     text-align: center;
+
+    /*
+      The ink, laid down left to right. A soft edge rather than a hard one, so
+      it reads as a nib leaving the page wet rather than as a wipe passing over
+      finished text.
+
+      Not a stroke-path draw-on: that needs single-stroke skeletons of each
+      letterform, and Bengali shapes conjuncts (ন্ম, ক্ত) across characters at
+      render time. Only the browser's own shaper gets those right, so the text
+      stays live text and the ink is a mask over it.
+    */
+    -webkit-mask-image: linear-gradient(90deg,
+      #000 calc(var(--drawn) - 4%),
+      transparent var(--drawn));
+    mask-image: linear-gradient(90deg, #000 calc(var(--drawn) - 4%), transparent var(--drawn));
+  }
+
+  [data-avro][data-armed] .avro__line {
+    --drawn: 0%;
+  }
+
+  [data-avro][data-armed][data-drawing] .avro__line {
+    animation: avro-write 1700ms var(--ease-out) forwards;
+  }
+
+  /*
+    The rhythm is a hand's, not a machine's: each word runs, then the pen
+    lifts for the space before the next one starts.
+  */
+  @keyframes avro-write {
+    0% {
+      --drawn: 0%;
+    }
+    24% {
+      --drawn: 30%;
+    }
+    32% {
+      --drawn: 33%;
+    }
+    54% {
+      --drawn: 57%;
+    }
+    62% {
+      --drawn: 60%;
+    }
+    100% {
+      --drawn: 114%;
+    }
   }
 
   /* The gap the caret opens in the line. It widens to make room for the word,
@@ -114,11 +172,9 @@ const { label } = Astro.props;
     white-space: nowrap;
     color: var(--color-brand);
     /* Laid down left to right by a mask, the way a pen lays down ink. */
-    -webkit-mask-image: linear-gradient(
-      90deg,
+    -webkit-mask-image: linear-gradient(90deg,
       #000 var(--written),
-      transparent var(--written)
-    );
+      transparent var(--written));
     mask-image: linear-gradient(90deg, #000 var(--written), transparent var(--written));
   }
 
@@ -158,6 +214,7 @@ const { label } = Astro.props;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .avro__line,
     .avro__insert,
     .avro__caret,
     .avro__word {
@@ -189,17 +246,18 @@ const { label } = Astro.props;
     // Until this attribute is set the CSS shows the finished mark, so nothing
     // is ever hidden by a script that failed to run.
     insert.dataset.armed = '';
+    root.dataset.armed = '';
 
     let done = false;
-    const watcher = new IntersectionObserver(
-      (entries) => {
+    const watcher = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting || done) continue;
           done = true;
           measure();
-          // Open the gap, then write into it.
-          window.setTimeout(() => (insert.dataset.open = ''), 300);
-          window.setTimeout(() => (insert.dataset.written = ''), 880);
+          // Write the line, then open the gap in it, then write into that.
+          root.dataset.drawing = '';
+          window.setTimeout(() => (insert.dataset.open = ''), 1500);
+          window.setTimeout(() => (insert.dataset.written = ''), 2050);
         }
       },
       { threshold: 0.55 },

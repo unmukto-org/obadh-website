@@ -22,7 +22,12 @@ export const SITE = {
   nameBn: 'অবাধ',
   /** Shipped inside the iOS app. Do not paraphrase it. */
   tagline: 'ভাষা হোক আরও উন্মুক্ত',
-  author: 'NSS Sayom',
+  /*
+    The project is the collective's, and the site never names an individual.
+    Unmukto is also the parent of this domain: obadh.unmukto.org.
+  */
+  author: 'Unmukto',
+  authorUrl: 'https://unmukto.org',
   license: 'MIT',
   /** Keep in step with the repos. */
   versions: {
@@ -62,7 +67,16 @@ export const LINKS = {
 export const PLACEHOLDER_LINKS = new Set<string>([LINKS.appStore, LINKS.macDmg, LINKS.discord]);
 
 /** Page paths, without locale prefix and always trailing-slashed. */
-export const ROUTES = ['/', '/download/', '/guide/', '/about/', '/faq/', '/contribute/', '/privacy/'] as const;
+export const ROUTES = [
+  '/',
+  '/download/',
+  '/guide/',
+  '/developers/',
+  '/about/',
+  '/faq/',
+  '/contribute/',
+  '/privacy/',
+] as const;
 export type Route = (typeof ROUTES)[number];
 
 /** `/about/` in English, `/bn/about/` in Bangla. */

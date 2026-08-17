@@ -10,7 +10,7 @@ import type { HomeContent } from '../types';
 */
 export const home: HomeContent = {
   meta: {
-    title: 'Obadh — a free, fast Bangla keyboard',
+    title: 'Obadh: a free, fast Bangla keyboard',
     description:
       'A free Bangla keyboard that is fast, gets the word right, and keeps everything on your device. On iPhone, iPad and Mac, with Linux, Android and Windows on the way.',
     ogTitle: 'Obadh: a free, fast Bangla keyboard',
@@ -38,34 +38,34 @@ export const home: HomeContent = {
       id: 'speed',
       icon: 'speed',
       label: 'Speed',
-      heading: 'Never keeps you waiting',
-      body: 'A word composes in about three microseconds, on a new phone or an old one.',
+      heading: 'Keeps up with you',
+      body: 'A word is ready in about three microseconds, on a new phone or an old one.',
     },
     {
       id: 'accurate',
       icon: 'accurate',
       label: 'Accuracy',
-      heading: 'Gets the word right',
+      heading: 'Gets the spelling right',
       body: 'Corrections come from 845,461 Bangla words, and the English ones people mix in.',
     },
     {
-      id: 'private',
-      icon: 'private',
-      label: 'Privacy',
-      heading: 'Your words never leave',
-      body: 'No account, no sync, no server. It all works in airplane mode.',
+      id: 'native',
+      icon: 'native',
+      label: 'Native',
+      heading: 'Works like your device',
+      body: 'The same keys and gestures your device already uses. Nothing new to learn.',
     },
     {
       id: 'free',
       icon: 'free',
       label: 'Free',
-      heading: 'Free, and open',
-      body: 'No price, no ads, nothing to upgrade to. MIT licensed, all of it.',
+      heading: 'Free, and open source',
+      body: 'Free to use, and MIT licensed, so anyone can read the code or build on it.',
     },
   ],
 
   /*
-    The visual block. Four tiles, a drawn keyboard and a grid of keys — the
+    The visual block. Four tiles, a drawn keyboard and a grid of keys, the
     things that are easier to look at than to read about. Each line here is one
     sentence, and if a tile needs two it is the wrong tile.
   */
@@ -149,10 +149,9 @@ export const home: HomeContent = {
   avro: {
     label: 'From Avro',
     heading: 'Nothing new to learn',
-    body: [
-      'Avro made it ordinary to write your own language in the letters you already had, and it cost nothing. Its scheme became what most people mean by typing Bangla. Obadh keeps those habits exactly: the same vowels, the same conjuncts, the same muscle memory.',
-      'What is new is underneath, and in how it feels while you use it.',
-    ],
+    // One line. The mark above it is the tribute; a paragraph explaining the
+    // mark would be a caption, and a caption here means the mark failed.
+    body: ['Avro made typing Bangla ordinary. Obadh keeps its scheme exactly. What is new is underneath.'],
     link: 'Where Obadh came from',
     markLabel:
       'Avro\u2019s line, <span lang="bn">ভাষা হোক উন্মুক্ত</span>, with one word written into it to make Obadh\u2019s: <span lang="bn">ভাষা হোক আরও উন্মুক্ত</span>.',

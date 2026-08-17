@@ -14,9 +14,12 @@ interface Props {
 const { locale, route, noSwitch = false } = Astro.props;
 const t = ui[locale];
 
+/* Download is not in this list. The Get Obadh button beside it goes to the
+   same page, and two controls a thumb-width apart pointing at one page is one
+   control too many. */
 const links = [
-  { route: '/download/', label: t.nav.download },
   { route: '/guide/', label: t.nav.guide },
+  { route: '/developers/', label: t.nav.developers },
   { route: '/about/', label: t.nav.about },
   { route: '/faq/', label: t.nav.faq },
   { route: '/contribute/', label: t.nav.contribute },
@@ -26,7 +29,7 @@ const links = [
 {/*
   No band. The header is transparent at the top of the page so the alpona
   behind the hero runs up through it, and takes the page's own colour once you
-  have scrolled past that — otherwise the words would sit on whatever happened
+  have scrolled past that, otherwise the words would sit on whatever happened
   to be underneath them. No border either way. The links are centred on the
   viewport independently of how wide the wordmark and the button happen to be.
 
@@ -59,8 +62,7 @@ const links = [
       aria-label={t.navMenu}
     >
       {
-        links.map((link) => (
-          <a
+        links.map((link) => (<a
             href={localizedPath(link.route, locale)}
             class:list={[
               'rounded-full px-4 py-2 text-sm no-underline transition-colors hover:text-ink',
@@ -69,8 +71,7 @@ const links = [
             aria-current={route === link.route ? 'page' : undefined}
           >
             {link.label}
-          </a>
-        ))
+          </a>))
       }
     </nav>
 
@@ -100,8 +101,7 @@ const links = [
       >
         <nav class="grid" aria-label={t.navMenu}>
           {
-            links.map((link) => (
-              <a
+            links.map((link) => (<a
                 href={localizedPath(link.route, locale)}
                 class:list={[
                   'site-menu__link flex min-h-11 items-center rounded-xl px-4 py-3 text-sm no-underline transition-colors hover:bg-raise hover:text-ink',
@@ -110,8 +110,7 @@ const links = [
                 aria-current={route === link.route ? 'page' : undefined}
               >
                 {link.label}
-              </a>
-            ))
+              </a>))
           }
         </nav>
 

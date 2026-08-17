@@ -10,7 +10,7 @@
  * nothing to do with this site. None of that should reach a browser.
  *
  * The work happens in a real browser rather than over the text, because the
- * file carries a flipping transform from the EPS conversion — every path's
+ * file carries a flipping transform from the EPS conversion, every path's
  * position on screen is the product of that matrix, so you cannot tell what is
  * artwork and what is furniture by reading the numbers.
  *
@@ -23,7 +23,7 @@
  * The last step is the surprising one. Kept as vector this is 325 KB, and 113
  * KB even gzipped, for six hundred paths the browser then has to rasterise on
  * every resize. It is a decorative background drawn at under half opacity
- * behind a mask, so vector precision buys nothing at all — a WebP at twice the
+ * behind a mask, so vector precision buys nothing at all, a WebP at twice the
  * size it is ever drawn is a fraction of the weight and costs the compositor
  * one texture.
  *
@@ -53,7 +53,7 @@ if (!SOURCE || !existsSync(SOURCE)) {
   so magenta has somewhere to go that is not the same as red.
 
   Colours are matched by hue rather than by an exact table, because these files
-  are traces and their fills come in drifts of near-duplicates — nine greens
+  are traces and their fills come in drifts of near-duplicates, nine greens
   that differ in the last digit, seven whites, four magentas. A lookup table
   would have to list every one of them and would break on the next artwork.
 */
@@ -86,7 +86,7 @@ function toHsl(hex) {
   if (!d) return { h: 0, s: 0, l };
   const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
   const h =
-    max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
   return { h: h * 60, s, l };
 }
 
@@ -107,7 +107,7 @@ function retune(hex) {
  *
  * This has to happen before anything is split up. A relative `m` starts from
  * wherever the previous subpath left off, so a subpath lifted out on its own
- * lands at the origin instead of where it belongs — which looks exactly like
+ * lands at the origin instead of where it belongs, which looks exactly like
  * artwork sitting outside the canvas, and gets thrown away.
  *
  * Only the commands these exports actually use. Anything else throws, and the
@@ -190,7 +190,7 @@ function absolutise(d) {
   separation in them to retune. It changes the output format as well as the
   colour, and both for the same reason.
 
-  Line art is the worst case for a lossy codec — every stroke is a hard edge —
+  Line art is the worst case for a lossy codec, every stroke is a hard edge,
   so the rangoli that costs 47 KB as AVIF costs 120 KB, and 300 KB as WebP.
   As a mask it is a few tens of kilobytes of vector, stays sharp at any size,
   and takes its colour from CSS.
@@ -213,7 +213,7 @@ await page.setContent(
   real artwork can be dropped on its own. Subpaths stay tagged with the path
   they came from and are put back together at the end, because `fill-rule:
   evenodd` only makes a hole where the inner shape shares a path element with
-  the outer one — regroup them by anything else and the middle of the drawing
+  the outer one, regroup them by anything else and the middle of the drawing
   fills in solid.
 
   A path whose commands this cannot read is kept whole. That is the safe
@@ -228,104 +228,105 @@ const split = (d) => {
   }
 };
 
-const result = await page.evaluate(({ stripBottom, mono, motifs, split: splitSource, folk }) => {
-  const svg = document.querySelector('#host svg');
+const result = await page.evaluate(
+  ({ stripBottom, mono, motifs, split: splitSource, folk }) => {
+    const svg = document.querySelector('#host svg');
 
-  // Some of these files carry a fixed pixel size and no viewBox, which pins
-  // them at their natural width and defeats every measurement below.
-  if (!svg.getAttribute('viewBox')) {
-    const w = svg.getAttribute('width');
-    const h = svg.getAttribute('height');
-    if (w && h) svg.setAttribute('viewBox', `0 0 ${parseFloat(w)} ${parseFloat(h)}`);
-  }
-  svg.removeAttribute('width');
-  svg.removeAttribute('height');
+    // Some of these files carry a fixed pixel size and no viewBox, which pins
+    // them at their natural width and defeats every measurement below.
+    if (!svg.getAttribute('viewBox')) {
+      const w = svg.getAttribute('width');
+      const h = svg.getAttribute('height');
+      if (w && h) svg.setAttribute('viewBox', `0 0 ${parseFloat(w)} ${parseFloat(h)}`);
+    }
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
 
-  const frame = svg.getBoundingClientRect();
+    const frame = svg.getBoundingClientRect();
 
-  /*
+    /*
     The artwork's own square. These files are sometimes taller than they are
     wide, with the drawing in the top square and a designer's mark in the band
-    below it — so the square is anchored at the top rather than centred.
+    below it, so the square is anchored at the top rather than centred.
   */
-  const side = Math.min(frame.width, frame.height);
-  const floor = frame.top + side;
+    const side = Math.min(frame.width, frame.height);
+    const floor = frame.top + side;
 
-  // Explode each path into its subpaths before anything is measured, keeping
-  // a note of which path each one came out of so they can be put back.
-  let group = 0;
-  for (const el of [...svg.querySelectorAll('path')]) {
-    const parts = splitSource[el.getAttribute('d')] ?? [el.getAttribute('d')];
-    group += 1;
-    if (parts.length < 2) {
-      el.setAttribute('data-group', String(group));
-      continue;
-    }
-    for (const d of parts) {
-      const clone = el.cloneNode(false);
-      clone.setAttribute('d', d);
-      clone.setAttribute('data-group', String(group));
-      el.before(clone);
-    }
-    el.remove();
-  }
-
-  const paths = [...svg.querySelectorAll('path')];
-  const dropped = { furniture: 0, mark: 0, crumb: 0 };
-  const unmapped = new Set();
-  const report = [];
-
-  for (const el of paths) {
-    const box = el.getBoundingClientRect();
-    const w = box.width / frame.width;
-    const h = box.height / frame.height;
-    // Where the top of this path sits down the artwork, 0 to 1.
-    const top = (box.top - frame.top) / frame.height;
-
-    const fill = (el.getAttribute('fill') ?? getComputedStyle(el).fill ?? '').toLowerCase();
-    const hex = fill.startsWith('rgb')
-      ? '#' +
-        fill
-          .match(/\d+/g)
-          .slice(0, 3)
-          .map((n) => Number(n).toString(16).padStart(2, '0'))
-          .join('')
-      : fill;
-
-    // The background and the frame: anything that spans nearly the whole box.
-    if (w > 0.92 && h > 0.92) {
+    // Explode each path into its subpaths before anything is measured, keeping
+    // a note of which path each one came out of so they can be put back.
+    let group = 0;
+    for (const el of [...svg.querySelectorAll('path')]) {
+      const parts = splitSource[el.getAttribute('d')] ?? [el.getAttribute('d')];
+      group += 1;
+      if (parts.length < 2) {
+        el.setAttribute('data-group', String(group));
+        continue;
+      }
+      for (const d of parts) {
+        const clone = el.cloneNode(false);
+        clone.setAttribute('d', d);
+        clone.setAttribute('data-group', String(group));
+        el.before(clone);
+      }
       el.remove();
-      dropped.furniture += 1;
-      continue;
-    }
-    // Anything below the artwork's own square: a designer's mark, or a stray
-    // fragment left by the trace.
-    if (box.top > floor - 1) {
-      el.remove();
-      dropped.mark += 1;
-      continue;
-    }
-    // A mark set along the bottom edge of the artwork itself.
-    if (stripBottom && top > 0.88) {
-      el.remove();
-      dropped.mark += 1;
-      continue;
-    }
-    // Invisible at any size this is drawn.
-    if (box.width < 0.6 && box.height < 0.6) {
-      el.remove();
-      dropped.crumb += 1;
-      continue;
     }
 
-    // Recoloured in Node, where the hue maths lives. The original has to come
-    // off: two fill attributes on one element is invalid, and the first wins.
-    el.removeAttribute('fill');
-    el.setAttribute('data-fill', mono ? '#000000' : hex);
-    el.removeAttribute('style');
-  }
+    const paths = [...svg.querySelectorAll('path')];
+    const dropped = { furniture: 0, mark: 0, crumb: 0 };
+    const unmapped = new Set();
+    const report = [];
 
-  /*
+    for (const el of paths) {
+      const box = el.getBoundingClientRect();
+      const w = box.width / frame.width;
+      const h = box.height / frame.height;
+      // Where the top of this path sits down the artwork, 0 to 1.
+      const top = (box.top - frame.top) / frame.height;
+
+      const fill = (el.getAttribute('fill') ?? getComputedStyle(el).fill ?? '').toLowerCase();
+      const hex = fill.startsWith('rgb')
+        ? '#' +
+          fill
+            .match(/\d+/g)
+            .slice(0, 3)
+            .map((n) => Number(n).toString(16).padStart(2, '0'))
+            .join('')
+        : fill;
+
+      // The background and the frame: anything that spans nearly the whole box.
+      if (w > 0.92 && h > 0.92) {
+        el.remove();
+        dropped.furniture += 1;
+        continue;
+      }
+      // Anything below the artwork's own square: a designer's mark, or a stray
+      // fragment left by the trace.
+      if (box.top > floor - 1) {
+        el.remove();
+        dropped.mark += 1;
+        continue;
+      }
+      // A mark set along the bottom edge of the artwork itself.
+      if (stripBottom && top > 0.88) {
+        el.remove();
+        dropped.mark += 1;
+        continue;
+      }
+      // Invisible at any size this is drawn.
+      if (box.width < 0.6 && box.height < 0.6) {
+        el.remove();
+        dropped.crumb += 1;
+        continue;
+      }
+
+      // Recoloured in Node, where the hue maths lives. The original has to come
+      // off: two fill attributes on one element is invalid, and the first wins.
+      el.removeAttribute('fill');
+      el.setAttribute('data-fill', mono ? '#000000' : hex);
+      el.removeAttribute('style');
+    }
+
+    /*
     Put the subpaths back together.
 
     This is not tidying, it is correctness: `fill-rule: evenodd` makes a hole
@@ -335,32 +336,32 @@ const result = await page.evaluate(({ stripBottom, mono, motifs, split: splitSou
 
     Which grouping is used decides what can be coloured, so there are two.
   */
-  const survivors = [...svg.querySelectorAll('path[data-group]')];
+    const survivors = [...svg.querySelectorAll('path[data-group]')];
 
-  if (!motifs) {
-    // One element per original path: the safe regrouping, and the only one
-    // that is certainly faithful.
-    const groups = new Map();
-    for (const el of survivors) {
-      const key = el.getAttribute('data-group');
-      if (!groups.has(key)) groups.set(key, { first: el, parts: [] });
-      groups.get(key).parts.push(el.getAttribute('d'));
-      if (groups.get(key).first !== el) el.remove();
-    }
-    for (const { first, parts } of groups.values()) {
-      first.setAttribute('d', parts.join(' '));
-      first.removeAttribute('data-group');
-    }
-  } else {
-    /*
+    if (!motifs) {
+      // One element per original path: the safe regrouping, and the only one
+      // that is certainly faithful.
+      const groups = new Map();
+      for (const el of survivors) {
+        const key = el.getAttribute('data-group');
+        if (!groups.has(key)) groups.set(key, { first: el, parts: [] });
+        groups.get(key).parts.push(el.getAttribute('d'));
+        if (groups.get(key).first !== el) el.remove();
+      }
+      for (const { first, parts } of groups.values()) {
+        first.setAttribute('d', parts.join(' '));
+        first.removeAttribute('data-group');
+      }
+    } else {
+      /*
       One element per SHAPE, and each shape coloured by where it sits in its
-      ring — which is how an alpona is actually coloured: a petal is one
+      ring, which is how an alpona is actually coloured: a petal is one
       colour, and its neighbour is another.
 
       A shape is an outer contour plus the contours nested inside it. Nesting
       is found by asking the browser whether one contour's fill covers a point
       that is genuinely on another, because comparing bounding boxes is quicker
-      and wrong — a petal's box encloses a neighbouring dot's box without the
+      and wrong, a petal's box encloses a neighbouring dot's box without the
       petal enclosing the dot.
 
       Shapes are then matched to each other by ARC LENGTH and radius, both of
@@ -368,87 +369,87 @@ const result = await page.evaluate(({ stripBottom, mono, motifs, split: splitSou
       degrees has a different width and height, which is what splits one ring
       of sixteen into groups of eight, four and two.
     */
-    const view = svg.viewBox.baseVal;
+      const view = svg.viewBox.baseVal;
 
-    /*
+      /*
       The drawing's centre, not the canvas's. These files are sometimes taller
-      than they are wide — a 1000x1080 box with the artwork in the top square —
+      than they are wide, a 1000x1080 box with the artwork in the top square,
       so the viewBox centre sits below the mandala and every wedge cut lands
       off-axis.
     */
-    const scale = view.width / frame.width;
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const el of survivors) {
-      const b = el.getBoundingClientRect();
-      minX = Math.min(minX, b.left);
-      minY = Math.min(minY, b.top);
-      maxX = Math.max(maxX, b.right);
-      maxY = Math.max(maxY, b.bottom);
-    }
-    const cx = view.x + ((minX + maxX) / 2 - frame.left) * scale;
-    const cy = view.y + ((minY + maxY) / 2 - frame.top) * scale;
-
-    const shapes = survivors.map((el) => {
-      const b = el.getBBox();
-      let length = 0;
-      try {
-        length = el.getTotalLength();
-      } catch {
-        length = 0;
+      const scale = view.width / frame.width;
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      for (const el of survivors) {
+        const b = el.getBoundingClientRect();
+        minX = Math.min(minX, b.left);
+        minY = Math.min(minY, b.top);
+        maxX = Math.max(maxX, b.right);
+        maxY = Math.max(maxY, b.bottom);
       }
-      const mx = b.x + b.width / 2;
-      const my = b.y + b.height / 2;
-      return {
-        el,
-        length,
-        area: b.width * b.height,
-        radius: Math.hypot(mx - cx, my - cy),
-        angle: (Math.atan2(my - cy, mx - cx) * 180) / Math.PI,
-        mark: el.getPointAtLength(0),
-        parent: -1,
+      const cx = view.x + ((minX + maxX) / 2 - frame.left) * scale;
+      const cy = view.y + ((minY + maxY) / 2 - frame.top) * scale;
+
+      const shapes = survivors.map((el) => {
+        const b = el.getBBox();
+        let length = 0;
+        try {
+          length = el.getTotalLength();
+        } catch {
+          length = 0;
+        }
+        const mx = b.x + b.width / 2;
+        const my = b.y + b.height / 2;
+        return {
+          el,
+          length,
+          area: b.width * b.height,
+          radius: Math.hypot(mx - cx, my - cy),
+          angle: (Math.atan2(my - cy, mx - cx) * 180) / Math.PI,
+          mark: el.getPointAtLength(0),
+          parent: -1,
+        };
+      });
+
+      for (const [i, shape] of shapes.entries()) {
+        for (const [j, other] of shapes.entries()) {
+          if (i === j || other.area <= shape.area) continue;
+          if (!other.el.isPointInFill(shape.mark)) continue;
+          if (shape.parent === -1 || other.area < shapes[shape.parent].area) shape.parent = j;
+        }
+      }
+
+      // Even nesting depth is solid, odd is a hole in whatever contains it.
+      const depthOf = (i) => {
+        let d = 0;
+        let at = shapes[i].parent;
+        while (at !== -1) {
+          d += 1;
+          at = shapes[at].parent;
+        }
+        return d;
       };
-    });
+      const rootOf = (i) => {
+        let at = i;
+        while (depthOf(at) % 2 === 1) at = shapes[at].parent;
+        return at;
+      };
 
-    for (const [i, shape] of shapes.entries()) {
-      for (const [j, other] of shapes.entries()) {
-        if (i === j || other.area <= shape.area) continue;
-        if (!other.el.isPointInFill(shape.mark)) continue;
-        if (shape.parent === -1 || other.area < shapes[shape.parent].area) shape.parent = j;
+      const merged = new Map();
+      for (const [i, shape] of shapes.entries()) {
+        const root = rootOf(i);
+        if (!merged.has(root)) merged.set(root, []);
+        merged.get(root).push(shape);
+        if (root !== i) shape.el.remove();
       }
-    }
 
-    // Even nesting depth is solid, odd is a hole in whatever contains it.
-    const depthOf = (i) => {
-      let d = 0;
-      let at = shapes[i].parent;
-      while (at !== -1) {
-        d += 1;
-        at = shapes[at].parent;
-      }
-      return d;
-    };
-    const rootOf = (i) => {
-      let at = i;
-      while (depthOf(at) % 2 === 1) at = shapes[at].parent;
-      return at;
-    };
-
-    const merged = new Map();
-    for (const [i, shape] of shapes.entries()) {
-      const root = rootOf(i);
-      if (!merged.has(root)) merged.set(root, []);
-      merged.get(root).push(shape);
-      if (root !== i) shape.el.remove();
-    }
-
-    /*
+      /*
       Colour by what each part IS.
 
-      A ring's parts are already separate subpaths in the file — the scalloped
-      rim, the plain circle inside it, the curl band, the petals — so they can
+      A ring's parts are already separate subpaths in the file, the scalloped
+      rim, the plain circle inside it, the curl band, the petals, so they can
       be told apart and coloured individually. Cutting a ring into angular
       wedges instead was the wrong model: it slices through geometry that has
       its own internal structure, so a petal comes out half one colour.
@@ -456,8 +457,8 @@ const result = await page.evaluate(({ stripBottom, mono, motifs, split: splitSou
       Three kinds, and the arithmetic tells them apart:
 
         A plain circle. Centred, and its arc length is pi times its width. This
-        is a structural line — the circle inside the outer rim, the one round
-        the middle — and it takes a colour of its own.
+        is a structural line, the circle inside the outer rim, the one round
+        the middle, and it takes a colour of its own.
 
         A band contour. Centred, but longer than a circle of its width: the
         scalloped rim is 1.33 times, the curl band 5.19. The whole band is one
@@ -466,42 +467,45 @@ const result = await page.evaluate(({ stripBottom, mono, motifs, split: splitSou
         A motif. Off centre, and one of a family that repeats round a ring.
         Those alternate, which is where an alpona's colour actually comes from.
     */
-    const roundness = (el, len) => {
-      const b = el.getBBox();
-      const wide = Math.max(b.width, b.height);
-      return wide ? len / (Math.PI * wide) : 0;
-    };
-
-    const RINGS = [folk.vermilion, folk.mustard, folk.jade, folk.indigo];
-    const PAIRS = [
-      [folk.vermilion, folk.mustard],
-      [folk.jade, folk.indigo],
-      [folk.mustard, folk.rose],
-      [folk.indigo, folk.jade],
-    ];
-
-    const structural = [];
-    const motifs = [];
-
-    for (const [root, parts] of merged.entries()) {
-      const el = shapes[root].el;
-      el.setAttribute('d', parts.map((part) => part.el.getAttribute('d')).join(' '));
-      el.removeAttribute('data-group');
-
-      const b = el.getBBox();
-      const centred = shapes[root].radius < Math.max(8, view.width * 0.012);
-      const entry = {
-        el,
-        radius: shapes[root].radius,
-        angle: shapes[root].angle,
-        length: parts.reduce((sum, part) => sum + part.length, 0),
-        reach: Math.hypot(b.width, b.height) / 2,
-        round: roundness(el, parts.reduce((sum, part) => sum + part.length, 0)),
+      const roundness = (el, len) => {
+        const b = el.getBBox();
+        const wide = Math.max(b.width, b.height);
+        return wide ? len / (Math.PI * wide) : 0;
       };
-      (centred ? structural : motifs).push(entry);
-    }
 
-    /*
+      const RINGS = [folk.vermilion, folk.mustard, folk.jade, folk.indigo];
+      const PAIRS = [
+        [folk.vermilion, folk.mustard],
+        [folk.jade, folk.indigo],
+        [folk.mustard, folk.rose],
+        [folk.indigo, folk.jade],
+      ];
+
+      const structural = [];
+      const motifs = [];
+
+      for (const [root, parts] of merged.entries()) {
+        const el = shapes[root].el;
+        el.setAttribute('d', parts.map((part) => part.el.getAttribute('d')).join(' '));
+        el.removeAttribute('data-group');
+
+        const b = el.getBBox();
+        const centred = shapes[root].radius < Math.max(8, view.width * 0.012);
+        const entry = {
+          el,
+          radius: shapes[root].radius,
+          angle: shapes[root].angle,
+          length: parts.reduce((sum, part) => sum + part.length, 0),
+          reach: Math.hypot(b.width, b.height) / 2,
+          round: roundness(
+            el,
+            parts.reduce((sum, part) => sum + part.length, 0),
+          ),
+        };
+        (centred ? structural : motifs).push(entry);
+      }
+
+      /*
       A band drawn as one contour is one colour all the way round, which is the
       opposite of how an alpona works. It can be cut, but only where the
       drawing itself has a seam.
@@ -514,207 +518,218 @@ const result = await page.evaluate(({ stripBottom, mono, motifs, split: splitSou
 
       This is what the earlier attempt got wrong. It cut at evenly spaced
       angles guessed from an ink histogram, which lands boundaries down the
-      middle of petals — the drawing came back with petals half one colour.
+      middle of petals, the drawing came back with petals half one colour.
     */
-    function seamsOf(el) {
-      const total = el.getTotalLength();
-      if (!total) return [];
+      function seamsOf(el) {
+        const total = el.getTotalLength();
+        if (!total) return [];
 
-      const BINS = 720;
-      const envelope = new Array(BINS).fill(0);
-      const samples = Math.min(4000, Math.max(1200, Math.round(total / 2)));
+        const BINS = 720;
+        const envelope = new Array(BINS).fill(0);
+        const samples = Math.min(4000, Math.max(1200, Math.round(total / 2)));
 
-      for (let i = 0; i < samples; i++) {
-        const pt = el.getPointAtLength((i / samples) * total);
-        const dx = pt.x - cx;
-        const dy = pt.y - cy;
-        let a = (Math.atan2(dy, dx) * 180) / Math.PI;
-        if (a < 0) a += 360;
-        const bin = Math.min(BINS - 1, Math.floor((a / 360) * BINS));
-        envelope[bin] = Math.max(envelope[bin], Math.hypot(dx, dy));
-      }
-
-      // Bins the outline never reached are not valleys, they are gaps in the
-      // sampling; fill them from their neighbours.
-      for (let i = 0; i < BINS; i++) {
-        if (envelope[i] > 0) continue;
-        let back = i;
-        let forward = i;
-        while (envelope[(back + BINS) % BINS] === 0) back -= 1;
-        while (envelope[forward % BINS] === 0) forward += 1;
-        envelope[i] = Math.min(envelope[(back + BINS) % BINS], envelope[forward % BINS]);
-      }
-
-      const high = Math.max(...envelope);
-      const low = Math.min(...envelope);
-      if (high - low < high * 0.04) return []; // A plain ring: no petals, no seams.
-
-      // A valley is a bin lower than everything within a window either side.
-      const window = 6;
-      const valleys = [];
-      for (let i = 0; i < BINS; i++) {
-        let lowest = true;
-        for (let k = -window; k <= window && lowest; k++) {
-          if (k === 0) continue;
-          if (envelope[(i + k + BINS) % BINS] < envelope[i]) lowest = false;
+        for (let i = 0; i < samples; i++) {
+          const pt = el.getPointAtLength((i / samples) * total);
+          const dx = pt.x - cx;
+          const dy = pt.y - cy;
+          let a = (Math.atan2(dy, dx) * 180) / Math.PI;
+          if (a < 0) a += 360;
+          const bin = Math.min(BINS - 1, Math.floor((a / 360) * BINS));
+          envelope[bin] = Math.max(envelope[bin], Math.hypot(dx, dy));
         }
-        if (lowest) valleys.push(i);
+
+        // Bins the outline never reached are not valleys, they are gaps in the
+        // sampling; fill them from their neighbours.
+        for (let i = 0; i < BINS; i++) {
+          if (envelope[i] > 0) continue;
+          let back = i;
+          let forward = i;
+          while (envelope[(back + BINS) % BINS] === 0) back -= 1;
+          while (envelope[forward % BINS] === 0) forward += 1;
+          envelope[i] = Math.min(envelope[(back + BINS) % BINS], envelope[forward % BINS]);
+        }
+
+        const high = Math.max(...envelope);
+        const low = Math.min(...envelope);
+        if (high - low < high * 0.04) return []; // A plain ring: no petals, no seams.
+
+        // A valley is a bin lower than everything within a window either side.
+        const window = 6;
+        const valleys = [];
+        for (let i = 0; i < BINS; i++) {
+          let lowest = true;
+          for (let k = -window; k <= window && lowest; k++) {
+            if (k === 0) continue;
+            if (envelope[(i + k + BINS) % BINS] < envelope[i]) lowest = false;
+          }
+          if (lowest) valleys.push(i);
+        }
+
+        // Collapse runs of equal-depth bins to one seam each.
+        const seams = [];
+        for (const v of valleys) {
+          const last = seams[seams.length - 1];
+          if (last !== undefined && v - last <= window) continue;
+          seams.push(v);
+        }
+        return seams.length >= 6 ? seams.map((bin) => (bin / BINS) * 360) : [];
       }
 
-      // Collapse runs of equal-depth bins to one seam each.
-      const seams = [];
-      for (const v of valleys) {
-        const last = seams[seams.length - 1];
-        if (last !== undefined && v - last <= window) continue;
-        seams.push(v);
-      }
-      return seams.length >= 6 ? seams.map((bin) => (bin / BINS) * 360) : [];
-    }
-
-    const defs =
-      svg.querySelector('defs') ??
-      svg.insertBefore(document.createElementNS('http://www.w3.org/2000/svg', 'defs'), svg.firstChild);
-    const far = Math.max(view.width, view.height) * 1.6;
-    let uid = 0;
-
-    structural.sort((a, b) => b.reach - a.reach);
-    for (const [i, part] of structural.entries()) {
-      const seams = part.round > 1.06 ? seamsOf(part.el) : [];
-      report.push({ radius: Math.round(part.reach), order: seams.length, parts: Number(part.round.toFixed(2)) });
-
-      if (seams.length < 6) {
-        // A plain circle, or a band with no seam to cut on.
-        part.el.setAttribute('data-fill', RINGS[i % RINGS.length]);
-        continue;
-      }
-
-      uid += 1;
-      const id = `alpona-band-${uid}`;
-      const def = part.el.cloneNode(false);
-      def.setAttribute('id', id);
-      def.removeAttribute('data-fill');
-      defs.append(def);
-
-      const pair = PAIRS[i % PAIRS.length];
-      for (let k = 0; k < seams.length; k++) {
-        const from = (seams[k] * Math.PI) / 180;
-        const to = (seams[(k + 1) % seams.length] * Math.PI) / 180 + (k === seams.length - 1 ? Math.PI * 2 : 0);
-
-        const clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-        clip.setAttribute('id', `${id}-s${k}`);
-        const wedge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        const sweep = to - from > Math.PI ? 1 : 0;
-        wedge.setAttribute(
-          'd',
-          `M${cx.toFixed(1)} ${cy.toFixed(1)}` +
-            `L${(cx + far * Math.cos(from)).toFixed(1)} ${(cy + far * Math.sin(from)).toFixed(1)}` +
-            `A${far.toFixed(1)} ${far.toFixed(1)} 0 ${sweep} 1 ` +
-            `${(cx + far * Math.cos(to)).toFixed(1)} ${(cy + far * Math.sin(to)).toFixed(1)}Z`,
+      const defs =
+        svg.querySelector('defs') ??
+        svg.insertBefore(
+          document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
+          svg.firstChild,
         );
-        clip.append(wedge);
-        defs.append(clip);
+      const far = Math.max(view.width, view.height) * 1.6;
+      let uid = 0;
 
-        const slice = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        slice.setAttribute('href', `#${id}`);
-        slice.setAttribute('clip-path', `url(#${id}-s${k})`);
-        slice.setAttribute('data-fill', pair[k % 2]);
-        part.el.before(slice);
+      structural.sort((a, b) => b.reach - a.reach);
+      for (const [i, part] of structural.entries()) {
+        const seams = part.round > 1.06 ? seamsOf(part.el) : [];
+        report.push({
+          radius: Math.round(part.reach),
+          order: seams.length,
+          parts: Number(part.round.toFixed(2)),
+        });
+
+        if (seams.length < 6) {
+          // A plain circle, or a band with no seam to cut on.
+          part.el.setAttribute('data-fill', RINGS[i % RINGS.length]);
+          continue;
+        }
+
+        uid += 1;
+        const id = `alpona-band-${uid}`;
+        const def = part.el.cloneNode(false);
+        def.setAttribute('id', id);
+        def.removeAttribute('data-fill');
+        defs.append(def);
+
+        const pair = PAIRS[i % PAIRS.length];
+        for (let k = 0; k < seams.length; k++) {
+          const from = (seams[k] * Math.PI) / 180;
+          const to =
+            (seams[(k + 1) % seams.length] * Math.PI) / 180 +
+            (k === seams.length - 1 ? Math.PI * 2 : 0);
+
+          const clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+          clip.setAttribute('id', `${id}-s${k}`);
+          const wedge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          const sweep = to - from > Math.PI ? 1 : 0;
+          wedge.setAttribute(
+            'd',
+            `M${cx.toFixed(1)} ${cy.toFixed(1)}` +
+              `L${(cx + far * Math.cos(from)).toFixed(1)} ${(cy + far * Math.sin(from)).toFixed(1)}` +
+              `A${far.toFixed(1)} ${far.toFixed(1)} 0 ${sweep} 1 ` +
+              `${(cx + far * Math.cos(to)).toFixed(1)} ${(cy + far * Math.sin(to)).toFixed(1)}Z`,
+          );
+          clip.append(wedge);
+          defs.append(clip);
+
+          const slice = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+          slice.setAttribute('href', `#${id}`);
+          slice.setAttribute('clip-path', `url(#${id}-s${k})`);
+          slice.setAttribute('data-fill', pair[k % 2]);
+          part.el.before(slice);
+        }
+        part.el.remove();
       }
-      part.el.remove();
-    }
 
-    // Motif families: same arc length, same distance out, whatever the angle.
-    const families = [];
-    for (const motif of motifs) {
-      const found = families.find(
-        (f) =>
-          Math.abs(f.length - motif.length) / Math.max(f.length, motif.length, 1) < 0.06 &&
-          Math.abs(f.radius - motif.radius) < Math.max(10, motif.radius * 0.08),
+      // Motif families: same arc length, same distance out, whatever the angle.
+      const families = [];
+      for (const motif of motifs) {
+        const found = families.find(
+          (f) =>
+            Math.abs(f.length - motif.length) / Math.max(f.length, motif.length, 1) < 0.06 &&
+            Math.abs(f.radius - motif.radius) < Math.max(10, motif.radius * 0.08),
+        );
+        if (found) found.members.push(motif);
+        else families.push({ length: motif.length, radius: motif.radius, members: [motif] });
+      }
+
+      families.sort((a, b) => a.radius - b.radius);
+      for (const family of families) {
+        report.push({
+          kind: 'family',
+          count: family.members.length,
+          radius: Math.round(family.radius),
+          length: Math.round(family.length),
+        });
+      }
+      for (const [fi, family] of families.entries()) {
+        family.members.sort((a, b) => a.angle - b.angle);
+        const pair = PAIRS[fi % PAIRS.length];
+        for (const [mi, member] of family.members.entries()) {
+          member.el.setAttribute('data-fill', family.members.length >= 4 ? pair[mi % 2] : pair[0]);
+        }
+      }
+
+      report.push(
+        ...structural.map((x) => ({
+          radius: Math.round(x.reach),
+          order: 0,
+          parts: Number(x.round.toFixed(2)),
+        })),
       );
-      if (found) found.members.push(motif);
-      else families.push({ length: motif.length, radius: motif.radius, members: [motif] });
     }
 
-    families.sort((a, b) => a.radius - b.radius);
-    for (const family of families) {
-      report.push({
-        kind: 'family',
-        count: family.members.length,
-        radius: Math.round(family.radius),
-        length: Math.round(family.length),
-      });
-    }
-    for (const [fi, family] of families.entries()) {
-      family.members.sort((a, b) => a.angle - b.angle);
-      const pair = PAIRS[fi % PAIRS.length];
-      for (const [mi, member] of family.members.entries()) {
-        member.el.setAttribute('data-fill', family.members.length >= 4 ? pair[mi % 2] : pair[0]);
-      }
-    }
-
-    report.push(
-      ...structural.map((x) => ({
-        radius: Math.round(x.reach),
-        order: 0,
-        parts: Number(x.round.toFixed(2)),
-      })),
-    );
-  }
-
-  /*
+    /*
     Retighten the viewBox onto what is left, now that the frame and the mark
     are gone. The measurement has to come from screen rectangles: the paths sit
     under the EPS conversion's flipping matrix, so `svg.getBBox()` reports the
     union in pre-transform coordinates and crops the wrong region entirely.
   */
-  const box = svg.viewBox.baseVal;
-  const ratio = box.width / frame.width;
-  let left = Infinity;
-  let top2 = Infinity;
-  let right = -Infinity;
-  let bottom = -Infinity;
+    const box = svg.viewBox.baseVal;
+    const ratio = box.width / frame.width;
+    let left = Infinity;
+    let top2 = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
 
-  // Every leaf that actually draws, at any nesting depth — these files wrap
-  // their paths in groups, and a wedge-cut band is a set of <use> elements.
-  // Measuring only top-level <path> crops the artwork to whatever is left.
-  for (const el of svg.querySelectorAll('path, use, circle, rect, ellipse, polygon, line')) {
-    if (el.closest('defs')) continue;
-    const b = el.getBoundingClientRect();
-    left = Math.min(left, b.left);
-    top2 = Math.min(top2, b.top);
-    right = Math.max(right, b.right);
-    bottom = Math.max(bottom, b.bottom);
-  }
+    // Every leaf that actually draws, at any nesting depth, these files wrap
+    // their paths in groups, and a wedge-cut band is a set of <use> elements.
+    // Measuring only top-level <path> crops the artwork to whatever is left.
+    for (const el of svg.querySelectorAll('path, use, circle, rect, ellipse, polygon, line')) {
+      if (el.closest('defs')) continue;
+      const b = el.getBoundingClientRect();
+      left = Math.min(left, b.left);
+      top2 = Math.min(top2, b.top);
+      right = Math.max(right, b.right);
+      bottom = Math.max(bottom, b.bottom);
+    }
 
-  const pad = 4;
-  svg.setAttribute(
-    'viewBox',
-    [
-      (box.x + (left - frame.left) * ratio - pad).toFixed(1),
-      (box.y + (top2 - frame.top) * ratio - pad).toFixed(1),
-      ((right - left) * ratio + pad * 2).toFixed(1),
-      ((bottom - top2) * ratio + pad * 2).toFixed(1),
-    ].join(' '),
-  );
-  svg.removeAttribute('width');
-  svg.removeAttribute('height');
+    const pad = 4;
+    svg.setAttribute(
+      'viewBox',
+      [
+        (box.x + (left - frame.left) * ratio - pad).toFixed(1),
+        (box.y + (top2 - frame.top) * ratio - pad).toFixed(1),
+        ((right - left) * ratio + pad * 2).toFixed(1),
+        ((bottom - top2) * ratio + pad * 2).toFixed(1),
+      ].join(' '),
+    );
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
 
-  return {
-    markup: new XMLSerializer().serializeToString(svg),
-    kept: svg.querySelectorAll('path').length,
-    dropped,
-    unmapped: [...unmapped],
-    report,
-  };
-}, {
-  stripBottom: process.argv.includes('--strip-bottom'),
-  mono: MONO,
-  motifs: MOTIFS,
-  folk: FOLK,
-  split: Object.fromEntries(
-    [...source.matchAll(/<path\b[^>]*?\bd="([^"]+)"/gs)].map((m) => [m[1], split(m[1])]),
-  ),
-});
+    return {
+      markup: new XMLSerializer().serializeToString(svg),
+      kept: svg.querySelectorAll('path').length,
+      dropped,
+      unmapped: [...unmapped],
+      report,
+    };
+  },
+  {
+    stripBottom: process.argv.includes('--strip-bottom'),
+    mono: MONO,
+    motifs: MOTIFS,
+    folk: FOLK,
+    split: Object.fromEntries(
+      [...source.matchAll(/<path\b[^>]*?\bd="([^"]+)"/gs)].map((m) => [m[1], split(m[1])]),
+    ),
+  },
+);
 
 await browser.close();
 
@@ -731,7 +746,7 @@ out = out
   //
   // The prefixed ELEMENTS have to go before their namespace declarations do.
   // Strip `xmlns:sodipodi` and leave a `<sodipodi:namedview>` behind and the
-  // file is no longer well-formed XML — the browser refuses to parse it, and a
+  // file is no longer well-formed XML, the browser refuses to parse it, and a
   // mask that will not parse silently masks everything away.
   .replace(/<(sodipodi|inkscape|dc|cc|rdf):[\w-]+[\s\S]*?(?:\/>|<\/\1:[\w-]+>)/g, '')
   .replace(/<metadata[\s\S]*?<\/metadata>/g, '')

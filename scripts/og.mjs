@@ -44,9 +44,7 @@ const MARK_PATH =
 
 async function inlineFonts() {
   const css = await readFile(join(FONTS, 'fonts.css'), 'utf8');
-  const wanted = new Set(
-    [...css.matchAll(/url\(\/fonts\/([\w-]+\.woff2)\)/g)].map((m) => m[1]),
-  );
+  const wanted = new Set([...css.matchAll(/url\(\/fonts\/([\w-]+\.woff2)\)/g)].map((m) => m[1]));
   let out = css;
   for (const file of wanted) {
     const bytes = await readFile(join(FONTS, file));
@@ -73,7 +71,7 @@ function page(card) {
     Two pairs go side by side, not one above the other. Stacked, the second
     pair pushed the wordmark off the bottom edge of the 630px canvas, and the
     only way to fit both vertically was to shrink them to the point where the
-    conjunct — the whole reason the guide card shows one — stopped reading at
+    conjunct (the whole reason the guide card shows one) stopped reading at
     the 300px an unfurl renders at. Side by side there is room to go larger
     instead: two columns of 372px, inside the 406px this row has.
   */
@@ -144,7 +142,10 @@ function page(card) {
 
 await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch({ executablePath: findExecutable() });
-const context = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+const context = await browser.newContext({
+  viewport: { width: 1200, height: 630 },
+  deviceScaleFactor: 1,
+});
 const tab = await context.newPage();
 
 let overflowed = 0;
@@ -155,7 +156,7 @@ for (const card of CARDS) {
 
   /*
     A card that overruns the canvas still writes a PNG, and the only sign is
-    the wordmark sliced by the bottom edge — which is how the two-row guide
+    the wordmark sliced by the bottom edge, which is how the two-row guide
     card shipped. Measure the flex column before trusting the screenshot.
   */
   const fit = await tab.evaluate(() => {

@@ -9,14 +9,24 @@ import type { Locale } from '../config';
  */
 export interface UIStrings {
   skipToContent: string;
-  nav: { download: string; guide: string; about: string; faq: string; contribute: string };
+  nav: { download: string; guide: string; developers: string; about: string; faq: string; contribute: string };
   navMenu: string;
   getObadh: string;
   /**
    * The download button renames itself to the device in front of the reader.
-   * `getObadh` is what anyone we cannot place — or cannot ship to — still sees.
+   * `getObadh` is what anyone we cannot place (or cannot ship to) still sees.
    */
   getFor: { mac: string; iphone: string; ipad: string };
+  /** The hero button on a platform Obadh has not reached. `{platform}` is filled in. */
+  comingFor: string;
+  /** Names for that slot, so the button can say which platform it means. */
+  platformNames: {
+    windows: string;
+    linux: string;
+    android: string;
+    chromeos: string;
+    other: string;
+  };
   languageLabel: string;
   otherLanguage: string;
   ogImageAlt: string;
@@ -48,6 +58,7 @@ export const ui: Record<Locale, UIStrings> = {
     nav: {
       download: 'Download',
       guide: 'Writing guide',
+      developers: 'Developers',
       about: 'About',
       faq: 'FAQ',
       contribute: 'Contribute',
@@ -59,6 +70,14 @@ export const ui: Record<Locale, UIStrings> = {
       iphone: 'Download for iPhone',
       ipad: 'Download for iPad',
     },
+    comingFor: 'Coming soon for {platform}',
+    platformNames: {
+      windows: 'Windows',
+      linux: 'Linux',
+      android: 'Android',
+      chromeos: 'ChromeOS',
+      other: 'your device',
+    },
     languageLabel: 'Language',
     otherLanguage: 'বাংলা',
     ogImageAlt:
@@ -69,7 +88,7 @@ export const ui: Record<Locale, UIStrings> = {
       playground: 'Engine playground',
       discord: 'Discord',
       privacy: 'Privacy',
-      licenseLine: 'MIT licensed. Engine 0.9.1, apps 0.1.0. Built by NSS Sayom.',
+      licenseLine: 'MIT licensed. Engine 0.9.1, apps 0.1.0. Built by Unmukto.',
       staticNote: 'This site is static. No analytics, no cookies.',
     },
     placeholderNote: 'Not live yet',
@@ -97,6 +116,7 @@ export const ui: Record<Locale, UIStrings> = {
     nav: {
       download: 'ডাউনলোড',
       guide: 'লেখার নিয়ম',
+      developers: 'ডেভেলপার',
       about: 'পরিচিতি',
       faq: 'প্রশ্ন-উত্তর',
       contribute: 'অবদান',
@@ -107,6 +127,14 @@ export const ui: Record<Locale, UIStrings> = {
       mac: 'ম্যাকের জন্য ডাউনলোড',
       iphone: 'আইফোনের জন্য ডাউনলোড',
       ipad: 'আইপ্যাডের জন্য ডাউনলোড',
+    },
+    comingFor: '{platform}-এর জন্য আসছে',
+    platformNames: {
+      windows: 'উইন্ডোজ',
+      linux: 'লিনাক্স',
+      android: 'অ্যান্ড্রয়েড',
+      chromeos: 'ক্রোমওএস',
+      other: 'আপনার যন্ত্র',
     },
     // Translated rather than left in English: আলো and আঁধার are the words the
     // home page already uses for the two modes it measures the keyboard in.
@@ -124,13 +152,13 @@ export const ui: Record<Locale, UIStrings> = {
       // Latin digits: a version is a string someone compares against a repo tag,
       // and every other page prints these two the same way. This line is rendered
       // as plain text, so the figures cannot take their usual span.
-      licenseLine: 'এমআইটি লাইসেন্স। ইঞ্জিন 0.9.1, অ্যাপ 0.1.0। বানিয়েছেন এনএসএস সায়ম।',
+      licenseLine: 'এমআইটি লাইসেন্স। ইঞ্জিন 0.9.1, অ্যাপ 0.1.0। বানিয়েছে উন্মুক্ত।',
       staticNote: 'এই সাইটটি স্ট্যাটিক। কোনো অ্যানালিটিকস নেই, কুকি নেই।',
     },
     placeholderNote: 'এখনো চালু হয়নি',
     typingBox: {
       label: 'ইংরেজি বর্ণে লিখুন',
-      noscript: 'এই বাক্সটি চলতে জাভাস্ক্রিপ্ট লাগে। ইঞ্জিনের পূর্ণ খেলাঘর আছে এখানে —',
+      noscript: 'এই বাক্সটি চলতে জাভাস্ক্রিপ্ট লাগে। ইঞ্জিনের পূর্ণ খেলাঘর আছে এখানে:',
     },
     // src/pages/404.astro carries its own bilingual copy today and reads none of
     // this. When it is wired up here, note that the Bangla title below is the

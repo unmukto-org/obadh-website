@@ -63,7 +63,7 @@ export const contribute: BlockContent = {
         {
           name: 'Linux',
           meta: 'IBus or Fcitx5',
-          body: 'Two jobs rather than one: X11 and Wayland handle text input differently enough that finishing one does not hand you the other. It is the same C ABI the Apple apps call, so the Rust underneath is a header and a link step.',
+          body: 'This is two jobs. X11 and Wayland handle text input differently enough that finishing one does not hand you the other. It is the same C ABI the Apple apps call, so the Rust underneath is a header and a link step.',
         },
         {
           name: 'Android',
@@ -78,11 +78,11 @@ export const contribute: BlockContent = {
         {
           name: 'ChromeOS',
           meta: 'IME API extension',
-          body: 'Nothing to link at all — the engine already runs in a browser, and the box on the <a href="/guide/#try">guide page</a> is an optimized WebAssembly build of about 390 KB. The smallest of the four.',
+          body: 'Nothing to link at all: the engine already runs in a browser, and the box on the <a href="/guide/#try">guide page</a> is an optimized WebAssembly build of about 390 KB. The smallest of the four.',
         },
       ],
       after:
-        'None of the four is a transliteration problem: the engine is written and tested, and you reach it through a stable C ABI. Open an issue and say which platform before you start — not to ask permission, but so two people do not spend three months on the same keyboard, and so the repository is public from its first commit.',
+        'None of the four is a transliteration problem: the engine is written and tested, and you reach it through a stable C ABI. Open an issue and say which platform before you start. That is not to ask permission; it is so two people do not spend three months on the same keyboard, and so the repository is public from its first commit.',
     },
 
     {
@@ -94,7 +94,7 @@ export const contribute: BlockContent = {
         'The box stops at the letters. If the letters are right and a correction or a next-word suggestion is wrong, the <a href="https://sayom.me/obadh_engine/">engine playground</a> runs that layer too. If both are right and the app still gets it wrong, it is the app.',
       ],
       after:
-        'Then file it in the repository that owns it. <a href="#the-repositories">The list is at the foot of this page</a>, and if you are not sure, file it against the app you were using — moving an issue is easier than writing it twice.',
+        'Then file it in the repository that owns it. <a href="#the-repositories">The list is at the foot of this page</a>, and if you are not sure, file it against the app you were using. Moving an issue is easier than writing it twice.',
     },
 
     {
@@ -154,7 +154,7 @@ export const contribute: BlockContent = {
         {
           name: 'The lexicon',
           meta: 'obadh_autocorrect_dataset',
-          body: '845,461 Bangla entries with frequencies, built from curated EPUBs, Bangla Wikipedia and Bangla newspapers and then filtered. Corpora carry their own misspellings, their own OCR damage and their own gaps — names, dialect words, anything that entered the language recently. Autocorrect is only as good as this file.',
+          body: '845,461 Bangla entries with frequencies, built from curated EPUBs, Bangla Wikipedia and Bangla newspapers and then filtered. Corpora carry their own misspellings, their own OCR damage and their own gaps: names, dialect words, anything that entered the language recently. Autocorrect is only as good as this file.',
         },
         {
           name: 'The loanword list',
@@ -174,7 +174,7 @@ export const contribute: BlockContent = {
         {
           name: 'The apps in Bangla',
           meta: 'obadh-ios, obadh-macos',
-          body: 'Neither app has a Bangla interface yet: the setup screens, the settings rows and the buttons are all English. Every page of this site was written as Bangla rather than translated into it, machine-translated pages are not published, and the apps’ strings need the same hand.',
+          body: 'Neither app has a Bangla interface yet: the setup screens, the settings rows and the buttons are all English. Every page of this site was written as Bangla instead of translated into it, machine-translated pages are not published, and the apps’ strings need the same hand.',
         },
         {
           name: 'Design',
@@ -230,7 +230,7 @@ export const contribute: BlockContent = {
         // created before launch; the copy below already says the room is new.
         `Some questions are faster asked than filed: whether something is a bug or a typing habit, what a rule was supposed to do, whether anyone has started on Android. Ask them in the <a href="${LINKS.discord}">Discord</a>. The server is new and the apps are at 0.1.0, so expect a quiet room rather than a crowd.`,
         'GitHub issues are the record, and questions are fine there too. An issue that turns out not to be a bug has still told the project that something was unclear, and unlike a message in a chat it is still findable in a year.',
-        'Reviews can be slow. An issue can sit for a month, not because nobody read it but because the person who read it was deep in something else. What you get back is that the whole thing fits in your head: one engine, two apps so far, a couple of data repositories, and no framework you have to learn before you can read the code. A rule you fix reaches every platform at once, because there is one implementation of it.',
+        'Reviews can be slow. An issue can sit for a month, usually because the person who read it was deep in something else. What you get back is a project that fits in your head: one engine, two apps so far, a couple of data repositories, and no framework you have to learn before you can read the code. A rule you fix reaches every platform at once, because there is one implementation of it.',
       ],
     },
   ],

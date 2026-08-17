@@ -7,7 +7,7 @@
  *
  * Nothing here is transcribed. Every Bangla string in the output file came out
  * of `obadh_engine/target/release/obadh`, so the animation shows exactly what
- * the keyboard would do — including the moments where a letter is still
+ * the keyboard would do, including the moments where a letter is still
  * undecided, which is the part that makes it worth watching.
  *
  * Re-run it after an engine bump. If a spelling rule changed, the file changes
@@ -51,7 +51,7 @@ const source = JSON.parse(await readFile(SOURCE, 'utf8'));
 const SKIP = new Set(source.skipWords ?? []);
 
 /*
-  Every field a line may carry. Anything else is a mistake — a typo in a key
+  Every field a line may carry. Anything else is a mistake, a typo in a key
   name would otherwise be silently ignored and the line would quietly lose the
   behaviour it was asked for.
 */
@@ -85,10 +85,14 @@ const LINES = source.groups.flatMap((group) =>
       const one = typeof entry.fix === 'string';
       const named = entry.fix && typeof entry.fix === 'object' && !Array.isArray(entry.fix);
       if (!one && !named) {
-        throw new Error(`${where}: fix must be a misspelling string, or { "<the roman word>": "<the misspelling>" }.`);
+        throw new Error(
+          `${where}: fix must be a misspelling string, or { "<the roman word>": "<the misspelling>" }.`,
+        );
       }
       if (named && Object.keys(entry.fix).length !== 1) {
-        throw new Error(`${where}: fix names ${Object.keys(entry.fix).length} words; one line corrects one word.`);
+        throw new Error(
+          `${where}: fix names ${Object.keys(entry.fix).length} words; one line corrects one word.`,
+        );
       }
     }
     return { ...entry, group: group.group };
@@ -99,7 +103,7 @@ const LINES = source.groups.flatMap((group) =>
   Both halves of the suggestion bar come out of the shipped artifacts, not out
   of anybody's judgement.
 
-  The emoji are `emoji-bn.bin` from the iOS app — the same memory-mapped table
+  The emoji are `emoji-bn.bin` from the iOS app, the same memory-mapped table
   the keyboard searches while you type, word to up to three emoji. Picking them
   by hand got five of seventeen wrong against it (চা is 🍵, not ☕; বই is 📚,
   not 📖) and invented six more for words the keyboard has no emoji for.
@@ -124,7 +128,9 @@ for (const [what, where] of [
   if (existsSync(where)) continue;
   console.error(`No ${what} at ${where}.`);
   if (what === 'autocorrect binary') {
-    console.error('Build it: cd obadh_engine && cargo build --release --features cli --bin obadh-autocorrect');
+    console.error(
+      'Build it: cd obadh_engine && cargo build --release --features cli --bin obadh-autocorrect',
+    );
   }
   process.exit(2);
 }
@@ -197,8 +203,8 @@ for (const line of LINES) {
   /*
     Which word is mistyped, and how.
 
-    A bare string mistypes the last word. An object names the word — the roman
-    token as it appears in the line — so the correction can land mid-sentence,
+    A bare string mistypes the last word. An object names the word, the roman
+    token as it appears in the line, so the correction can land mid-sentence,
     which is where autocorrect actually happens: you misspell a word, hit
     space, it silently becomes right, and you keep typing.
   */
@@ -214,7 +220,9 @@ for (const line of LINES) {
       throw new Error(`"${roman}": fix names "${target}", which is not a word of this line.`);
     }
     if (found > 1) {
-      throw new Error(`"${roman}": fix names "${target}", which appears ${found} times — ambiguous.`);
+      throw new Error(
+        `"${roman}": fix names "${target}", which appears ${found} times, ambiguous.`,
+      );
     }
     fixAt = words.indexOf(target);
     wrong = misspelling;
@@ -224,7 +232,7 @@ for (const line of LINES) {
   /*
     Which word the emoji is for, and which emoji.
 
-    By default the line's last word, so the tap can be shown — tapping an emoji
+    By default the line's last word, so the tap can be shown, tapping an emoji
     replaces the composed word, and mid-sentence that would eat one. Failing
     that, the nearest earlier word the table knows, shown but not taken.
   */
@@ -269,7 +277,7 @@ for (const line of LINES) {
   /*
     A line that ends in punctuation does not end by taking an emoji. The tap
     replaces the word being composed, and by the time the dari is down the word
-    is behind it — so the emoji is shown in the bar and left there, which is
+    is behind it, so the emoji is shown in the bar and left there, which is
     also what happens on the phone.
   */
   const endsInPunctuation = Boolean(split(words[words.length - 1]).after);
@@ -278,7 +286,9 @@ for (const line of LINES) {
     (take === 'emoji' && !endsInPunctuation) ||
     (take === 'auto' && !fix && emojiIsLast && emojiList);
   if (take === 'emoji' && endsInPunctuation) {
-    throw new Error(`"${roman}": take=emoji, but the line ends in punctuation, which commits the word first.`);
+    throw new Error(
+      `"${roman}": take=emoji, but the line ends in punctuation, which commits the word first.`,
+    );
   }
   const repeat = line.repeat ?? Boolean(wantsEmojiTake);
 
@@ -290,7 +300,7 @@ for (const line of LINES) {
     without the mistake is a picture of a feature rather than the feature.
 
     With an emoji being taken, the word is typed TWICE, and the second one is
-    tapped away into the emoji — so the sentence keeps the word and gains the
+    tapped away into the emoji, so the sentence keeps the word and gains the
     emoji, which is what a person actually does.
   */
   const typedWords = [...words];
@@ -316,7 +326,7 @@ for (const line of LINES) {
     One engine call per keystroke.
 
     Past the correction the line is composed from the RIGHT spelling, because
-    that is what is on screen from then on — carrying on from the misspelling
+    that is what is on screen from then on, carrying on from the misspelling
     would un-correct the word as soon as the next letter went down. The two
     spellings are different lengths, so the offset moves by the difference.
   */
@@ -324,9 +334,7 @@ for (const line of LINES) {
   const steps = [];
   for (let i = 0; i < typedRoman.length; i++) {
     const text =
-      spaceAt >= 0 && i > spaceAt
-        ? roman.slice(0, i + 1 + delta)
-        : typedRoman.slice(0, i + 1);
+      spaceAt >= 0 && i > spaceAt ? roman.slice(0, i + 1 + delta) : typedRoman.slice(0, i + 1);
     steps.push(await compose(text));
   }
 
@@ -364,7 +372,7 @@ for (const line of LINES) {
 
   if (fixAt >= 0 && take !== 'none') {
     // Typing punctuation is what commits an autocorrection on the phone, so a
-    // line that ends in one still ends by taking the word — with the
+    // line that ends in one still ends by taking the word, with the
     // punctuation kept on the end of it.
     const correct = await compose(words[fixAt]);
     if (correct === (await compose(typedWords[fixAt]))) {
@@ -414,13 +422,13 @@ export interface HeroLine {
    * The suggestion bar at each keystroke, or 0 where it has nothing to offer.
    *
    * The bar's first slot is always the word as composed, which \`steps\` already
-   * carries, so it is not repeated here. \`c\` is the second text candidate —
-   * the correction the engine's autocorrect returns — and \`e\` is up to three
+   * carries, so it is not repeated here. \`c\` is the second text candidate,
+   * the correction the engine's autocorrect returns, and \`e\` is up to three
    * emoji from the keyboard's own table, which share the third slot.
    */
   bar: ({ c?: string; e?: string[] } | 0)[];
   /**
-   * The one tap in the line, at keystroke \`at\` — which is the last one when
+   * The one tap in the line, at keystroke \`at\`, which is the last one when
    * an emoji is taken, and the space that commits the word when a correction
    * is. \`take\` is the word or emoji itself, so the slot holding it can be
    * flashed, and \`after\` is the whole field the moment it lands.
@@ -437,7 +445,7 @@ await writeFile(join(ROOT, 'src/data/hero-lines.ts'), file);
   The same data as a file the page fetches. Inlined it is 120 KB of JSON in the
   markup of the home page, which is more than the rest of the page put together
   and cannot be cached between visits. The component server-renders the first
-  line from the module above — so the hero is complete before any script runs —
+  line from the module above, so the hero is complete before any script runs,
   and picks the rest up from here.
 */
 await writeFile(join(ROOT, 'public/hero-lines.json'), JSON.stringify(lines));

@@ -81,7 +81,7 @@ const schema = [
     description: c.meta.description,
     inLanguage: locale,
     about: { '@type': 'Thing', name: 'Bangla transliteration typing scheme' },
-    author: { '@id': `${SITE_URL}/#sayom` },
+    author: { '@id': `${SITE_URL}/#unmukto` },
     // Without these the article floats: nothing tied it to the site it is on or
     // to whoever stands behind it.
     isPartOf: { '@id': `${SITE_URL}/#website` },
@@ -157,15 +157,12 @@ const schema = [
         <p class="guide__empty" data-guide-empty hidden></p>
 
         {
-          sections.map((section) => (
-            <section class="guide__section" id={section.group} data-section data-spy>
+          sections.map((section) => (<section class="guide__section" id={section.group} data-section data-spy>
               <h2 class="guide__h2">
                 <a href={`#${section.group}`} set:html={section.heading} />
               </h2>
               <div class="prose guide__note">
-                {section.body.map((paragraph) => (
-                  <p set:html={paragraph} />
-                ))}
+                {section.body.map((paragraph) => (<p set:html={paragraph} />))}
               </div>
               <SchemeTable
                 group={section.group as SchemeGroup}
@@ -173,22 +170,16 @@ const schema = [
                 notes={notes}
                 copyLabel={tools.copy}
               />
-            </section>
-          ))
+            </section>))
         }
 
         {
-          c.tryIt && (
-            <section class="guide__section" id={tryId} data-aside data-spy>
-              {c.tryIt.heading && (
-                <h2 class="guide__h2">
+          c.tryIt && (<section class="guide__section" id={tryId} data-aside data-spy>
+              {c.tryIt.heading && (<h2 class="guide__h2">
                   <a href={`#${tryId}`} set:html={c.tryIt.heading} />
-                </h2>
-              )}
+                </h2>)}
               <div class="prose guide__note">
-                {c.tryIt.body.map((paragraph) => (
-                  <p set:html={paragraph} />
-                ))}
+                {c.tryIt.body.map((paragraph) => (<p set:html={paragraph} />))}
               </div>
               <div class="guide__box">
                 <Composer
@@ -197,26 +188,19 @@ const schema = [
                   seed={{ roman: 'jyOt``sna', bangla: 'জ্যোৎস্না' }}
                 />
               </div>
-            </section>
-          )
+            </section>)
         }
 
         {
-          c.strict && (
-            <section class="guide__section" id={strictId} data-aside data-spy>
-              {c.strict.heading && (
-                <h2 class="guide__h2">
+          c.strict && (<section class="guide__section" id={strictId} data-aside data-spy>
+              {c.strict.heading && (<h2 class="guide__h2">
                   <a href={`#${strictId}`} set:html={c.strict.heading} />
-                </h2>
-              )}
+                </h2>)}
               <div class="prose guide__note">
-                {c.strict.body.map((paragraph) => (
-                  <p set:html={paragraph} />
-                ))}
+                {c.strict.body.map((paragraph) => (<p set:html={paragraph} />))}
               </div>
               {c.strict.source && <p class="guide__source">{c.strict.source}</p>}
-            </section>
-          )
+            </section>)
         }
 
         <section class="guide__section" id="from-avro" data-aside data-spy>
@@ -569,14 +553,13 @@ const schema = [
 
     if (spied.length && 'IntersectionObserver' in window) {
       const inView = new Set<Element>();
-      const watcher = new IntersectionObserver(
-        (entries) => {
+      const watcher = new IntersectionObserver((entries) => {
           for (const entry of entries) {
             if (entry.isIntersecting) inView.add(entry.target);
             else inView.delete(entry.target);
           }
           // The topmost section that has cleared the two sticky bars wins. If
-          // none has — a section taller than the window — the last one stands.
+          // none has (a section taller than the window) the last one stands.
           const first = spied.find((section) => inView.has(section));
           if (first) markCurrent(first.id);
         },

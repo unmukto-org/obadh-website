@@ -18,8 +18,8 @@ const items = c.groups.flatMap((group) => group.items);
   Google stopped showing FAQ rich results in May 2026, so this earns nothing
   there. It stays because it is still valid schema.org, still read by Bing and
   by the retrieval crawlers that matter for a project like this, and costs
-  nothing. Its answers are the visible answers, word for word — the lead line
-  and the paragraph under it, in that order — which is what Google's guidance
+  nothing. Its answers are the visible answers, word for word, the lead line
+  and the paragraph under it, in that order, which is what Google's guidance
   requires and what makes it worth emitting at all.
 */
 const stripTags = (html: string) => html.replace(/<[^>]+>/g, '');
@@ -59,24 +59,20 @@ const schema = [
           the chips are how you get to the one you came for. */}
       <ul class="faq__jump" data-reveal>
         {
-          c.groups.map((group) => (
-            <li>
+          c.groups.map((group) => (<li>
               <a class="faq__chip" href={`#${group.id}`} set:html={group.heading} />
-            </li>
-          ))
+            </li>))
         }
       </ul>
 
       {
-        c.groups.map((group) => (
-          <section class="faq__group scroll-mt-24" id={group.id} data-reveal>
+        c.groups.map((group) => (<section class="faq__group scroll-mt-24" id={group.id} data-reveal>
             <div class="faq__head">
               <h2 class="faq__title" set:html={group.heading} />
             </div>
 
             <div class="faq__cards">
-              {group.items.map((item) => (
-                <article class="faq__card scroll-mt-24" id={item.id}>
+              {group.items.map((item) => (<article class="faq__card scroll-mt-24" id={item.id}>
                   <h3 class="faq__question">
                     {/* The heading is the permalink. No pilcrow, no hover-only glyph. */}
                     <a href={`#${item.id}`} set:html={item.question} />
@@ -84,11 +80,9 @@ const schema = [
                   {/* The answer is the first line. Everything under it is support. */}
                   <p class="faq__lead" set:html={item.lead} />
                   {item.answer?.map((paragraph) => <p class="faq__more" set:html={paragraph} />)}
-                </article>
-              ))}
+                </article>))}
             </div>
-          </section>
-        ))
+          </section>))
       }
     </div>
   </div>
@@ -126,7 +120,7 @@ const schema = [
 
   .faq__chip:hover {
     border-color: var(--color-brand);
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   .faq__group {
@@ -172,7 +166,7 @@ const schema = [
   }
 
   .faq__question a:hover {
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   .faq__lead {
@@ -188,7 +182,7 @@ const schema = [
 
   .faq__lead :global(a),
   .faq__more :global(a) {
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 
   @media (min-width: 64rem) {

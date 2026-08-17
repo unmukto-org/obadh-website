@@ -6,21 +6,21 @@
     "The engine is stricter than intuition: `sobar` not `shobar`, `col` not `chol`, `ekoTa` not `ekTa`, `shUny` not `shUnyo`, `tarader` not `taradher`.",
     "A line is either a plain string, or an object when it needs one of the fields below. Unknown fields are an error, not a typo the build ignores.",
     "Punctuation is typed like anything else and the engine composes it too: a plain `.` becomes a দাঁড়ি, digits become ০–৯, and `,` `?` `!` and quotes pass through. A dot between digits stays a dot, so ১২.৫ works. On the keyboard these live behind the 123 key, which is the key the demo lights for them.",
-    "Two rules follow from punctuation, both enforced by the build. A word is stripped of it before the emoji table and the autocorrect lexicon are asked, since neither has a key ending in a dari. And a line that ends in punctuation cannot end by tapping an emoji — the tap replaces the word being composed, and the dari has already committed it — so use it on lines that correct instead, where typing punctuation is what commits the correction on the phone anyway."
+    "Two rules follow from punctuation, both enforced by the build. A word is stripped of it before the emoji table and the autocorrect lexicon are asked, since neither has a key ending in a dari. And a line that ends in punctuation cannot end by tapping an emoji (the tap replaces the word being composed, and the dari has already committed it) so use it on lines that correct instead, where typing punctuation is what commits the correction on the phone anyway."
   ],
   "fields": {
     "roman": "Required. What gets typed. A bare string entry is shorthand for { roman }.",
     "note": "Free text for whoever edits this file. JSON has no comments; this is the substitute. Never shipped.",
     "fix": "A misspelling to type INSTEAD of the line's last word, so the bar has a real correction to offer and the demo can take it. The right spelling is the line's own last Roman token, and the build fails if the misspelling composes it already.",
-    "emoji": "false suppresses the emoji. A literal emoji string forces one, overriding the keyboard's table — the build prints a warning when it does, because an emoji the keyboard would not offer is a demo of something that does not happen. Omit for the table's own answer.",
+    "emoji": "false suppresses the emoji. A literal emoji string forces one, overriding the keyboard's table, the build prints a warning when it does, because an emoji the keyboard would not offer is a demo of something that does not happen. Omit for the table's own answer.",
     "emojiWord": "Which word of the line the emoji is for, as the Bangla word. Defaults to the last word, then the nearest earlier word the table knows. Use it when a line has two words with emoji and the wrong one wins.",
-    "take": "What the demo taps at the end: 'auto' (the default — the correction if there is one, else the emoji), 'none' to show the bar without tapping, 'word', or 'emoji'.",
-    "repeat": "Whether the emoji's word is typed twice, so the tap leaves both the word and the emoji. Defaults to true when an emoji is taken, because tapping an emoji REPLACES the composed word — typing it once and tapping would leave the sentence a word short."
+    "take": "What the demo taps at the end: 'auto' (the default, the correction if there is one, else the emoji), 'none' to show the bar without tapping, 'word', or 'emoji'.",
+    "repeat": "Whether the emoji's word is typed twice, so the tap leaves both the word and the emoji. Defaults to true when an emoji is taken, because tapping an emoji REPLACES the composed word, typing it once and tapping would leave the sentence a word short."
   },
   "sources": {
-    "composition": "obadh_engine/target/release/obadh — one call per keystroke.",
+    "composition": "obadh_engine/target/release/obadh, one call per keystroke.",
     "candidates": "obadh-autocorrect suggest-fst against data/autocorrect/models/bn.fst. The two text slots are what the keyboard would offer.",
-    "emoji": "obadh-ios Resources/ObadhModels/emoji/emoji-bn.bin — the memory-mapped table the keyboard searches, word to up to three emoji, decoded from the binary."
+    "emoji": "obadh-ios Resources/ObadhModels/emoji/emoji-bn.bin, the memory-mapped table the keyboard searches, word to up to three emoji, decoded from the binary."
   },
   "skipWords": [
     "না",

@@ -50,7 +50,7 @@ export interface Capability {
 /** A value card: a label, a short benefit, and one line under it. */
 export interface Value {
   id: string;
-  icon: 'speed' | 'accurate' | 'private' | 'free';
+  icon: 'speed' | 'accurate' | 'native' | 'private' | 'free';
   label: string;
   heading: string;
   /** One sentence. If it needs two, it belongs on another page. */
@@ -129,7 +129,7 @@ export interface PageContent {
 }
 
 /**
- * One card on /faq/. `lead` is the answer — yes, no, completely, three — and
+ * One card on /faq/. `lead` is the answer (yes, no, completely, three) and
  * `answer` is at most one short paragraph of support under it. A wall of text
  * in a card is a page-design bug as much as a writing one.
  *
@@ -154,29 +154,21 @@ export interface FaqContent extends PageContent {
   groups: FaqGroup[];
 }
 
-export interface DownloadPlatform {
-  id: string;
+/** One platform you can install today. */
+export interface DownloadRelease {
+  /** Contract anchor. `macos` and `ios` are linked from other pages. */
+  id: 'ios' | 'macos';
   name: string;
-  state: 'shipping' | 'building';
-  stateLabel: string;
-  /** The deck. One of the forms in copy-shared.md §7, never a new one. */
+  /** The one requirement worth knowing before you press the button. */
   requirement: string;
-  action?: Action;
-  /** Beside the action, where a second route exists: macOS has All releases. */
+  action: Action;
+  /** Beside the action, where a second route exists: macOS has all releases. */
   altAction?: Action;
-  body: string[];
-  /** The install steps: the only numbered list on this site, per art-direction.md §6. */
-  stepsHeading?: string;
-  /** Contract anchor: `turning-it-on`, `installing-it`. */
-  stepsId?: string;
-  stepsIntro?: string;
-  steps?: { heading: string; body: string; source?: string }[];
-  stepsAfter?: string;
-  /** The h3 blocks under the platform, each with its own contract anchor. */
-  sections?: Prose[];
+  /** Three short facts, each a noun phrase. Never a sentence. */
+  facts: string[];
 }
 
-/** A repository on `/download/#build-from-source`; the command is the point of the row. */
+/** A repository on `/download/#build-from-source`; the command is the point. */
 export interface RepoRow {
   /** Key in `LINKS.github`, so no page hard-codes a URL. */
   repo: 'engine' | 'ios' | 'macos';
@@ -185,64 +177,100 @@ export interface RepoRow {
 }
 
 /**
- * The panel at the top of /download/, which answers one question — what do I
- * press — for the device actually in front of the reader.
+ * /download/ lists every platform, in one place, and routes nothing.
  *
- * Every variant is in the HTML. The script picks one and hides the rest, so
- * the page is complete without JavaScript and complete to a crawler, and the
- * routing is a convenience laid over a page that already worked.
+ * The hero button on the home page is what reads the user agent and sends a
+ * person straight at their own release. This page is the opposite job: the
+ * whole list, for someone choosing, or downloading for another device, or
+ * checking whether their platform is there yet.
  */
-export interface DownloadGet {
-  /** Shown before the script has decided, and to anyone without it. */
-  all: { heading: string; body: string };
-  mac: {
+export interface DownloadContent extends PageContent {
+  releasesHeading: string;
+  releases: DownloadRelease[];
+  /** Section id `turning-it-on`. Four pages link at it. */
+  setup: {
     heading: string;
-    /** Used instead when the file is genuinely on its way. */
-    startingHeading: string;
-    body: string;
-    starting: string;
-    button: string;
-    again: string;
+    lede: string;
+    ios: { heading: string; steps: string[] };
+    macos: { heading: string; steps: string[] };
+    after: string;
   };
-  iphone: { heading: string; body: string };
-  ipad: { heading: string; body: string };
-  /** A platform we can name and have not built for. `{platform}` is filled in. */
-  soon: { heading: string; body: string; available: string };
-  /** A platform we cannot name. */
-  unknown: { heading: string; body: string; link: string };
-  /** Only on a desktop, where the phone is the other device in the room. */
-  qr: { heading: string; body: string; alt: string };
-  /** Fills `{platform}` above. */
-  names: { windows: string; linux: string; android: string; chromeos: string };
-  appStore: string;
-  macButton: string;
-  /** Opens the full list for someone downloading on behalf of another device. */
-  otherDevice: string;
+  /** Section id `other-platforms`. */
+  soon: {
+    heading: string;
+    lede: string;
+    rows: PlatformRow[];
+    action: Action;
+  };
+  /** Section id `build-from-source`. */
+  source: {
+    heading: string;
+    lede: string;
+    repos: RepoRow[];
+  };
 }
 
-export interface DownloadContent extends PageContent {
-  /** The routed panel, above everything else on the page. */
-  get: DownloadGet;
-  /** The rest of the page head, after the standfirst. */
-  intro: string[];
-  /** Try the scheme before installing anything. */
-  tryFirst: string;
-  platforms: DownloadPlatform[];
-  otherHeading: string;
-  otherLede: string;
-  /** What "Coming" means. This page states it; the others link to it. */
-  otherIntro: string;
-  /** Why each platform is its own piece of work, before the rows. */
-  otherEngine: string;
-  others: PlatformRow[];
-  otherClosing: string;
-  /** Section id `build-from-source`. */
-  sourceHeading: string;
-  sourceBody: string[];
-  repos: RepoRow[];
-  sourceClosing: string;
-  versions: Prose;
-  closing: string;
+/**
+ * /thanks/, where the Mac button lands after it starts the disk image.
+ *
+ * The person is watching a download bar and has nothing to do for ten seconds,
+ * which is the best moment on the whole site to hand them the four steps. It
+ * is a noindex page: it means nothing to anyone who did not arrive by pressing
+ * the button.
+ */
+export interface ThanksContent extends PageContent {
+  /** Four steps, each one thing to do. */
+  steps: { heading: string; body: string }[];
+  /** The line that proves it worked. */
+  check: { heading: string; body: string };
+  /** For a download that never started. */
+  retry: { label: string; note: string };
+  /** Where to go once it is typing. */
+  next: { label: string; href: string }[];
+}
+
+/** A code sample on /developers/. The command is the point of the block. */
+export interface CodeSample {
+  /** Shown above the block, so a reader knows what they are looking at. */
+  label: string;
+  /** Language name for the label only. Nothing on this site highlights syntax. */
+  lang: string;
+  code: string;
+}
+
+/**
+ * /developers/ introduces the engine as a library rather than as a keyboard.
+ *
+ * Everything on it must be checkable against the crate: versions, feature
+ * names and API names come from obadh_engine itself, never from memory.
+ */
+export interface DevelopersContent extends PageContent {
+  /** Section id `rust`. */
+  rust: {
+    heading: string;
+    lede: string;
+    facts: { term: string; value: string }[];
+    blocks: CodeSample[];
+    actions: Action[];
+  };
+  /** Section id `other-languages`. */
+  bindings: {
+    heading: string;
+    lede: string;
+    rows: { name: string; feature: string; body: string }[];
+  };
+  /** Section id `javascript`. The one unbuilt thing on the page. */
+  javascript: {
+    heading: string;
+    state: string;
+    lede: string;
+    body: string[];
+    action: Action;
+  };
+  repos: {
+    heading: string;
+    rows: RepoRow[];
+  };
 }
 
 export interface GuideSection {
@@ -318,7 +346,7 @@ export interface ArticleContent extends PageContent {
 
    /about/ and /contribute/ are not documents the way /privacy/ is. They are a
    spec list, a set of cards, a numbered path, a shell block and one pulled
-   line — structure where the structure is honest, and prose only where it is
+   line, structure where the structure is honest, and prose only where it is
    not. Both pages are built out of the blocks below.
 
    Every text field here is rendered with `set:html`, which is the only reason
@@ -350,7 +378,7 @@ export interface FactsBlock extends BlockHead {
 
 /**
  * Cards. `grid` is a set of parallel things; `rows` is a list whose left
- * column is a name — a platform, a repository — and whose right column says
+ * column is a name (a platform, a repository) and whose right column says
  * what it is. `href` turns the name into the link.
  */
 export interface CardsBlock extends BlockHead {

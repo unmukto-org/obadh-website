@@ -16,7 +16,7 @@ const failures = [];
 const check = (name, ok, detail = '') => {
   if (ok) console.log(`  ok   ${name}`);
   else {
-    console.error(`  FAIL ${name}${detail ? ` — ${detail}` : ''}`);
+    console.error(`  FAIL ${name}${detail ? `, ${detail}` : ''}`);
     failures.push(name);
   }
 };
@@ -30,15 +30,20 @@ page.on('console', (message) => {
 });
 
 // --- the typing box ------------------------------------------------------
+// It lives on the guide page. The home page had one too until the hero grew a
+// keyboard that types on its own, which made a second box redundant.
 console.log('\ntyping box');
-await page.goto(`${origin}/`, { waitUntil: 'networkidle' });
+await page.goto(`${origin}/guide/`, { waitUntil: 'networkidle' });
 
 const input = page.locator('#composer-input');
 const output = page.locator('[data-output]');
 
-await page.waitForFunction(() => document.querySelector('[data-composer]')?.dataset.state === 'ready', {
-  timeout: 15000,
-});
+await page.waitForFunction(
+  () => document.querySelector('[data-composer]')?.dataset.state === 'ready',
+  {
+    timeout: 15000,
+  },
+);
 check('the engine loads', true);
 
 await input.click();
@@ -52,22 +57,24 @@ check(
 
 // Strict transliteration hands back the original when a rule does not claim a
 // character. That is documented behavior and must not look like an error.
-await input.fill('ami — tumi');
-check('unsupported input passes through', (await output.textContent()) === 'ami — tumi');
+// The em dash here is the POINT of the test: it is a character no rule claims,
+// and the engine must hand the whole line back untouched. Do not "clean" it.
+await input.fill('ami \u2014 tumi');
+check('unsupported input passes through', (await output.textContent()) === 'ami \u2014 tumi');
 
 await input.fill('');
 check('an empty field empties the output', (await output.textContent()) === '');
 
 // --- the typing box, read rather than seen -------------------------------
 // The field used to have no box at all, so its focus indicator had to be
-// invented — a rail drawn over the text, which read as a stray line across the
+// invented, a rail drawn over the text, which read as a stray line across the
 // panel. It is a field now and carries its own ring. And the pair under it used
 // to be a live region, so a screen reader was read every intermediate letter,
 // including the thirty the script types on its own before anyone has touched
 // the page.
 console.log('\nthe typing box, read rather than seen');
 
-await page.goto(`${origin}/`, { waitUntil: 'networkidle' });
+await page.goto(`${origin}/guide/`, { waitUntil: 'networkidle' });
 const ringOf = () =>
   page.evaluate(() => {
     const style = getComputedStyle(document.querySelector('.composer__field'));
@@ -98,7 +105,11 @@ const quietLive = await page.evaluate(() => ({
 }));
 check('the visible pair is not a live region', quietLive.out === 'off', quietLive.out ?? 'missing');
 check('there is a live region for settled results', quietLive.settledLive === 'polite');
-check('the scripted type-out announces nothing', quietLive.settledText === '', quietLive.settledText);
+check(
+  'the scripted type-out announces nothing',
+  quietLive.settledText === '',
+  quietLive.settledText,
+);
 
 await input.click();
 await input.type('ami banglay likhchi', { delay: 12 });
@@ -130,7 +141,7 @@ check(
 
 // The theme switch is gone: the site is one light palette now, and there is
 // nothing left to toggle. Routing by platform on /download/ replaced it as the
-// thing on this site that changes under you — scripts/platforms.mjs covers it.
+// thing on this site that changes under you, scripts/platforms.mjs covers it.
 
 // --- keyboard ------------------------------------------------------------
 console.log('\nkeyboard');
@@ -148,24 +159,33 @@ check('focus is visible', ring.startsWith('solid') && parseFloat(ring.split(' ')
 // --- names in the accessibility tree -------------------------------------
 // The home link announced itself twice, once from the mark's aria-label and
 // once from the word beside it, and the switcher carried one aria-label with
-// two languages in it — an attribute has no lang, so half of it was always
+// two languages in it, an attribute has no lang, so half of it was always
 // read in the wrong voice.
 console.log('\nnames');
 await page.goto(`${origin}/`, { waitUntil: 'domcontentloaded' });
 
-const wordmark = await page.locator('.wordmark').first().evaluate((link) => ({
-  svg: link.querySelector('svg')?.getAttribute('aria-hidden'),
-  labelled: link.querySelector('svg')?.hasAttribute('aria-label'),
-  text: link.textContent.trim(),
-}));
-check('the mark beside the word does not name itself', wordmark.svg === 'true' && !wordmark.labelled);
+const wordmark = await page
+  .locator('.wordmark')
+  .first()
+  .evaluate((link) => ({
+    svg: link.querySelector('svg')?.getAttribute('aria-hidden'),
+    labelled: link.querySelector('svg')?.hasAttribute('aria-label'),
+    text: link.textContent.trim(),
+  }));
+check(
+  'the mark beside the word does not name itself',
+  wordmark.svg === 'true' && !wordmark.labelled,
+);
 check('the home link is named once', wordmark.text === 'Obadh', wordmark.text);
 
-const switcher = await page.locator('.site-header .lang').first().evaluate((link) => ({
-  aria: link.getAttribute('aria-label'),
-  langs: [...link.querySelectorAll('span')].map((span) => span.getAttribute('lang')).join(','),
-  href: link.getAttribute('href'),
-}));
+const switcher = await page
+  .locator('.site-header .lang')
+  .first()
+  .evaluate((link) => ({
+    aria: link.getAttribute('aria-label'),
+    langs: [...link.querySelectorAll('span')].map((span) => span.getAttribute('lang')).join(','),
+    href: link.getAttribute('href'),
+  }));
 check('the switcher has no two-language aria-label', switcher.aria === null, switcher.aria ?? '');
 check('each run of the name carries its own language', switcher.langs === 'en,bn', switcher.langs);
 
@@ -181,11 +201,14 @@ check(
 );
 
 const eyebrows = await page.goto(`${origin}/`, { waitUntil: 'domcontentloaded' }).then(() =>
-  page.locator('.site-footer h2').first().evaluate((h) => ({
-    aria: h.getAttribute('aria-label'),
-    text: h.textContent.trim(),
-    shown: getComputedStyle(h).textTransform,
-  })),
+  page
+    .locator('.site-footer h2')
+    .first()
+    .evaluate((h) => ({
+      aria: h.getAttribute('aria-label'),
+      text: h.textContent.trim(),
+      shown: getComputedStyle(h).textTransform,
+    })),
 );
 check(
   'the eyebrow is not uppercased in CSS',
@@ -202,46 +225,29 @@ check('the switcher stays on the page', target === '/bn/faq/', target ?? 'missin
 // --- the scheme table ----------------------------------------------------
 console.log('\nthe scheme table');
 await page.goto(`${origin}/guide/`, { waitUntil: 'domcontentloaded' });
-const heads = await page.locator('.scheme').first().evaluate((table) =>
-  [...table.querySelectorAll('th')].map((th) => ({
-    aria: th.getAttribute('aria-label'),
-    text: th.textContent.trim(),
-  })),
-);
+const heads = await page
+  .locator('.scheme')
+  .first()
+  .evaluate((table) =>
+    [...table.querySelectorAll('th')].map((th) => ({
+      aria: th.getAttribute('aria-label'),
+      text: th.textContent.trim(),
+    })),
+  );
 check(
   'every column header is named in its own case',
   heads.length === 3 && heads.every((head) => head.aria === head.text),
   JSON.stringify(heads),
 );
 
-// --- the recording -------------------------------------------------------
-// The GIF used to replace the button outright: it could not be stopped, and
-// whoever had pressed it lost their place in the document.
-console.log('\nthe recording');
-await page.goto(`${origin}/download/`, { waitUntil: 'networkidle' });
-const play = page.locator('.shot__play').first();
-await play.scrollIntoViewIfNeeded();
-const frame = () => play.locator('img').evaluate((img) => ({ src: img.src, srcset: img.srcset }));
-const poster = await frame();
-await play.click();
-await page.waitForTimeout(200);
-check('pressing it plays the recording', (await frame()).src.endsWith('.gif'));
-check('the button says it is playing', (await play.getAttribute('aria-pressed')) === 'true');
-check('and keeps the focus it was given', await play.evaluate((b) => b === document.activeElement));
-await play.click();
-await page.waitForTimeout(200);
-const back = await frame();
-check(
-  'pressing it again puts the still frame back',
-  back.src === poster.src && back.srcset === poster.srcset,
-  `${back.src} | ${back.srcset}`,
-);
-check('and says so', (await play.getAttribute('aria-pressed')) === 'false');
-
 // --- the mobile sheet ----------------------------------------------------
 // Native <details> has no Escape handling, and this one is an overlay.
 console.log('\nthe mobile sheet');
-const narrow = await browser.newContext({ viewport: { width: 380, height: 800 }, hasTouch: true, isMobile: true });
+const narrow = await browser.newContext({
+  viewport: { width: 380, height: 800 },
+  hasTouch: true,
+  isMobile: true,
+});
 const small = await narrow.newPage();
 await small.goto(`${origin}/guide/`, { waitUntil: 'networkidle' });
 const menu = small.locator('.site-menu');
@@ -268,7 +274,13 @@ check('a press outside closes it', !(await menu.evaluate((details) => details.op
 console.log('\nreachable with a thumb');
 await summary.click();
 const targets = await small.evaluate(() => {
-  const wanted = ['.wordmark', '.site-menu__button', '.site-menu .lang', '.guide__index a', '#composer-input'];
+  const wanted = [
+    '.wordmark',
+    '.site-menu__button',
+    '.site-menu .lang',
+    '.guide__index a',
+    '#composer-input',
+  ];
   return wanted.map((selector) => {
     const el = document.querySelector(selector);
     if (!el) return { selector, missing: true };
@@ -292,7 +304,20 @@ console.log('\n320px, and 400% zoom, which is the same thing');
 for (const width of [320, 380]) {
   const context = await browser.newContext({ viewport: { width, height: 800 } });
   const narrowPage = await context.newPage();
-  for (const route of ['/', '/guide/', '/download/', '/about/', '/faq/', '/contribute/', '/privacy/', '/404.html', '/bn/', '/bn/guide/', '/bn/download/', '/bn/privacy/']) {
+  for (const route of [
+    '/',
+    '/guide/',
+    '/download/',
+    '/about/',
+    '/faq/',
+    '/contribute/',
+    '/privacy/',
+    '/404.html',
+    '/bn/',
+    '/bn/guide/',
+    '/bn/download/',
+    '/bn/privacy/',
+  ]) {
     await narrowPage.goto(`${origin}${route}`, { waitUntil: 'networkidle' });
     const over = await narrowPage.evaluate(() => {
       const doc = document.documentElement;
@@ -309,9 +334,20 @@ console.log('\nno javascript');
 const quiet = await browser.newContext({ javaScriptEnabled: false });
 const still = await quiet.newPage();
 await still.goto(`${origin}/`, { waitUntil: 'domcontentloaded' });
+/*
+  The hero server-renders its first line, so the device is a finished picture
+  before any script runs. The line itself is curated in hero-lines.json and
+  changes, so what is checked is that Bangla is there, not which Bangla.
+*/
+const heroText = await still
+  .locator('.device__text')
+  .first()
+  .textContent()
+  .then((t) => (t ?? '').trim());
 check(
-  'the hero pair renders without scripts',
-  (await still.locator('[data-output]').textContent()) === 'আমি বাংলায় গান গাই',
+  'the hero renders its first line without scripts',
+  /[\u0980-\u09ff]/.test(heroText),
+  heroText.slice(0, 40),
 );
 await quiet.close();
 

@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /**
- * Drives /download/ as each platform and checks it hands back the right panel.
+ * Drives the home page as each platform and checks the hero button.
+ *
+ *   iPhone, iPad  →  the App Store listing
+ *   Mac           →  the disk image, and a click that lands on /thanks/
+ *   anything else →  "Coming soon for <name>", pointing at /download/
  *
  * The user agents are real strings, not invented ones. The iPad pair matters
  * most: modern iPadOS asks for the desktop site and so arrives with a Mac's
@@ -20,76 +24,78 @@ const CHROME = [
 const PORT = 4333;
 const origin = `http://localhost:${PORT}`;
 
-/** What the download button should say on each platform. */
-const CTA = {
-  mac: 'Download for Mac',
-  iphone: 'Download for iPhone',
-  ipad: 'Download for iPad',
-};
-
 const CASES = [
   {
     name: 'macOS Safari',
     ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15',
     touch: 0,
-    panel: 'mac',
-    qr: true,
+    label: { en: 'Download for Mac', bn: 'ম্যাকের জন্য ডাউনলোড' },
+    href: /\.dmg$/,
+    direct: true,
   },
   {
     name: 'iPhone Safari',
     ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Mobile/15E148 Safari/604.1',
     touch: 5,
-    panel: 'ios',
-    qr: false,
+    label: { en: 'Download for iPhone', bn: 'আইফোনের জন্য ডাউনলোড' },
+    href: /apps\.apple\.com/,
+    direct: true,
   },
   {
     name: 'iPad, desktop user agent',
     ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15',
     touch: 5,
-    panel: 'ios',
-    qr: false,
+    label: { en: 'Download for iPad', bn: 'আইপ্যাডের জন্য ডাউনলোড' },
+    href: /apps\.apple\.com/,
+    direct: true,
   },
   {
     name: 'iPad, mobile user agent',
     ua: 'Mozilla/5.0 (iPad; CPU OS 18_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Mobile/15E148 Safari/604.1',
     touch: 5,
-    panel: 'ios',
-    qr: false,
+    label: { en: 'Download for iPad', bn: 'আইপ্যাডের জন্য ডাউনলোড' },
+    href: /apps\.apple\.com/,
+    direct: true,
   },
   {
     name: 'Windows Chrome',
     ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
     touch: 0,
-    panel: 'soon',
-    qr: true,
+    label: { en: 'Coming soon for Windows', bn: 'উইন্ডোজ-এর জন্য আসছে' },
+    href: /\/download\/$/,
+    direct: false,
   },
   {
     name: 'Linux Firefox',
     ua: 'Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0',
     touch: 0,
-    panel: 'soon',
-    qr: true,
+    label: { en: 'Coming soon for Linux', bn: 'লিনাক্স-এর জন্য আসছে' },
+    href: /\/download\/$/,
+    direct: false,
   },
   {
     name: 'Android Chrome',
     ua: 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
     touch: 5,
-    panel: 'soon',
-    qr: false,
+    label: { en: 'Coming soon for Android', bn: 'অ্যান্ড্রয়েড-এর জন্য আসছে' },
+    href: /\/download\/$/,
+    direct: false,
   },
   {
     name: 'ChromeOS',
     ua: 'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
     touch: 0,
-    panel: 'soon',
-    qr: true,
+    label: { en: 'Coming soon for ChromeOS', bn: 'ক্রোমওএস-এর জন্য আসছে' },
+    href: /\/download\/$/,
+    direct: false,
   },
   {
     name: 'something else entirely',
     ua: 'Mozilla/5.0 (PlayStation; PlayStation 5/2.26) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15',
     touch: 0,
-    panel: 'unknown',
-    qr: false,
+    label: { en: 'Coming soon for your device', bn: 'আপনার যন্ত্র-এর জন্য আসছে' },
+    href: /\/download\/$/,
+    direct: false,
   },
 ];
 
@@ -104,7 +110,10 @@ const check = (label, ok, detail = '') => {
   console.log(`  ${ok ? '✓' : '✗'} ${label}${detail ? `  ${detail}` : ''}`);
 };
 
-for (const route of ['/download/', '/bn/download/']) {
+for (const [route, locale] of [
+  ['/', 'en'],
+  ['/bn/', 'bn'],
+]) {
   console.log(`\n${route}`);
 
   for (const testCase of CASES) {
@@ -115,7 +124,7 @@ for (const route of ['/download/', '/bn/download/']) {
       Object.defineProperty(navigator, 'maxTouchPoints', { get: () => ${testCase.touch} });
 
       // Overriding the user agent leaves navigator.userAgentData describing a
-      // browser nobody is using — Playwright reports "Windows" for any user
+      // browser nobody is using, Playwright reports "Windows" for any user
       // agent it cannot parse, which is not a thing a real browser does. Taking
       // it away leaves a coherent fixture and exercises the fallback path.
       delete Navigator.prototype.userAgentData;
@@ -127,45 +136,81 @@ for (const route of ['/download/', '/bn/download/']) {
     await page.goto(origin + route, { waitUntil: 'networkidle' });
 
     const state = await page.evaluate(() => {
-      const shown = [...document.querySelectorAll('[data-panel]')].filter((el) => !el.hidden);
-      const qr = [...document.querySelectorAll('[data-qr]')].filter((el) => !el.hidden);
+      const el = document.querySelector('[data-platform-cta]');
+      if (!el) return null;
       return {
-        panels: shown.map((el) => el.dataset.panel),
-        heading: shown[0]?.querySelector('h2')?.textContent?.trim() ?? '',
-        qr: qr.length > 0,
+        label: el.querySelector('[data-cta-label]')?.textContent?.trim() ?? '',
+        href: el.getAttribute('href') ?? '',
+        direct: el.hasAttribute('data-direct'),
+        arrow: getComputedStyle(el.querySelector('.cta-arrow')).display !== 'none',
       };
     });
 
-    const one = state.panels.length === 1 && state.panels[0] === testCase.panel;
-    check(
-      `${testCase.name} → ${testCase.panel}`,
-      one && state.qr === testCase.qr && errors.length === 0,
-      one ? (state.qr === testCase.qr ? state.heading : `qr ${state.qr}`) : state.panels.join(','),
-    );
-
-    // Nothing may be left saying {platform}.
-    if (testCase.panel === 'soon') {
-      const raw = await page.evaluate(
-        () => document.querySelector('[data-panel="soon"]')?.textContent ?? '',
-      );
-      check('    the platform name is filled in', !raw.includes('{platform}'));
+    if (!state) {
+      check(`${testCase.name}`, false, 'no hero button on the page');
+      await context.close();
+      continue;
     }
 
+    const wanted = testCase.label[locale];
+    const ok =
+      state.label === wanted &&
+      testCase.href.test(state.href) &&
+      state.direct === testCase.direct &&
+      state.arrow === testCase.direct &&
+      errors.length === 0;
+
+    check(`${testCase.name} → ${wanted}`, ok, ok ? '' : `${state.label} | ${state.href}`);
     await context.close();
   }
+}
+
+// --- the Mac click hands off to /thanks/ ---------------------------------
+console.log('\nthe Mac hand-off');
+{
+  const context = await browser.newContext({ userAgent: CASES[0].ua });
+  await context.addInitScript(
+    "Object.defineProperty(navigator, 'maxTouchPoints', { get: () => 0 }); delete Navigator.prototype.userAgentData;",
+  );
+  const page = await context.newPage();
+  /*
+    The disk image is stubbed, what is under test is the hand-off, not GitHub.
+    The Content-Disposition matters: it is what GitHub sends for a release
+    asset, and it is why the browser downloads the file instead of navigating
+    to it, which is the whole reason the page is still there to redirect.
+  */
+  await page.route('**/*.dmg', (r) =>
+    r.fulfill({
+      status: 200,
+      headers: { 'content-disposition': 'attachment; filename=Obadh.dmg' },
+      body: 'stub',
+    }),
+  );
+  await page.goto(`${origin}/`, { waitUntil: 'networkidle' });
+  await page.click('[data-platform-cta]');
+  await page.waitForURL('**/thanks/', { timeout: 5000 }).catch(() => {});
+  check('a Mac click lands on /thanks/', new URL(page.url()).pathname === '/thanks/', page.url());
+  const steps = await page.locator('.step').count();
+  check('the steps are there', steps === 4, String(steps));
+  await context.close();
 }
 
 // --- and with the script off ---------------------------------------------
 console.log('\nwithout JavaScript');
 const bare = await browser.newContext({ javaScriptEnabled: false });
 const page = await bare.newPage();
+await page.goto(`${origin}/`, { waitUntil: 'domcontentloaded' });
+const cta = page.locator('[data-platform-cta]');
+check(
+  'the hero button falls back to the download page',
+  (await cta.getAttribute('href')) === '/download/',
+  (await cta.getAttribute('href')) ?? '',
+);
+
 await page.goto(`${origin}/download/`, { waitUntil: 'domcontentloaded' });
-const seen = await page
-  .locator('[data-panel]:not([hidden])')
-  .evaluateAll((els) => els.map((el) => el.dataset.panel));
-check('the fallback panel is the one showing', seen.length === 1 && seen[0] === 'all', seen.join(','));
-const buttons = await page.locator('[data-panel="all"] a').count();
-check('both platforms are reachable', buttons === 2, String(buttons));
+for (const id of ['ios', 'macos', 'turning-it-on', 'other-platforms', 'build-from-source']) {
+  check(`/download/ still has #${id}`, (await page.locator(`#${id}`).count()) === 1);
+}
 await bare.close();
 
 await browser.close();

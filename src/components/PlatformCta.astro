@@ -1,18 +1,19 @@
 ---
 /**
- * The hero's download button. It names the device in front of the reader and
- * links straight at that platform's release — the Mac disk image, the App
- * Store listing — rather than at the download page.
+ * The hero's download button, which reads the device in front of the reader.
+ *
+ *   iPhone, iPad  →  the App Store listing
+ *   Mac           →  starts the disk image, then goes to /thanks/ with the steps
+ *   anything else →  "Coming soon for Windows", and goes to /download/
  *
  * That is the difference between this and the button in the header, which
- * keeps the generic label and goes to `/download/`, where a person can read
- * about what they are installing first. This one is for someone who has
- * already decided.
+ * keeps the generic label and opens /download/, where every platform is listed
+ * at once. This one is for someone who has already decided.
  *
  * It ships as the generic button and is specialised on the client, so a
  * crawler and a reader without JavaScript get something true for everyone: the
- * download page. The arrow only appears once the link actually points at a
- * file, so the button never promises a download it is not going to start.
+ * download page. The arrow only appears once the link points at a release, so
+ * the button never promises a download it is not going to start.
  */
 import { ui } from '../i18n/ui';
 import { LINKS, localizedPath, type Locale } from '../config';
@@ -30,6 +31,13 @@ const targets = {
   iphone: LINKS.appStore,
   ipad: LINKS.appStore,
 };
+
+const soon = Object.fromEntries(
+  Object.entries(t.platformNames).map(([key, name]) => [
+    key,
+    t.comingFor.replace('{platform}', name),
+  ]),
+);
 ---
 
 <a
@@ -38,6 +46,9 @@ const targets = {
   data-platform-cta
   data-labels={JSON.stringify(t.getFor)}
   data-targets={JSON.stringify(targets)}
+  data-soon={JSON.stringify(soon)}
+  data-thanks={localizedPath('/thanks/', locale)}
+  data-fallback={localizedPath('/download/', locale)}
 >
   <svg
     class="cta-arrow"
@@ -59,7 +70,7 @@ const targets = {
 </a>
 
 <style>
-  /* Hidden until the link is a download rather than a page. */
+  /* Hidden until the link is a release rather than a page. */
   .cta-arrow {
     display: none;
     flex: none;
@@ -68,6 +79,14 @@ const targets = {
 
   [data-platform-cta][data-direct] .cta-arrow {
     display: block;
+  }
+
+  /* A platform we have not reached. The button stays a real link to the list,
+     so it is never a dead control, but it stops claiming to be a download. */
+  [data-platform-cta][data-soon-state] {
+    background: transparent;
+    border-color: var(--color-hair-strong);
+    color: var(--color-ink);
   }
 </style>
 
@@ -79,13 +98,43 @@ const targets = {
   for (const el of document.querySelectorAll<HTMLAnchorElement>('[data-platform-cta]')) {
     const labels = JSON.parse(el.dataset.labels ?? '{}') as Record<string, string>;
     const targets = JSON.parse(el.dataset.targets ?? '{}') as Record<string, string>;
+    const soon = JSON.parse(el.dataset.soon ?? '{}') as Record<string, string>;
+    const text = el.querySelector<HTMLElement>('[data-cta-label]');
+
     const label = labels[where];
     const target = targets[where];
-    if (!label || !target) continue;
 
-    const text = el.querySelector<HTMLElement>('[data-cta-label]');
-    if (text) text.textContent = label;
-    el.href = target;
-    el.dataset.direct = '';
+    if (label && target) {
+      if (text) text.textContent = label;
+      el.href = target;
+      el.dataset.direct = '';
+
+      /*
+        The Mac release is a file, and a file leaves the reader looking at the
+        page they were already on with no idea what to do next. The browser
+        downloads it without navigating, GitHub serves the disk image as an
+        attachment, so the click starts it and then moves the page on to the
+        steps. Without this script the same link still downloads; only the
+        hand-off to /thanks/ is lost.
+      */
+      if (where === 'mac') {
+        const thanks = el.dataset.thanks;
+        if (thanks) {
+          el.addEventListener('click', () => {
+            window.setTimeout(() => {
+              window.location.href = thanks;
+            }, 400);
+          });
+        }
+      }
+      continue;
+    }
+
+    // Somewhere we cannot ship to. Name it, and keep the link honest.
+    const waiting = soon[where] ?? soon.other;
+    if (!waiting) continue;
+    if (text) text.textContent = waiting;
+    el.href = el.dataset.fallback ?? el.href;
+    el.dataset.soonState = '';
   }
 </script>

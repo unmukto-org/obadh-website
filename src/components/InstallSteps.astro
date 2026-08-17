@@ -46,7 +46,7 @@ const { heading, intro, steps, after, id } = Astro.props;
 
           <div class="min-w-0 pt-1">
             <h4
-              class="text-lg font-semibold tracking-tight transition-colors duration-300 group-data-[on]:text-brand"
+              class="text-lg font-semibold tracking-tight transition-colors duration-300 group-data-[on]:text-brand-ink"
               set:html={step.heading}
             />
             <p class="mt-1.5 text-sm text-muted" set:html={step.body} />
@@ -56,7 +56,7 @@ const { heading, intro, steps, after, id } = Astro.props;
     }
   </ol>
 
-  {after && <p class="mt-8 max-w-prose text-sm text-muted [&_a]:text-brand" set:html={after} />}
+  {after && <p class="mt-8 max-w-prose text-sm text-muted [&_a]:text-brand-ink" set:html={after} />}
 </div>
 
 <style>
@@ -64,7 +64,7 @@ const { heading, intro, steps, after, id } = Astro.props;
      as progress rather than as one lit row travelling down a dead one. */
   [data-step][data-done] > span:first-child {
     border-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
-    color: var(--color-brand);
+    color: var(--color-brand-ink);
   }
 </style>
 

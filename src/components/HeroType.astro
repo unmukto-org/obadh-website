@@ -3,25 +3,25 @@
  * The hero: the keyboard working, as the three surfaces it actually is.
  *
  *   The field. Bangla appears here and nowhere else, because that is what
- *   happens — you never see the Roman on screen. The word still being composed
+ *   happens, you never see the Roman on screen. The word still being composed
  *   is underlined, which is the marked text both apps show until space or
  *   return commits it.
  *
  *   The suggestion bar, under the field and over the keys, where iOS puts it.
  *   It is live: every keystroke it shows the word in progress, what that word
- *   is going to be, and the emoji the keyboard has for it — because that is
+ *   is going to be, and the emoji the keyboard has for it, because that is
  *   what a suggestion bar does, rather than appearing once at the end.
  *
  *   And it gets taken. Some lines are mistyped on purpose, the bar offers the
  *   correction, and the demo taps it: the wrong word in the field becomes the
  *   right one. On a line that ends on a word with an emoji, tapping the emoji
- *   REPLACES the word — which is what the phone does, because the word you
+ *   REPLACES the word, which is what the phone does, because the word you
  *   typed was the query. Mid-sentence that would eat a word, so it is only ever
  *   shown at the end.
  *
  *   The keys. This is where the Roman shows: a key lights as it is pressed, and
  *   shift lights with it on a capital. That is the whole scheme in one gesture
- *   — `O` is a different vowel from `o`, and you can watch shift go down for it.
+ *  , `O` is a different vowel from `o`, and you can watch shift go down for it.
  *
  * The lines come from src/data/hero-lines.json via scripts/hero-lines.mjs,
  * which asks the engine what each one composes after every keystroke. Nothing
@@ -33,8 +33,8 @@
  * the browser nothing to shape, and আমার সোনার বাংলা renders as আম ◌ার স ◌োনার
  * with every mark orphaned onto a dotted circle.
  *
- * The one split that IS safe is at a space — a word boundary nothing shapes
- * across — and that is exactly the split the marked text needs. The committed
+ * The one split that IS safe is at a space, a word boundary nothing shapes
+ * across, and that is exactly the split the marked text needs. The committed
  * words and the word being composed are two runs; everything else is set whole.
  */
 import { HERO_LINES } from '../data/hero-lines';
@@ -49,7 +49,7 @@ const { label } = Astro.props;
 /*
   The server renders the first line and only the first line. Picking at random
   here would bake one choice into the build, and inlining all of them is 120 KB
-  of JSON in the markup — more than the rest of the page put together, and not
+  of JSON in the markup, more than the rest of the page put together, and not
   cacheable between visits. The rest arrives from /hero-lines.json, written by
   the same script, so the hero is complete before any script runs and gets the
   other fifty once one has.
@@ -60,8 +60,8 @@ const cut = first.bangla.lastIndexOf(' ') + 1;
 /*
   The app's own layout, from KeyboardLayout.swift in obadh-ios: three letter
   rows with shift and backspace inside the third, then a command row of 123,
-  emoji, space and return. Punctuation is not on the letters page — it lives
-  behind 123 — so a key like `^` lights that one, which is where you would
+  emoji, space and return. Punctuation is not on the letters page, it lives
+  behind 123, so a key like `^` lights that one, which is where you would
   actually have gone to find it.
 */
 interface Key {
@@ -111,7 +111,7 @@ const ROWS: Key[][] = [
     <span class="device__text device__mirror" lang="bn" data-mirror>{first.bangla}</span>
 
     {/*
-      The bar iOS puts between the field and the keys. Three slots, always —
+      The bar iOS puts between the field and the keys. Three slots, always,
       the two text candidates keep theirs whether or not there is a second one
       to show, and the emoji share the third between them. Slots that come and
       go make the bar twitch on every keystroke.
@@ -128,18 +128,14 @@ const ROWS: Key[][] = [
 
     <div class="device__keys">
       {
-        ROWS.map((row) => (
-          <div class="device__row">
-            {row.map((key) => (
-              <span
+        ROWS.map((row) => (<div class="device__row">
+            {row.map((key) => (<span
                 class:list={['key', key.wide && 'key--mod', key.space && 'key--space']}
                 data-key={key.k}
               >
                 {key.label ?? key.k}
-              </span>
-            ))}
-          </div>
-        ))
+              </span>))}
+          </div>))
       }
     </div>
   </div>
@@ -165,9 +161,21 @@ const ROWS: Key[][] = [
        input method as much as a phone keyboard, and a 30rem device stranded in
        the middle of a 78rem hero looks like a screenshot of something small. */
     width: min(100%, 44rem);
-    border: 1px solid var(--color-hair);
+
+    /*
+      The device keeps its own surface, deliberately pinned rather than taken
+      from the palette. Everything inside it, the key fills, their shadows,
+      the bar, is a mix against this ground, tuned by eye on it. The site's
+      card plane was lifted afterwards for contrast, and letting that through
+      here would re-tint every key. This is a picture of a phone, not a card.
+    */
+    --device-surface: #0d2b37;
+    --device-hair: #16333f;
+    --device-muted: #9db6bb;
+
+    border: 1px solid var(--device-hair);
     border-radius: var(--radius-panel);
-    background: var(--color-card);
+    background: var(--device-surface);
     box-shadow: var(--shadow-lift);
     overflow: hidden;
     text-align: start;
@@ -236,7 +244,7 @@ const ROWS: Key[][] = [
     /* Fixed. Three slots whatever there is to put in them. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
     min-height: 3.4rem;
-    border-block: 1px solid var(--color-hair);
+    border-block: 1px solid var(--device-hair);
     background: color-mix(in srgb, #000 12%, transparent);
   }
 
@@ -248,18 +256,18 @@ const ROWS: Key[][] = [
     font-size: var(--text-base);
     line-height: 1;
     letter-spacing: 0;
-    color: var(--color-muted);
+    color: var(--device-muted);
     white-space: nowrap;
     overflow: hidden;
   }
 
   /* iOS separates the slots with hairlines rather than boxes. */
   .device__cell + .device__cell {
-    box-shadow: -1px 0 0 var(--color-hair);
+    box-shadow: -1px 0 0 var(--device-hair);
   }
 
   /*
-    The one space commits. It is the word as composed, not the correction —
+    The one space commits. It is the word as composed, not the correction,
     nothing changes under your fingers unless you reach for it.
   */
   .device__cell--on:not(:empty) {
@@ -268,7 +276,7 @@ const ROWS: Key[][] = [
   }
 
   /*
-    The third slot is itself up to three, side by side — and only as many as
+    The third slot is itself up to three, side by side, and only as many as
     there are. Dividing it in three regardless left a lone emoji pinned in the
     left ninth of the bar with two empty ninths beside it, reading as something
     misaligned rather than as one suggestion. The OUTER three slots are still
@@ -405,8 +413,8 @@ const ROWS: Key[][] = [
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     /**
-     * The field is as tall as the tallest line in the set — not the tallest so
-     * far — so the device never changes height while it plays.
+     * The field is as tall as the tallest line in the set, not the tallest so
+     * far, so the device never changes height while it plays.
      */
     function lockHeight() {
       let tallest = 0;
@@ -418,7 +426,7 @@ const ROWS: Key[][] = [
     }
 
     /**
-     * Splits at the last space — the one boundary Bengali does not shape
+     * Splits at the last space, the one boundary Bengali does not shape
      * across. `settled` puts the whole line in the committed run, which is
      * what taking a suggestion does: the word stops being marked text.
      */
@@ -447,7 +455,7 @@ const ROWS: Key[][] = [
      * Lights the key for a character, and shift with it on a capital.
      *
      * The previous key is lifted first. Keystrokes can land 70 ms apart and the
-     * light lasts 105, so without this two keys are down at once — which reads
+     * light lasts 105, so without this two keys are down at once, which reads
      * as a stuck key rather than as typing.
      */
     let down: HTMLElement[] = [];
@@ -480,7 +488,7 @@ const ROWS: Key[][] = [
     /*
       Two shuffled decks, drawing from the one with suggestions about two times
       in three. Shuffling everything together would show the bar half as often
-      as it deserves — it is the part of the keyboard people ask about.
+      as it deserves, it is the part of the keyboard people ask about.
     */
     const shuffle = (list: number[]) => {
       const deck = [...list];
@@ -565,7 +573,7 @@ const ROWS: Key[][] = [
 
           /*
             A correction lands on the space, and by then the bar has nothing to
-            say — the word it was offering for is behind the cursor. So on that
+            say, the word it was offering for is behind the cursor. So on that
             keystroke the previous bar is held, which is the suggestion that was
             live when the space went down, and therefore the one being taken.
           */
@@ -624,8 +632,7 @@ const ROWS: Key[][] = [
       .catch(() => {});
 
     // It runs only while it is on screen.
-    const watcher = new IntersectionObserver(
-      (entries) => {
+    const watcher = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting && !running) void play();
           else if (!entry.isIntersecting && running) {
@@ -640,8 +647,7 @@ const ROWS: Key[][] = [
     watcher.observe(root);
 
     let resizing: number | undefined;
-    window.addEventListener(
-      'resize',
+    window.addEventListener('resize',
       () => {
         window.clearTimeout(resizing);
         resizing = window.setTimeout(() => {

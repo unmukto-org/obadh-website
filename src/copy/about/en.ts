@@ -9,7 +9,7 @@ import type { BlockContent } from '../types';
   them: the version, the dictionary, the two artifact sizes.
 
   Three things this page does not do. It does not frame Obadh as an iOS and
-  macOS product — the project is Bangla typing on every platform, and iPhone,
+  macOS product, the project is Bangla typing on every platform, and iPhone,
   iPad and Mac are the ones out first. It does not explain phonetic typing to
   someone who has been typing that way since school. And it does not print the
   tagline twice: the section quotes OmicronLab's line, and the page ends on
@@ -29,8 +29,7 @@ export const about: BlockContent = {
 
   eyebrow: 'About',
   heading: 'What Obadh is, and where it came from',
-  standfirst:
-    'A free Bangla keyboard that types by sound, fixes the words you get wrong, and never sends any of it anywhere.',
+  standfirst: 'A free Bangla keyboard, and the twenty-year-old idea it continues.',
 
   blocks: [
     {
@@ -38,34 +37,15 @@ export const about: BlockContent = {
       id: 'the-short-version',
       heading: 'In short',
       items: [
-        {
-          term: 'Today',
-          value: 'iPhone and iPad on iOS 18 or later. Mac on macOS 15 or later.',
-        },
+        { term: 'Today', value: 'iPhone and iPad on iOS 18 or later. Mac on macOS 15 or later.' },
         {
           term: 'Not yet',
           value:
             'Linux, Android, Windows and ChromeOS. Nobody has started any of the four, and <a href="/contribute/#the-platforms-that-need-someone">one of them could be yours</a>.',
         },
-        { term: 'Price', value: 'None. No ads, no subscription, nothing to sign in to.' },
+        { term: 'Price', value: 'Free to use. No ads, nothing to sign in to.' },
         { term: 'License', value: 'MIT, throughout. Engine 0.9.1, apps 0.1.0.' },
-        {
-          term: 'Network',
-          value:
-            'The keyboard has no networking code in it: no <code>URLSession</code>, no sockets.',
-        },
-        { term: 'Dictionary', value: '845,461 Bangla words, on the device.' },
-        { term: 'Written by', value: 'NSS Sayom.' },
-      ],
-    },
-
-    {
-      kind: 'prose',
-      id: 'what-it-does',
-      heading: 'Bangla in every app you already use',
-      body: [
-        'Obadh writes Bangla anywhere your device takes text: a message, a search box, a form, a document. On iPhone and iPad it is a keyboard; on a Mac it is an input source, the same kind of thing the system already ships with. You switch it on once in settings and then stop thinking about it.',
-        'What it writes is Unicode, so your words open as words on a machine that has never heard of this project, with no font to install and nothing to send along with the file. The <a href="/guide/">writing guide</a> has every rule of the scheme in one place, and <a href="/download/">the download page</a> has the steps.',
+        { term: 'Built by', value: '<a href="https://unmukto.org">Unmukto</a>, an open source collective.' },
       ],
     },
 
@@ -74,7 +54,7 @@ export const about: BlockContent = {
       id: 'where-it-came-from',
       heading: 'Where it came from',
       body: [
-        'For about fifteen years, writing Bangla on a computer meant buying software and learning a layout first, the way you learn a typewriter. What you produced was font-encoded text: a Latin key bound to a finished Bengali glyph inside a proprietary font, so the file was readable only on a machine that carried the same one.',
+        'For about fifteen years, writing Bangla on a computer meant buying software and learning a layout first. What you produced was font-encoded text, readable only on a machine carrying the same proprietary font. Then one student changed that.',
       ],
     },
 
@@ -88,15 +68,15 @@ export const about: BlockContent = {
         },
         {
           name: '21 April 2003',
-          body: 'The name Avro arrives, with version 0.9.0. Rifat Un Nabi, Tanbin Islam Siam and Shabab Mustafa carry the credit with him. They publish as OmicronLab, which is a handful of people and not a company.',
+          body: 'The name Avro arrives, with version 0.9.0. Rifat Un Nabi, Tanbin Islam Siam and Shabab Mustafa carry the credit with him. They publish as OmicronLab, a handful of people and not a company.',
         },
         {
           name: 'The years after',
-          body: 'Avro cost nothing, wrote Unicode, and let you type by sound. Phonetic typing became the ordinary way to write Bangla, taken up and reimplemented well beyond OmicronLab — Borno, OpenBangla on Linux, Wikipedia’s Universal Language Selector, other people’s Android keyboards. A generation learned to write its language by sound and never learned a layout at all.',
+          body: 'Avro cost nothing, wrote Unicode, and let you type by sound. A generation learned to write its language that way and never learned a layout at all.',
         },
         {
           name: 'February 2025',
-          body: 'The Ekushey Padak in science and technology goes to all four of them for Avro. Papers in Bangladesh reported that it had been announced for Mehdi Hasan Khan alone, that he asked for it to name the other three, and that the ministry then made it a joint award.',
+          body: 'The Ekushey Padak in science and technology goes to all four of them for Avro. It was announced for Mehdi Hasan Khan alone; he asked for it to name the other three, and the ministry made it a joint award.',
         },
       ],
     },
@@ -111,9 +91,8 @@ export const about: BlockContent = {
     {
       kind: 'prose',
       body: [
-        'Obadh’s line adds one word to that, and the added word is the whole relationship between the two projects.',
-        'So this is not a rewrite of Avro and not a fork of it. Obadh shares no code with it, and the Roman scheme is its own, deliberately — the whole of it written down in the <a href="/guide/">guide</a>, including <a href="/guide/#from-avro">a section for people arriving with Avro habits</a>. Nobody from OmicronLab has any part in this project, and nothing here should be read as their endorsement.',
-        'What Obadh takes is the premise: that the way a person writes their own language should not be something they buy, and should not be something anyone can take back.',
+        'Obadh’s line adds one word to that. It is not a rewrite of Avro and not a fork: no shared code, and a Roman scheme of its own, written down in <a href="/guide/">the guide</a> with <a href="/guide/#from-avro">a section for people arriving with Avro habits</a>. Nobody from OmicronLab has any part in this, and nothing here is their endorsement.',
+        'What it takes from Avro is the premise: the way you write your own language should not be something you buy, and should not be something anyone can take back.',
       ],
     },
 
@@ -122,43 +101,9 @@ export const about: BlockContent = {
       id: 'how-it-is-built',
       heading: 'Why it never guesses',
       body: [
-        'Type a word nobody has ever written down and Obadh still gets it right, the same way every time. That comes from one decision.',
-        'The layer that turns Roman into Bangla is rule-based and dictionary-free, and it is meant to stay that way. <code>kt</code> becomes <span lang="bn">ক্ত</span> because a rule says a consonant meeting a consonant binds, and that rule is a file in the repository with tests over it, not a statistical tendency.',
-        'A transliterator that leans on a word list is at its worst exactly where a language is most alive: your friend’s name, your village, a word your family uses and nobody else does, a line of Nazrul in the spelling of 1922. The core holds no opinion about how common a word is. When it is wrong, it is wrong for a reason someone can read, argue with and fix.',
+        'Type a word nobody has ever written down (your friend’s name, your village, a line of Nazrul in the spelling of 1922) and Obadh still gets it right, the same way every time.',
+        'The layer that turns Roman into Bangla holds no dictionary at all. <code>kt</code> becomes <span lang="bn">ক্ত</span> because a rule says a consonant meeting a consonant binds, and that rule is a file in <a href="https://github.com/nsssayom/obadh_engine">the repository</a> with tests over it. Corrections are a separate layer, and they only ever offer; nothing is inserted for you unless you switch that on.',
       ],
-    },
-
-    {
-      kind: 'facts',
-      items: [
-        {
-          term: 'The core',
-          value:
-            'One Rust library, <a href="https://github.com/nsssayom/obadh_engine"><code>obadh_engine</code></a>, with no word list inside it and no data files at all. About 390 KB compiled to WebAssembly, which is why the same code runs in a typing box on a web page.',
-        },
-        {
-          term: 'Autocorrect',
-          value:
-            'A finite-state lexicon of 845,461 Bangla words. It does not reach into your word and change it; it returns ranked candidates carrying their own reasons, as numbers rather than intuitions, and the keyboard decides what to do with them.',
-        },
-        {
-          term: 'Next word',
-          value:
-            'An n-gram model over a curated Bangla corpus, with a bounded personal overlay that learns from your own writing on your own device. The 29 MB artifact ships on iPhone and iPad only; a test in the macOS repository pins its absence.',
-        },
-        {
-          term: 'The seam',
-          value:
-            'Everything above the engine reaches it through a thin, versioned C interface: UTF-8 buffers in, packed records out, no objects and no callbacks. iOS and macOS link the same static library and share the same Swift layer over it.',
-        },
-        {
-          term: 'Each platform',
-          value:
-            'On iPhone and iPad the keyboard’s geometry is measured against Apple’s own and held there by a screenshot test suite. On a Mac, Obadh registers through InputMethodKit, shows the Bangla as marked text, and follows the caret with a candidate bar.',
-        },
-      ],
-      after:
-        'None of it needs the network, and there is nothing to switch off: no account, no telemetry, no sign-in. <a href="/privacy/">What Obadh does with your typing</a> is the long version of that sentence, down to the file each claim rests on.',
     },
 
     {
@@ -166,19 +111,18 @@ export const about: BlockContent = {
       id: 'the-name',
       heading: 'The name',
       body: [
-        '<span lang="bn">অবাধ</span>, romanized <code>obadh</code>, means unhindered. It is an everyday word rather than a coinage: <span lang="bn">অবাধে</span> is how you say that something happens freely, with nothing standing in its way.',
-        'What was asked of the software is the word itself. Not a price, not an account, not a layout, not a network.',
-        'Type <code>obadh</code> into the engine and it gives back <span lang="bn">অবাধ</span>. Type <code>obadhe bangla likhun</code> and it gives <span lang="bn">অবাধে বাংলা লিখুন</span>.',
+        '<span lang="bn">অবাধ</span>, romanized <code>obadh</code>, means unhindered. Nobody coined it for this: <span lang="bn">অবাধে</span> is how you say that something happens freely, with nothing in its way.',
+        'Type <code>obadhe bangla likhun</code> into the engine and it gives <span lang="bn">অবাধে বাংলা লিখুন</span>.',
       ],
     },
 
     {
       kind: 'prose',
       id: 'who-makes-it',
-      heading: 'Who writes it',
+      heading: 'Who builds it',
       body: [
-        'Obadh is written by NSS Sayom: the engine, the iOS keyboard, the macOS input method, and the data work behind the lexicon and the corpus. That is the entire list of names today, which is a fact about how old the project is rather than a preference.',
-        'The list of names is short; the list of things that would help is not. <a href="/contribute/">Where to start</a> says what each of them takes, and most of them are not code.',
+        '<a href="https://unmukto.org">Unmukto</a> is an open source collective that builds and maintains free software for the Bangla language and for Bangladesh. Obadh is one of those projects.',
+        'It is a small group, and plenty of the work that would help is <a href="/contribute/">not code</a>.',
       ],
     },
 
@@ -191,8 +135,8 @@ export const about: BlockContent = {
       id: 'the-license',
       heading: 'The license',
       body: [
-        'The engine, both apps and the scripts that build them are MIT licensed. The license is short enough to read in a minute: use Obadh for anything, including work you are paid for; read the source, change it, ship your own version; keep the copyright notice with any copy you pass on; and expect no warranty, because nobody is charging you for one.',
-        'Free of cost is the easy half. The half that matters more is that it cannot be withdrawn. If this project stopped tomorrow, everything needed to keep it alive would already be in the hands of anyone who wanted it, and nobody would have to ask.',
+        'MIT, throughout. Use Obadh for anything including work you are paid for, read the source, change it, ship your own version; keep the copyright notice on any copy you pass on, and expect no warranty.',
+        'The part that matters is not the price. If this project stopped tomorrow, everything needed to keep it alive is already in the hands of anyone who wants it.',
       ],
     },
   ],

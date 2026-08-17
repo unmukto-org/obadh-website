@@ -1,4 +1,60 @@
+# Everything here is meant to be read, by people and by machines alike.
 User-agent: *
 Allow: /
+
+# Assistants are named explicitly rather than left to the wildcard above. They
+# are welcome: someone asking a chatbot how to type Bangla on a Mac should get
+# an answer that matches this site, and that only happens if it can read it.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# The one page that is not for a reader who arrived from a search result.
+Disallow: /thanks/
+Disallow: /bn/thanks/
 
 Sitemap: https://obadh.unmukto.org/sitemap-index.xml

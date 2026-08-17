@@ -3,7 +3,7 @@ import type { ThanksContent } from '../types';
 export const thanks: ThanksContent = {
   meta: {
     title: 'ধন্যবাদ: ম্যাকে অবাধ ইনস্টল করা',
-    description: 'ডাউনলোড শুরু হয়েছে। চারটি ধাপে অবাধ ইনস্টল করে বাংলা লেখা শুরু করুন।',
+    description: 'ডাউনলোড শুরু হয়েছে। চারটি ধাপে ম্যাকে অবাধ ইনস্টল করে বাংলা লেখা শুরু করুন, আর ঠিকমতো চলছে কি না তা যাচাই করে নিন।',
   },
 
   eyebrow: 'নামছে',

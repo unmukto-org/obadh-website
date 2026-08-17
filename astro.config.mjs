@@ -21,7 +21,11 @@ export default defineConfig({
     // values for fourteen static pages is noise in the file.
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', bn: 'bn' } },
-      filter: (page) => !page.includes('/404'),
+      /* /thanks/ is noindex: it means nothing to anyone who did not arrive by
+         pressing the download button, and a sitemap entry for a page that asks
+         not to be indexed is two published statements contradicting each
+         other. */
+      filter: (page) => !page.includes('/404') && !page.includes('/thanks'),
 
       // The integration emits en and bn but no x-default, while every page's
       // <head> emits all three. Two published statements of the same fact

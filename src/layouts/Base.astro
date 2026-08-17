@@ -58,7 +58,14 @@ const {
 
 const t = ui[locale];
 const canonical = absoluteUrl(localizedPath(route, locale));
-const ogUrl = absoluteUrl(`/og/${ogImage}`);
+/*
+  One card per page per language. The Bangla card carries Bangla, so a link
+  shared in a Bangla conversation does not unfurl in English. The name is
+  derived rather than declared in the copy: two files that have to be kept in
+  step will not be.
+*/
+const ogFile = locale === 'bn' ? ogImage.replace(/\.png$/, '-bn.png') : ogImage;
+const ogUrl = absoluteUrl(`/og/${ogFile}`);
 const isBangla = locale === 'bn';
 
 /* Seven cards are served across fifteen pages, so the alt travels with the

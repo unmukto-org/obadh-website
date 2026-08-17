@@ -15,6 +15,8 @@ export const developers: DevelopersContent = {
     ogTitle: 'অবাধের উপরে বানান',
     ogDescription:
       'কিবোর্ড যে রাস্ট ইঞ্জিনটি চালায়, সেটিই একটি ক্রেট হিসেবে। নিয়মনিষ্ঠ, অভিধানহীন, এমআইটি লাইসেন্সে।',
+    ogImage: 'developers.png',
+    ogImageAlt: 'ডেভেলপারদের জন্য অবাধ, sobar upore manuSh লেখাটির নিচে তার বাংলা, সবার উপরে মানুষ',
   },
 
   eyebrow: 'ডেভেলপার',

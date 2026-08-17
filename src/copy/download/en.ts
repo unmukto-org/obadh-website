@@ -20,9 +20,9 @@ import { LINKS, SITE } from '../../config';
 */
 export const download: DownloadContent = {
   meta: {
-    title: 'Download Obadh: a free Bangla keyboard for iPhone, iPad and Mac',
+    title: 'Download Obadh: Bangla keyboard for iPhone, iPad and Mac',
     description:
-      'Get the free Obadh Bangla keyboard for iPhone, iPad and Mac. No account, works in every app you type in, and nothing you type leaves the device.',
+      'Install the Obadh Bangla keyboard on iPhone, iPad or Mac. Native controls, corrections as you type, and it works in every app you already use.',
     ogTitle: 'Download Obadh',
     ogDescription:
       'Free Bangla typing on iPhone, iPad and Mac. One button per platform, and nothing you type leaves the device.',

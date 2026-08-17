@@ -27,16 +27,95 @@ const OUT = join(ROOT, 'public/og');
 
 const SITE = 'obadh.unmukto.org';
 
+/*
+  A card has one job: someone sees it in a chat window at about 300px wide and
+  learns what this is. So every card carries the product line at the foot, the
+  page's own promise as the headline, and one engine-verified pair as the
+  picture. The pairs are checked against the engine before anything renders,
+  because the obvious spelling is usually the wrong one and an image has no
+  autocorrect.
+*/
+/*
+  A card has one job: someone sees it in a chat window at about 300px wide and
+  learns what this is. So it shows the keyboard.
+
+  It used to show a Roman/Bangla pair, which explained the input scheme to
+  people who already knew it and told everyone else nothing. The device says
+  "Bangla keyboard" without a word of explanation, and the line in its field
+  changes per page so the cards are not eight copies of one picture.
+
+  Every Bangla line here came out of the engine. Never add one that has not.
+*/
+const PRODUCT = {
+  en: 'A modern Bangla keyboard for every platform',
+  bn: 'সব প্ল্যাটফর্মের জন্য আধুনিক বাংলা কিবোর্ড',
+};
+
 const CARDS = [
-  { name: 'default', roman: 'ami banglay gan gai', bangla: 'আমি বাংলায় গান গাই' },
-  { name: 'download', roman: 'obadhe bangla likhun', bangla: 'অবাধে বাংলা লিখুন' },
-  { name: 'guide', roman: 'rrkSh', bangla: 'র্ক্ষ', second: { roman: 'NGj', bangla: 'ঞ্জ' } },
-  { name: 'about', tagline: true },
-  { name: 'faq', roman: 'aji e probhate robir kor', bangla: 'আজি এ প্রভাতে রবির কর' },
-  { name: 'contribute', roman: 'bhalObasa', bangla: 'ভালোবাসা' },
-  // The most private sentence a person types, on the page that explains it
-  // never leaves the phone.
-  { name: 'privacy', roman: 'ami tOmay bhalObasi', bangla: 'আমি তোমায় ভালোবাসি' },
+  {
+    name: 'default',
+    en: { title: 'Native Bangla typing, everywhere' },
+    bn: { title: 'সব যন্ত্রে চেনা বাংলা লেখা' },
+    roman: 'ami banglay gan gai',
+    bangla: 'আমি বাংলায় গান গাই',
+    bar: ['গান', 'গাান'],
+  },
+  {
+    name: 'download',
+    en: { title: 'Native on iPhone, iPad and Mac' },
+    bn: { title: 'আইফোন, আইপ্যাড আর ম্যাকে নেটিভ' },
+    roman: 'obadhe bangla likhun',
+    bangla: 'অবাধে বাংলা লিখুন',
+    bar: ['লিখুন', 'লিখুণ'],
+  },
+  {
+    name: 'guide',
+    en: { title: 'Every rule, in one place' },
+    bn: { title: 'সব নিয়ম এক জায়গায়' },
+    roman: 'rrkSh theke NGj',
+    bangla: 'র্ক্ষ থেকে ঞ্জ',
+    bar: ['ঞ্জ', 'নজ'],
+  },
+  {
+    name: 'about',
+    en: { title: 'Where Obadh came from' },
+    bn: { title: 'অবাধ এল কোথা থেকে' },
+    tagline: true,
+  },
+  {
+    name: 'faq',
+    en: { title: 'Questions, answered' },
+    bn: { title: 'প্রশ্ন, আর উত্তর' },
+    roman: 'aji e probhate robir kor',
+    bangla: 'আজি এ প্রভাতে রবির কর',
+    bar: ['রবির', 'রবীর'],
+  },
+  {
+    name: 'contribute',
+    en: { title: 'Help build it' },
+    bn: { title: 'আপনিও হাত লাগান' },
+    roman: 'bhalObasa',
+    bangla: 'ভালোবাসা',
+    bar: ['ভালোবাসা', 'ভালবাসা'],
+  },
+  {
+    // The most private sentence a person types, on the page that explains it
+    // never leaves the phone.
+    name: 'privacy',
+    en: { title: 'Nothing you type leaves your device' },
+    bn: { title: 'আপনার লেখা যন্ত্রেই থাকে' },
+    roman: 'ami tOmay bhalObasi',
+    bangla: 'আমি তোমায় ভালোবাসি',
+    bar: ['ভালোবাসি', 'ভালবাসি'],
+  },
+  {
+    name: 'developers',
+    en: { title: 'The engine is a library first' },
+    bn: { title: 'ইঞ্জিনটি আগে একটি লাইব্রেরি' },
+    roman: 'sobar upore manuSh',
+    bangla: 'সবার উপরে মানুষ',
+    bar: ['মানুষ', 'মানুস'],
+  },
 ];
 
 const MARK_PATH =
@@ -58,89 +137,169 @@ async function inlineFonts() {
 
 const fontCss = await inlineFonts();
 
-function page(card) {
-  // Geometry matches the site: Anek's matra is 0.629 em above the baseline,
-  // and IBM Plex Mono's ascent is 1.025 em with a 1.29 em box.
-  const row = (roman, bangla, scale = 1) => `
-    <div class="row" style="--s:${scale}">
-      <div class="cell roman">${roman}</div>
-      <div class="cell bn" lang="bn">${bangla}</div>
-    </div>`;
+/* The drawing is a mask, so it ships as a data URI and the colour stays in CSS. */
+const alponaUri = `data:image/svg+xml;base64,${(
+  await readFile(join(ROOT, 'public/art/alpona.svg'))
+).toString('base64')}`;
+
+/* Every pair is put through the engine before a card is drawn. The comment at
+   the top of this file used to ask a human to do this; asking the engine is
+   cheaper and cannot be forgotten. */
+const engine = process.env.OBADH_BIN ?? '/Users/nsssayom/Dev/obadh_engine/target/release/obadh';
+async function verifyPairs() {
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const run = promisify(execFile);
+  const pairs = [];
+  for (const card of CARDS) {
+    if (card.roman) pairs.push([card.roman, card.bangla]);
+    if (card.second) pairs.push([card.second.roman, card.second.bangla]);
+  }
+  let wrong = 0;
+  for (const [roman, bangla] of pairs) {
+    const { stdout } = await run(engine, [roman]);
+    const got = stdout.replace(/\n$/, '');
+    if (got !== bangla) {
+      wrong += 1;
+      console.error(`  ✗ ${roman}\n      card   ${bangla}\n      engine ${got}`);
+    }
+  }
+  if (wrong) {
+    console.error(`${wrong} pair(s) on the cards disagree with the engine.`);
+    process.exit(1);
+  }
+  console.log(`${pairs.length} pairs verified against the engine\n`);
+}
+
+function page(card, locale) {
+  const copy = card[locale];
+  const bn = locale === 'bn';
 
   /*
-    Two pairs go side by side, not one above the other. Stacked, the second
-    pair pushed the wordmark off the bottom edge of the 630px canvas, and the
-    only way to fit both vertically was to shrink them to the point where the
-    conjunct (the whole reason the guide card shows one) stopped reading at
-    the 300px an unfurl renders at. Side by side there is room to go larger
-    instead: two columns of 372px, inside the 406px this row has.
+    The keyboard, drawn the way the site draws it: a field with the Bangla in
+    it, the suggestion strip iOS puts above the keys, and enough of the keys
+    to be unmistakable. Two rows, not four. At the size a card is seen, the
+    bottom rows are texture and the strip is the part that says which keyboard
+    this is.
   */
-  const pair = Boolean(card.second);
-  const scale = pair ? 1.7 : 1;
+  const ROWS = ['qwertyuiop', 'asdfghjkl'];
+  const keys = ROWS.map(
+    (row) =>
+      `<div class="krow">${[...row].map((k) => `<span class="key">${k}</span>`).join('')}</div>`,
+  ).join('');
 
-  const body = card.tagline
+  const device = card.tagline
     ? `<div class="tagline" lang="bn">ভাষা হোক <b>আরও</b> উন্মুক্ত</div>`
-    : row(card.roman, card.bangla, scale) +
-      (pair ? row(card.second.roman, card.second.bangla, scale) : '');
+    : `<div class="device">
+        <div class="field" lang="bn">${card.bangla}<i class="caret"></i></div>
+        <div class="bar">
+          <span class="cell on" lang="bn">${card.bar[0]}</span>
+          <span class="cell" lang="bn">${card.bar[1]}</span>
+          <span class="cell emoji">🇧🇩</span>
+        </div>
+        <div class="keys">${keys}</div>
+      </div>`;
 
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     ${fontCss}
     * { margin:0; padding:0; box-sizing:border-box; }
-    /* The site's ground and the same faint wash the hero carries, so a card
-       unfurled in a chat window looks like the page it links to. */
     body {
       width:1200px; height:630px; background:#061A22; color:#EAF5F4;
-      /* One wash, the same one <body> carries on the site. */
       background-image:
-        radial-gradient(110% 60% at 50% -10%, rgba(22,80,111,0.38), transparent 70%);
+        radial-gradient(120% 80% at 8% -25%, rgba(22,80,111,0.44), transparent 68%);
       font-family:'Schibsted Grotesk',sans-serif;
-      display:flex; flex-direction:column; justify-content:space-between;
-      padding:72px 80px;
+      padding:60px 62px; position:relative; overflow:hidden;
+      display:grid; grid-template-columns:1fr 528px; align-items:center; gap:48px;
     }
-    .head { display:flex; align-items:center; gap:18px; }
-    .head svg { width:52px; height:52px; display:block; }
-    .head span { font-size:30px; font-weight:600; letter-spacing:-0.02em; }
-    .body { display:flex; flex-direction:column; gap:44px; }
-    .body.pair { flex-direction:row; align-items:flex-start; gap:200px; }
-    .row { display:flex; flex-direction:column; gap:16px; }
-    .cell { position:relative; width:max-content; max-width:1040px; }
-    .roman {
-      font-family:'IBM Plex Mono',monospace; font-size:calc(46px*var(--s));
-      line-height:1.45; color:#9DB6BB;
+    /* The alpona, entering from the right the way it enters the hero from the
+       left. Texture behind the device, never competing with it. */
+    .art {
+      position:absolute; inset-block-start:-260px; inset-inline-end:-360px;
+      width:760px; height:760px; background-color:#0d2c39;
+      -webkit-mask-image:url('${alponaUri}'); mask-image:url('${alponaUri}');
+      -webkit-mask-size:contain; mask-size:contain;
+      -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
     }
-    /* The Bangla carries the accent flat, the same way it does in the hero and
-       in the typing box. No rail over either run: a stroke at the matra height
-       reads as a line struck through the words. */
-    .bn {
-      font-family:'Anek Bangla',sans-serif; font-size:calc(88px*var(--s));
-      line-height:1.5; font-weight:500; letter-spacing:0; padding-block:0.06em;
-      color:#3CBFBC;
+    .left { position:relative; display:flex; flex-direction:column; gap:34px; height:100%; justify-content:space-between; }
+    .head { display:flex; align-items:center; gap:16px; }
+    .head svg { width:46px; height:46px; display:block; }
+    .head span { font-size:27px; font-weight:600; letter-spacing:-0.02em; }
+    .title {
+      font-size:${bn ? 56 : 60}px; font-weight:600; line-height:1.15;
+      letter-spacing:-0.025em; max-width:500px;
+      ${bn ? "font-family:'Anek Bangla',sans-serif; letter-spacing:0; line-height:1.36;" : ''}
+    }
+    .product {
+      font-size:21px; font-weight:500; color:#C2D6DA; max-width:500px; white-space:nowrap;
+      ${bn ? "font-family:'Anek Bangla',sans-serif;" : ''}
+    }
+    .site { font-family:'IBM Plex Mono',monospace; font-size:19px; color:#7D959B; margin-block-start:10px; }
+
+    /* --- the keyboard ---------------------------------------------------- */
+    .stage { position:relative; display:flex; align-items:center; height:100%; }
+    .device {
+      width:528px; border-radius:24px; border:1px solid #16333f;
+      background:#0d2b37; box-shadow:0 40px 90px -30px rgba(0,0,0,0.75);
+      overflow:hidden;
+    }
+    .field {
+      padding:26px 26px 22px; background:rgba(0,0,0,0.22);
+      font-family:'Anek Bangla',sans-serif; font-size:36px; font-weight:500;
+      line-height:1.5; letter-spacing:0; color:#EAF5F4; white-space:nowrap;
+    }
+    .caret {
+      display:inline-block; width:3px; height:0.95em; margin-inline-start:3px;
+      vertical-align:-0.14em; background:#3CBFBC;
+    }
+    .bar { display:grid; grid-template-columns:repeat(3,1fr); border-block:1px solid #16333f; }
+    .cell {
+      display:grid; place-items:center; padding:16px 8px;
+      font-family:'Anek Bangla',sans-serif; font-size:24px; color:#9DB6BB;
+      white-space:nowrap;
+    }
+    .cell + .cell { box-shadow:-1px 0 0 #16333f; }
+    .cell.on { color:#EAF5F4; font-weight:600; }
+    .cell.emoji { font-family:'Schibsted Grotesk',sans-serif; font-size:30px; }
+    .keys { display:grid; gap:9px; padding:18px 14px 22px; }
+    .krow { display:flex; justify-content:center; gap:8px; }
+    .key {
+      flex:1; display:grid; place-items:center; height:42px; border-radius:8px;
+      background:rgba(234,245,244,0.12); box-shadow:0 1px 0 rgba(0,0,0,0.45);
+      font-size:20px; color:rgba(234,245,244,0.85);
     }
     .tagline {
-      font-family:'Tiro Bangla',serif; font-size:96px; line-height:1.5;
-      letter-spacing:0; padding-block:0.06em;
+      font-family:'Tiro Bangla',serif; font-size:62px; line-height:1.5;
+      letter-spacing:0; padding-block:0.06em; text-align:center;
     }
     .tagline b { font-weight:400; color:#3CBFBC; }
-    .foot { font-family:'IBM Plex Mono',monospace; font-size:22px; color:#7D959B; }
   </style></head><body>
-    <div class="head">
-      <svg viewBox="0 0 512 512"><defs>
-        <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="209" x2="237" y2="0">
-          <stop offset="0" stop-color="#16506f"/><stop offset=".2367" stop-color="#1c7690"/>
-          <stop offset=".4996" stop-color="#23899b"/><stop offset=".7309" stop-color="#2aa7ab"/>
-          <stop offset="1" stop-color="#3cbfbc"/></linearGradient>
-        <clipPath id="c"><rect width="512" height="512" rx="121" ry="121"/></clipPath></defs>
-        <g clip-path="url(#c)"><rect width="512" height="512" fill="#1e2124"/>
-        <g transform="translate(96,115) scale(1.35)"><path fill="url(#g)" fill-rule="evenodd" d="${MARK_PATH}"/></g></g>
-      </svg>
-      <span>Obadh</span>
+    <div class="art"></div>
+    <div class="left">
+      <div class="head">
+        <svg viewBox="0 0 512 512"><defs>
+          <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="209" x2="237" y2="0">
+            <stop offset="0" stop-color="#16506f"/><stop offset=".2367" stop-color="#1c7690"/>
+            <stop offset=".4996" stop-color="#23899b"/><stop offset=".7309" stop-color="#2aa7ab"/>
+            <stop offset="1" stop-color="#3cbfbc"/></linearGradient>
+          <clipPath id="c"><rect width="512" height="512" rx="121" ry="121"/></clipPath></defs>
+          <g clip-path="url(#c)"><rect width="512" height="512" fill="#1e2124"/>
+          <g transform="translate(96,115) scale(1.35)"><path fill="url(#g)" fill-rule="evenodd" d="${MARK_PATH}"/></g></g>
+        </svg>
+        <span>Obadh</span>
+      </div>
+      <div class="title"${bn ? ' lang="bn"' : ''}>${copy.title}</div>
+      <div>
+        <div class="product"${bn ? ' lang="bn"' : ''}>${PRODUCT[locale]}</div>
+        <div class="site">${SITE}</div>
+      </div>
     </div>
-    <div class="body${pair ? ' pair' : ''}">${body}</div>
-    <div class="foot">${SITE}</div>
+    <div class="stage">${device}</div>
   </body></html>`;
 }
 
+await verifyPairs();
 await mkdir(OUT, { recursive: true });
+
 const browser = await chromium.launch({ executablePath: findExecutable() });
 const context = await browser.newContext({
   viewport: { width: 1200, height: 630 },
@@ -151,36 +310,44 @@ const tab = await context.newPage();
 let overflowed = 0;
 
 for (const card of CARDS) {
-  await tab.setContent(page(card), { waitUntil: 'load' });
-  await tab.evaluate(() => document.fonts.ready);
+  for (const locale of ['en', 'bn']) {
+    await tab.setContent(page(card, locale), { waitUntil: 'load' });
+    await tab.evaluate(() => document.fonts.ready);
 
-  /*
-    A card that overruns the canvas still writes a PNG, and the only sign is
-    the wordmark sliced by the bottom edge, which is how the two-row guide
-    card shipped. Measure the flex column before trusting the screenshot.
-  */
-  const fit = await tab.evaluate(() => {
-    const box = (selector) => document.querySelector(selector).getBoundingClientRect();
-    const body = box('.body');
-    const foot = box('.foot');
-    return {
-      body: Math.round(body.height),
-      clear: Math.round(foot.top - body.bottom),
-      spill: Math.round(foot.bottom - document.body.clientHeight),
-    };
-  });
-  if (fit.clear < 0 || fit.spill > 0) {
-    overflowed += 1;
-    console.error(
-      `${card.name}: body ${fit.body}px overruns the canvas ` +
-        `(${fit.clear}px to the wordmark, ${fit.spill}px past the edge)`,
+    /*
+      A card that overruns the canvas still writes a PNG, and the only sign is
+      the product line sliced by the bottom edge. Measure before trusting the
+      screenshot: the middle block has to clear the foot, and nothing may sit
+      past the canvas.
+    */
+    const fit = await tab.evaluate(() => {
+      const box = (s) => document.querySelector(s)?.getBoundingClientRect();
+      const left = box('.left');
+      const art = box('.device') ?? box('.tagline');
+      const h = document.body.clientHeight;
+      return {
+        mid: Math.round(art.height),
+        clear: Math.round(h - left.bottom),
+        above: Math.round(left.top),
+        spill: Math.round(Math.max(art.bottom - h, 0)),
+      };
+    });
+    if (fit.clear < 0 || fit.above < 0 || fit.spill > 0) {
+      overflowed += 1;
+      console.error(
+        `${card.name}.${locale}: ${fit.above}px under the wordmark, ` +
+          `${fit.clear}px to the product line, ${fit.spill}px past the edge`,
+      );
+    }
+
+    const file = join(OUT, `${card.name}${locale === 'bn' ? '-bn' : ''}.png`);
+    await tab.screenshot({ path: file });
+    const { size } = await import('node:fs').then((fs) => fs.statSync(file));
+    console.log(
+      `${(card.name + (locale === 'bn' ? '-bn' : '')).padEnd(16)} ` +
+        `${(size / 1024).toFixed(0).padStart(3)} KB   clear ${fit.clear}px`,
     );
   }
-
-  const file = join(OUT, `${card.name}.png`);
-  await tab.screenshot({ path: file });
-  const { size } = await import('node:fs').then((fs) => fs.statSync(file));
-  console.log(`${card.name}.png  ${(size / 1024).toFixed(0)} KB  body ${fit.body}px`);
 }
 
 await browser.close();

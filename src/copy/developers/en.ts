@@ -17,6 +17,9 @@ export const developers: DevelopersContent = {
     ogTitle: 'Build on Obadh',
     ogDescription:
       'The same Rust engine the keyboard runs, as a crate you can depend on. Deterministic, dictionary-free, MIT licensed.',
+    ogImage: 'developers.png',
+    ogImageAlt:
+      'Obadh for developers, with the Roman string sobar upore manuSh above the Bangla it composes, সবার উপরে মানুষ',
   },
 
   eyebrow: 'Developers',

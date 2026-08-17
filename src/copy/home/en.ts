@@ -10,12 +10,12 @@ import type { HomeContent } from '../types';
 */
 export const home: HomeContent = {
   meta: {
-    title: 'Obadh: a free, fast Bangla keyboard',
+    title: 'Obadh: a modern Bangla keyboard for iPhone, iPad and Mac',
     description:
-      'A free Bangla keyboard that is fast, gets the word right, and keeps everything on your device. On iPhone, iPad and Mac, with Linux, Android and Windows on the way.',
-    ogTitle: 'Obadh: a free, fast Bangla keyboard',
+      'A modern Bangla keyboard for iPhone, iPad and Mac. Composes a word in three microseconds, corrects as you type, and nothing you type leaves the device.',
+    ogTitle: 'Obadh: a modern Bangla keyboard',
     ogDescription:
-      'Fast, accurate Bangla typing on every device. Free, open source, and nothing you type leaves your phone.',
+      'Fast, accurate Bangla typing that feels native on every device it reaches, with corrections that come from 845,461 words and nothing leaving your phone.',
     ogImage: 'default.png',
     ogImageAlt:
       'The Roman string ami banglay gan gai above the Bangla it composes, আমি বাংলায় গান গাই',

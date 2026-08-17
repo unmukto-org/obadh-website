@@ -1,0 +1,205 @@
+---
+import '../styles/app.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { ui } from '../i18n/ui';
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  LOCALE_TAG,
+  SITE,
+  absoluteUrl,
+  localizedPath,
+  type Locale,
+} from '../config';
+
+interface Props {
+  locale: Locale;
+  /** Path without a locale prefix, e.g. `/about/`. */
+  route: string;
+  title: string;
+  description: string;
+  /** Filename in /og/. Falls back to the site card. */
+  ogImage?: string;
+  /** Describes the card above, and only it. Falls back with the image it belongs to. */
+  ogImageAlt?: string;
+  /** Read in a chat window rather than a result list, so it can be plainer. */
+  ogTitle?: string;
+  ogDescription?: string;
+  /** Extra JSON-LD graph nodes for this page. */
+  schema?: Record<string, unknown>[];
+  /** Preload the Bangla text serif too, for pages that open with it. */
+  preloadSerif?: boolean;
+  /**
+   * Keeps a page out of the index, out of the hreflang cluster, and out of
+   * every place a URL is asserted: canonical, og:url and the page half of the
+   * JSON-LD graph. See the note below.
+   */
+  noindex?: boolean;
+  /** Hides the language switcher, for a page that carries both languages. */
+  noSwitch?: boolean;
+}
+
+const {
+  locale,
+  route,
+  title,
+  description,
+  ogImage = 'default.png',
+  ogImageAlt,
+  ogTitle,
+  ogDescription,
+  schema = [],
+  preloadSerif = false,
+  noindex = false,
+  noSwitch = false,
+} = Astro.props;
+
+const t = ui[locale];
+const canonical = absoluteUrl(localizedPath(route, locale));
+const ogUrl = absoluteUrl(`/og/${ogImage}`);
+const isBangla = locale === 'bn';
+
+/* Seven cards are served across fifteen pages, so the alt travels with the
+   image rather than with the site. The fallback is the default card's own alt,
+   which is right for every page that takes the default image and for no other. */
+const imageAlt = ogImageAlt ?? t.ogImageAlt;
+
+/* The 404 is the only noindex route, and it is the one page served at addresses
+   that do not match it: /404/ itself is not a page here. A canonical or an
+   og:url there would name a URL that returns 404, which is a claim a crawler
+   acts on. The title, description and card stay, because a chat window still
+   unfurls a dead link someone pasted. */
+const routed = !noindex;
+---
+
+<!doctype html>
+<html lang={LOCALE_TAG[locale]} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {routed && <link rel="canonical" href={canonical} />}
+
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    {
+      /* A dangling alternate is worse than an absent one, so the cluster is
+         only emitted for pages that exist in both languages. */
+      !noindex && (
+        <>
+          {LOCALES.map((other) => (
+            <link
+              rel="alternate"
+              hreflang={LOCALE_TAG[other]}
+              href={absoluteUrl(localizedPath(route, other))}
+            />
+          ))}
+          <link
+            rel="alternate"
+            hreflang="x-default"
+            href={absoluteUrl(localizedPath(route, DEFAULT_LOCALE))}
+          />
+        </>
+      )
+    }
+
+    <!-- Applied before first paint, so a chosen theme never flashes the other
+         one, and `js` is set here so the scroll reveal starts hidden only when
+         something is going to show it again. -->
+    <script is:inline>
+      (() => {
+        document.documentElement.classList.add('js');
+        try {
+          const saved = localStorage.getItem('obadh-theme');
+          if (saved === 'light' || saved === 'dark') {
+            document.documentElement.dataset.theme = saved;
+          }
+        } catch {}
+      })();
+    </script>
+
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/schibsted-grotesk-3.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/anek-bangla-0.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-9.woff2" crossorigin />
+    {
+      (preloadSerif || isBangla) && (
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/tiro-bangla-3.woff2" crossorigin />
+      )
+    }
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#061a22" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={isBangla ? 'bn_BD' : 'en_US'} />
+    <meta property="og:locale:alternate" content={isBangla ? 'en_US' : 'bn_BD'} />
+    {routed && <meta property="og:url" content={canonical} />}
+    <meta property="og:title" content={ogTitle ?? title} />
+    <meta property="og:description" content={ogDescription ?? description} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle ?? title} />
+    <meta name="twitter:description" content={ogDescription ?? description} />
+    <meta name="twitter:image" content={ogUrl} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <meta name="author" content={SITE.author} />
+    {/* The section is `the-license`, and a Bangla page keeps its reader in Bangla. */}
+    <link rel="license" href={`${absoluteUrl(localizedPath('/about/', locale))}#the-license`} />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
+    <JsonLd
+      locale={locale}
+      route={route}
+      title={title}
+      description={description}
+      routed={routed}
+      extra={schema}
+    />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">{t.skipToContent}</a>
+    <Header locale={locale} route={route} noSwitch={noSwitch} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+
+    <script>
+      // One observer for the whole page. Each block rises fourteen pixels into
+      // place the first time it is seen, and is never touched again.
+      const blocks = document.querySelectorAll('[data-reveal]');
+      if (blocks.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const seen = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add('is-visible');
+              seen.unobserve(entry.target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.05 },
+        );
+        for (const block of blocks) seen.observe(block);
+      } else {
+        for (const block of blocks) block.classList.add('is-visible');
+      }
+    </script>
+  </body>
+</html>

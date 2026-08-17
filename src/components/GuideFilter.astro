@@ -1,0 +1,197 @@
+---
+/**
+ * The one control that makes 176 rows usable: a field that narrows every table
+ * on the page as you type, matching the keystrokes, the Bangla, or the note.
+ *
+ * It rides under the site header for the length of the page, because the row
+ * you want is never the one next to where you happen to be standing.
+ *
+ * Nothing here works without JavaScript, and nothing here is needed without
+ * it: the whole bar is hidden until the inline script in Base.astro has put
+ * `js` on the root element, so a scriptless page is the full scheme, visible.
+ */
+import type { GuideTools } from '../copy/types';
+
+interface Props {
+  tools: GuideTools;
+  /** Row count, printed before anyone has typed anything. */
+  total: string;
+}
+
+const { tools, total } = Astro.props;
+---
+
+<div class="guide__bar" data-guide-bar>
+  <div class="shell guide__bar-inner">
+    <label class="visually-hidden" for="guide-filter">{tools.filterLabel}</label>
+
+    <div class="guide__field">
+      <svg
+        class="guide__field-icon"
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.6-3.6"></path>
+      </svg>
+
+      <input
+        id="guide-filter"
+        class="guide__input"
+        type="search"
+        placeholder={tools.filterPlaceholder}
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        enterkeyhint="search"
+        data-guide-input
+      />
+
+      <button type="button" class="guide__clear" data-guide-clear hidden>
+        <span class="visually-hidden">{tools.clear}</span>
+        <svg
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+      </button>
+    </div>
+
+    {
+      /* The count is printed as it changes; the announcement waits until the
+         keys stop, so a screen reader is told the result rather than read
+         every intermediate one. The copy buttons speak through both. */
+    }
+    <p class="guide__count" data-guide-count>{total}</p>
+    <span class="visually-hidden" aria-live="polite" aria-atomic="true" data-guide-live></span>
+  </div>
+</div>
+
+<style>
+  .guide__bar {
+    position: sticky;
+    inset-block-start: var(--guide-header, 4.0625rem);
+    z-index: 20;
+    background: var(--color-ground);
+    border-block-end: 1px solid var(--color-hair);
+  }
+
+  :global(html:not(.js)) .guide__bar {
+    display: none;
+  }
+
+  .guide__bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 0.5rem;
+  }
+
+  .guide__field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* The field gives up width to the count, not the other way round: a count
+       cut to "176 of 1…" is worse than a narrower field. */
+    flex: 1 1 6rem;
+    min-width: 0;
+    max-width: 22rem;
+    border: 1px solid var(--color-hair-strong);
+    border-radius: 999px;
+    background: var(--color-veil);
+    padding-inline: 0.75rem;
+    transition:
+      border-color 140ms var(--ease-out),
+      box-shadow 140ms var(--ease-out);
+  }
+
+  .guide__field:focus-within {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 20%, transparent);
+  }
+
+  .guide__field-icon {
+    flex: none;
+    color: var(--color-faint);
+  }
+
+  .guide__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 40px;
+    padding-inline: 0.55rem;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .guide__input:focus {
+    outline: none;
+  }
+
+  .guide__input::placeholder {
+    color: var(--color-faint);
+  }
+
+  /* The field has its own clear button, in both languages and both engines. */
+  .guide__input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .guide__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-inline-end: -0.25rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--color-faint);
+    cursor: pointer;
+  }
+
+  .guide__clear:hover {
+    color: var(--color-ink);
+    background: var(--color-raise);
+  }
+
+  .guide__count {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--text-2xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-faint);
+    white-space: nowrap;
+  }
+
+  :global(html[lang='bn']) .guide__count {
+    font-size: var(--text-xs);
+  }
+
+  @media (forced-colors: active) {
+    .guide__field {
+      border-color: CanvasText;
+    }
+  }
+</style>

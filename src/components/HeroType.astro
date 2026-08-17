@@ -1,0 +1,655 @@
+---
+/**
+ * The hero: the keyboard working, as the three surfaces it actually is.
+ *
+ *   The field. Bangla appears here and nowhere else, because that is what
+ *   happens — you never see the Roman on screen. The word still being composed
+ *   is underlined, which is the marked text both apps show until space or
+ *   return commits it.
+ *
+ *   The suggestion bar, under the field and over the keys, where iOS puts it.
+ *   It is live: every keystroke it shows the word in progress, what that word
+ *   is going to be, and the emoji the keyboard has for it — because that is
+ *   what a suggestion bar does, rather than appearing once at the end.
+ *
+ *   And it gets taken. Some lines are mistyped on purpose, the bar offers the
+ *   correction, and the demo taps it: the wrong word in the field becomes the
+ *   right one. On a line that ends on a word with an emoji, tapping the emoji
+ *   REPLACES the word — which is what the phone does, because the word you
+ *   typed was the query. Mid-sentence that would eat a word, so it is only ever
+ *   shown at the end.
+ *
+ *   The keys. This is where the Roman shows: a key lights as it is pressed, and
+ *   shift lights with it on a capital. That is the whole scheme in one gesture
+ *   — `O` is a different vowel from `o`, and you can watch shift go down for it.
+ *
+ * The lines come from src/data/hero-lines.json via scripts/hero-lines.mjs,
+ * which asks the engine what each one composes after every keystroke. Nothing
+ * is transcribed, so what the page shows is what the keyboard would do.
+ *
+ * NEVER SPLIT THE BANGLA INTO PER-CHARACTER SPANS. Bengali shapes across
+ * characters: া and ো are combining marks belonging to the consonant before
+ * them, and conjuncts form from sequences. One element per code point leaves
+ * the browser nothing to shape, and আমার সোনার বাংলা renders as আম ◌ার স ◌োনার
+ * with every mark orphaned onto a dotted circle.
+ *
+ * The one split that IS safe is at a space — a word boundary nothing shapes
+ * across — and that is exactly the split the marked text needs. The committed
+ * words and the word being composed are two runs; everything else is set whole.
+ */
+import { HERO_LINES } from '../data/hero-lines';
+
+interface Props {
+  /** Read out in place of the animation. Carries `lang` markup on its scripts. */
+  label: string;
+}
+
+const { label } = Astro.props;
+
+/*
+  The server renders the first line and only the first line. Picking at random
+  here would bake one choice into the build, and inlining all of them is 120 KB
+  of JSON in the markup — more than the rest of the page put together, and not
+  cacheable between visits. The rest arrives from /hero-lines.json, written by
+  the same script, so the hero is complete before any script runs and gets the
+  other fifty once one has.
+*/
+const first = HERO_LINES[0];
+const cut = first.bangla.lastIndexOf(' ') + 1;
+
+/*
+  The app's own layout, from KeyboardLayout.swift in obadh-ios: three letter
+  rows with shift and backspace inside the third, then a command row of 123,
+  emoji, space and return. Punctuation is not on the letters page — it lives
+  behind 123 — so a key like `^` lights that one, which is where you would
+  actually have gone to find it.
+*/
+interface Key {
+  /** What the key types, or a name for the ones that do not type. */
+  k: string;
+  /** What it shows, when that is not what it types. */
+  label?: string;
+  /** The command keys, which are wider than a letter. */
+  wide?: boolean;
+  /** The space bar, which takes what is left of the row. */
+  space?: boolean;
+}
+
+const ROWS: Key[][] = [
+  [{ k: 'q' }, { k: 'w' }, { k: 'e' }, { k: 'r' }, { k: 't' }, { k: 'y' }, { k: 'u' }, { k: 'i' }, { k: 'o' }, { k: 'p' }],
+  [{ k: 'a' }, { k: 's' }, { k: 'd' }, { k: 'f' }, { k: 'g' }, { k: 'h' }, { k: 'j' }, { k: 'k' }, { k: 'l' }],
+  [
+    { k: 'shift', label: '⇧', wide: true },
+    { k: 'z' }, { k: 'x' }, { k: 'c' }, { k: 'v' }, { k: 'b' }, { k: 'n' }, { k: 'm' },
+    { k: 'backspace', label: '⌫', wide: true },
+  ],
+  [
+    { k: 'symbols', label: '123', wide: true },
+    { k: 'emoji', label: '☺', wide: true },
+    { k: ' ', space: true },
+    { k: 'return', label: '↵', wide: true },
+  ],
+];
+---
+
+<div class="hero-type" data-hero-type>
+  <p class="visually-hidden" set:html={label} />
+
+  <div class="device" aria-hidden="true">
+    {/* Where the Bangla lands. */}
+    <div class="device__field">
+      <p class="device__text">
+        <span lang="bn" data-committed>{first.bangla.slice(0, cut)}</span><span
+          class="device__mark"
+          lang="bn"
+          data-composing>{first.bangla.slice(cut)}</span
+        ><span class="device__caret"></span>
+      </p>
+    </div>
+
+    {/* Measured, never seen: the tallest line decides the field's height. */}
+    <span class="device__text device__mirror" lang="bn" data-mirror>{first.bangla}</span>
+
+    {/*
+      The bar iOS puts between the field and the keys. Three slots, always —
+      the two text candidates keep theirs whether or not there is a second one
+      to show, and the emoji share the third between them. Slots that come and
+      go make the bar twitch on every keystroke.
+    */}
+    <div class="device__bar" data-strip>
+      <span class="device__cell device__cell--on" lang="bn" data-slot-a></span>
+      <span class="device__cell" lang="bn" data-slot-b></span>
+      <span class="device__cell device__cell--emoji" data-slot-c>
+        <span class="device__emoji" data-emoji-0></span>
+        <span class="device__emoji" data-emoji-1></span>
+        <span class="device__emoji" data-emoji-2></span>
+      </span>
+    </div>
+
+    <div class="device__keys">
+      {
+        ROWS.map((row) => (
+          <div class="device__row">
+            {row.map((key) => (
+              <span
+                class:list={['key', key.wide && 'key--mod', key.space && 'key--space']}
+                data-key={key.k}
+              >
+                {key.label ?? key.k}
+              </span>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <script
+    is:inline
+    type="application/json"
+    data-hero-first
+    set:html={JSON.stringify(first)}
+  />
+</div>
+
+<style>
+  .hero-type {
+    display: grid;
+    justify-items: center;
+    width: 100%;
+  }
+
+  /* One surface, three parts, stacked the way the system stacks them. */
+  .device {
+    /* As wide as the reading column, not as wide as a phone. Obadh is a Mac
+       input method as much as a phone keyboard, and a 30rem device stranded in
+       the middle of a 78rem hero looks like a screenshot of something small. */
+    width: min(100%, 44rem);
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-panel);
+    background: var(--color-card);
+    box-shadow: var(--shadow-lift);
+    overflow: hidden;
+    text-align: start;
+  }
+
+  .device__field {
+    display: flex;
+    align-items: center;
+    min-height: var(--field-h, 6rem);
+    padding: 1.15rem clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
+    background: color-mix(in srgb, #000 22%, transparent);
+  }
+
+  .device__text {
+    font-family: var(--font-bangla);
+    font-size: clamp(1.375rem, 1rem + 1.7vw, 2.25rem);
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0;
+    /* ঁ reaches nearly a full em above the baseline. */
+    padding-block: 0.08em;
+    color: var(--color-ink);
+  }
+
+  /* Marked text: what both apps underline until space commits it. */
+  .device__mark {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-brand) 75%, transparent);
+    text-decoration-thickness: 2px;
+    /* Bengali descends far enough that the default offset draws through it. */
+    text-underline-offset: 0.3em;
+    text-decoration-skip-ink: none;
+  }
+
+  .device__caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-inline-start: 1px;
+    vertical-align: -0.16em;
+    background: var(--color-brand);
+    animation: hero-caret 1.06s steps(1) infinite;
+  }
+
+  @keyframes hero-caret {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    50.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .device__mirror {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* --- the suggestion bar ----------------------------------------------- */
+
+  .device__bar {
+    display: grid;
+    /* Fixed. Three slots whatever there is to put in them. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-height: 3.4rem;
+    border-block: 1px solid var(--color-hair);
+    background: color-mix(in srgb, #000 12%, transparent);
+  }
+
+  .device__cell {
+    display: grid;
+    place-items: center;
+    padding-inline: 0.35rem;
+    font-family: var(--font-bangla);
+    font-size: var(--text-base);
+    line-height: 1;
+    letter-spacing: 0;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* iOS separates the slots with hairlines rather than boxes. */
+  .device__cell + .device__cell {
+    box-shadow: -1px 0 0 var(--color-hair);
+  }
+
+  /*
+    The one space commits. It is the word as composed, not the correction —
+    nothing changes under your fingers unless you reach for it.
+  */
+  .device__cell--on:not(:empty) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /*
+    The third slot is itself up to three, side by side — and only as many as
+    there are. Dividing it in three regardless left a lone emoji pinned in the
+    left ninth of the bar with two empty ninths beside it, reading as something
+    misaligned rather than as one suggestion. The OUTER three slots are still
+    fixed; it is only this slot's own division that follows its contents.
+  */
+  .device__cell--emoji {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    justify-content: center;
+    gap: 0.2rem;
+    padding-inline: 0.2rem;
+  }
+
+  .device__emoji {
+    display: grid;
+    place-items: center;
+    min-width: 2.5em;
+    padding-block: 0.22em;
+    /* An emoji is not Bangla and must not take the Bangla face or its scale. */
+    font-family: var(--font-sans);
+    font-size: var(--text-xl);
+    line-height: 1;
+  }
+
+  .device__emoji:empty {
+    display: none;
+  }
+
+  /* The moment a suggestion is tapped. */
+  .device__cell[data-taken],
+  .device__emoji[data-taken] {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    border-radius: 0.4rem;
+  }
+
+  /* --- the keys ---------------------------------------------------------- */
+
+  .device__keys {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.7rem clamp(0.45rem, 0.25rem + 0.7vw, 0.8rem) 0.85rem;
+  }
+
+  .device__row {
+    display: flex;
+    justify-content: center;
+    gap: 0.28rem;
+  }
+
+  .key {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    height: clamp(2rem, 1.6rem + 1.6vw, 3rem);
+    border-radius: 0.35rem;
+    background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, #000 45%, transparent);
+    font-family: var(--font-sans);
+    font-size: clamp(0.8125rem, 0.72rem + 0.4vw, 1rem);
+    line-height: 1;
+    color: color-mix(in srgb, var(--color-ink) 85%, transparent);
+    transition:
+      background-color 90ms linear,
+      color 90ms linear,
+      transform 90ms var(--ease-out);
+  }
+
+  /* Down. Brief and bright, the way a key looks under a thumb. */
+  .key[data-down] {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    transform: translateY(1px);
+  }
+
+  .key--mod {
+    flex: 1.6;
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+    color: var(--color-faint);
+  }
+
+  .key--space {
+    flex: 5;
+    background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .device__caret {
+      animation: none;
+      opacity: 0;
+    }
+
+    .device__bar,
+    .key {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  interface HeroLine {
+    roman: string;
+    bangla: string;
+    steps: string[];
+    bar: ({ c?: string; e?: string[] } | 0)[];
+    suggest?: { at: number; take: string; kind: 'word' | 'emoji'; after: string };
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-hero-type]')) {
+    const committedEl = root.querySelector<HTMLElement>('[data-committed]');
+    const composingEl = root.querySelector<HTMLElement>('[data-composing]');
+    const mirror = root.querySelector<HTMLElement>('[data-mirror]');
+    const strip = root.querySelector<HTMLElement>('[data-strip]');
+    const slotA = root.querySelector<HTMLElement>('[data-slot-a]');
+    const slotB = root.querySelector<HTMLElement>('[data-slot-b]');
+    const emojiSlots = [0, 1, 2].map((i) =>
+      root.querySelector<HTMLElement>(`[data-emoji-${i}]`),
+    );
+    const seed = root.querySelector<HTMLScriptElement>('[data-hero-first]');
+    if (!committedEl || !composingEl || !mirror || !seed) continue;
+    if (!strip || !slotA || !slotB || emojiSlots.some((el) => !el)) continue;
+
+    // Starts as the one line the server rendered, and grows to the whole set
+    // when the file lands. Nothing waits on the fetch.
+    let lines: HeroLine[] = [JSON.parse(seed.textContent ?? 'null')].filter(Boolean);
+    if (!lines.length) continue;
+
+    const keys = new Map<string, HTMLElement>();
+    for (const el of root.querySelectorAll<HTMLElement>('[data-key]')) {
+      keys.set(el.dataset.key!, el);
+    }
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    /**
+     * The field is as tall as the tallest line in the set — not the tallest so
+     * far — so the device never changes height while it plays.
+     */
+    function lockHeight() {
+      let tallest = 0;
+      for (const item of lines) {
+        mirror!.textContent = item.bangla;
+        tallest = Math.max(tallest, mirror!.getBoundingClientRect().height);
+      }
+      root.style.setProperty('--field-h', `${Math.ceil(tallest) + 34}px`);
+    }
+
+    /**
+     * Splits at the last space — the one boundary Bengali does not shape
+     * across. `settled` puts the whole line in the committed run, which is
+     * what taking a suggestion does: the word stops being marked text.
+     */
+    function show(text: string, settled = false) {
+      const at = settled ? text.length : text.lastIndexOf(' ') + 1;
+      committedEl!.textContent = text.slice(0, at);
+      composingEl!.textContent = text.slice(at);
+    }
+
+    /** Fills the three slots. Empty ones stay, so the bar never re-flows. */
+    function setBar(composed: string, alt: string, emoji: string[]) {
+      slotA!.textContent = composed;
+      slotB!.textContent = alt;
+      for (const [i, el] of emojiSlots.entries()) el!.textContent = emoji[i] ?? '';
+    }
+
+    /** The bar as it stands at a given keystroke of a line. */
+    function barAt(item: HeroLine, i: number) {
+      const composed = item.steps[i].split(' ').pop() ?? '';
+      const entry = item.bar[i];
+      if (!entry) return setBar(composed, '', []);
+      setBar(composed, entry.c ?? '', entry.e ?? []);
+    }
+
+    /**
+     * Lights the key for a character, and shift with it on a capital.
+     *
+     * The previous key is lifted first. Keystrokes can land 70 ms apart and the
+     * light lasts 105, so without this two keys are down at once — which reads
+     * as a stuck key rather than as typing.
+     */
+    let down: HTMLElement[] = [];
+    let lift: number | undefined;
+
+    function press(char: string) {
+      window.clearTimeout(lift);
+      for (const el of down) el.removeAttribute('data-down');
+      down = [];
+      if (!char) return;
+
+      // Anything that is not a letter or a space is on the symbols page, so
+      // that is the key that goes down for it.
+      const key = keys.get(char.toLowerCase()) ?? (char === ' ' ? undefined : keys.get('symbols'));
+      if (key) down.push(key);
+      if (/[A-Z]/.test(char)) {
+        const shift = keys.get('shift');
+        if (shift) down.push(shift);
+      }
+      for (const el of down) el.setAttribute('data-down', '');
+
+      const lifting = down;
+      lift = window.setTimeout(() => {
+        for (const el of lifting) el.removeAttribute('data-down');
+      }, 95);
+    }
+
+    let at = 0;
+
+    /*
+      Two shuffled decks, drawing from the one with suggestions about two times
+      in three. Shuffling everything together would show the bar half as often
+      as it deserves — it is the part of the keyboard people ask about.
+    */
+    const shuffle = (list: number[]) => {
+      const deck = [...list];
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    };
+
+    let richDeck = shuffle(lines.map((l, i) => (l.suggest ? i : -1)).filter((i) => i >= 0));
+    let plainDeck = shuffle(lines.map((l, i) => (l.suggest ? -1 : i)).filter((i) => i >= 0));
+    let sincePlain = 0;
+
+    function nextLine(): HeroLine {
+      const wantRich = plainDeck.length === 0 || (richDeck.length > 0 && sincePlain < 2);
+      sincePlain = wantRich ? sincePlain + 1 : 0;
+
+      let deck = wantRich ? richDeck : plainDeck;
+      if (!deck.length) {
+        const pool = lines
+          .map((l, i) => (Boolean(l.suggest) === wantRich ? i : -1))
+          .filter((i) => i >= 0);
+        if (wantRich) richDeck = shuffle(pool);
+        else plainDeck = shuffle(pool);
+        deck = wantRich ? richDeck : plainDeck;
+      }
+
+      let next = deck.shift()!;
+      if (next === at && deck.length) {
+        const swap = deck.shift()!;
+        deck.unshift(next);
+        next = swap;
+      }
+      at = next;
+      return lines[at];
+    }
+
+    const settle = (item: HeroLine) => {
+      const s = item.suggest;
+      // At rest, a line that ENDS by taking something is shown having taken
+      // it. A line corrected mid-sentence has kept typing since, and its last
+      // step already carries the correction.
+      if (s && s.at === item.steps.length - 1) show(s.after, true);
+      else show(item.bangla);
+      setBar('', '', []);
+    };
+
+    let timer: number | undefined;
+    let running = false;
+    const wait = (ms: number) => new Promise<void>((r) => (timer = window.setTimeout(r, ms)));
+
+    // Measurements taken before the Bangla face has loaded are a fallback
+    // font's, so they are taken again once it has.
+    lockHeight();
+    void document.fonts?.ready.then(() => {
+      lockHeight();
+      if (!running) settle(lines[at]);
+    });
+
+    if (reduced.matches) {
+      settle(lines[at]);
+      continue;
+    }
+
+    async function play() {
+      running = true;
+      while (running) {
+        const item = nextLine();
+
+        show('');
+        setBar('', '', []);
+        await wait(650);
+        if (!running) return;
+
+        for (let i = 0; i < item.steps.length; i++) {
+          const key = item.roman[i];
+          const taking = i === item.suggest?.at;
+
+          press(key);
+          show(item.steps[i]);
+
+          /*
+            A correction lands on the space, and by then the bar has nothing to
+            say — the word it was offering for is behind the cursor. So on that
+            keystroke the previous bar is held, which is the suggestion that was
+            live when the space went down, and therefore the one being taken.
+          */
+          barAt(item, taking && key === ' ' && i > 0 ? i - 1 : i);
+
+          // Uneven on purpose: a constant interval reads as a machine typing,
+          // and a space is where a person pauses.
+          await wait(taking ? 850 : key === ' ' ? 230 : 70 + ((i * 53) % 55));
+          if (!running) return;
+
+          /*
+            Take it. The slot flashes, then the field changes under it.
+
+            This is not always the end of the line: a correction lands on the
+            space that commits the word, which is usually mid-sentence, and the
+            typing carries on over the corrected word.
+          */
+          if (taking && item.suggest) {
+            const chip =
+              item.suggest.kind === 'emoji'
+                ? emojiSlots.find((el) => el!.textContent === item.suggest!.take)
+                : slotB;
+            chip?.setAttribute('data-taken', '');
+            await wait(280);
+            if (!running) return;
+
+            // Taking it commits the word, so it stops being marked text.
+            show(item.suggest.after, true);
+            await wait(460);
+            if (!running) return;
+
+            chip?.removeAttribute('data-taken');
+            setBar('', '', []);
+          }
+        }
+
+        await wait(2200);
+        if (!running) return;
+      }
+    }
+
+    /*
+      The rest of the lines. If the fetch fails the hero keeps typing the one
+      it was rendered with, which is a working hero, so nothing is retried and
+      nothing is reported.
+    */
+    void fetch('/hero-lines.json')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((all: HeroLine[] | null) => {
+        if (!all?.length) return;
+        lines = all;
+        richDeck = shuffle(lines.map((l, i) => (l.suggest ? i : -1)).filter((i) => i >= 0));
+        plainDeck = shuffle(lines.map((l, i) => (l.suggest ? -1 : i)).filter((i) => i >= 0));
+        lockHeight();
+      })
+      .catch(() => {});
+
+    // It runs only while it is on screen.
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !running) void play();
+          else if (!entry.isIntersecting && running) {
+            running = false;
+            window.clearTimeout(timer);
+            settle(lines[at]);
+          }
+        }
+      },
+      { threshold: 0.3 },
+    );
+    watcher.observe(root);
+
+    let resizing: number | undefined;
+    window.addEventListener(
+      'resize',
+      () => {
+        window.clearTimeout(resizing);
+        resizing = window.setTimeout(() => {
+          lockHeight();
+          if (!running) settle(lines[at]);
+        }, 160);
+      },
+      { passive: true },
+    );
+  }
+</script>

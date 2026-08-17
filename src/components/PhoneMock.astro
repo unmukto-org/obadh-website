@@ -1,0 +1,203 @@
+---
+/**
+ * The keyboard, drawn.
+ *
+ * Not a screenshot — a screenshot of a keyboard at this size is a grey smear,
+ * and the two things worth showing are the suggestion strip and the fact that
+ * the keys carry Bangla. Both are drawn here at a size you can actually read.
+ *
+ * Every Bangla string in it is real: the strip shows a misspelling beside the
+ * correction the engine offers for it, which is the whole behaviour in one
+ * picture. Verified in src/data/pairs.ts.
+ */
+interface Props {
+  /**
+   * The field mid-sentence, ending on the word being composed — so the strip
+   * underneath is offering a correction for a word you can see in the field.
+   */
+  line: string;
+  typed: string;
+  fixed: string;
+  /** Read out in place of the drawing. */
+  label: string;
+}
+
+const { line, typed, fixed, label } = Astro.props;
+
+/*
+  Roman keys, because Obadh is a phonetic keyboard: you type `manuSh` on the
+  layout your thumbs already know and the Bangla is composed from it. Drawing
+  Bangla letters on these keys would be showing a product that does not exist.
+*/
+const rows = [
+  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+];
+---
+
+<figure class="phone" role="img" aria-label={label}>
+  <div class="phone__body">
+    <div class="phone__screen">
+      <span class="phone__island" aria-hidden="true"></span>
+
+      {/* What has been typed, sitting in an app. */}
+      <p class="phone__line" lang="bn">{line}</p>
+
+      <div class="phone__keyboard">
+        <div class="phone__strip">
+          <span class="phone__chip" lang="bn">{typed}</span>
+          <span class="phone__chip phone__chip--on" lang="bn">{fixed}</span>
+          <span class="phone__chip phone__chip--ghost" aria-hidden="true"></span>
+        </div>
+
+        <div class="phone__keys">
+          {
+            rows.map((row) => (
+              <div class="phone__row">
+                {row.map((key) => (
+                  <span class="phone__key">{key}</span>
+                ))}
+              </div>
+            ))
+          }
+          <div class="phone__row">
+            <span class="phone__key phone__key--wide"></span>
+            <span class="phone__key phone__key--space"></span>
+            <span class="phone__key phone__key--wide"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .phone {
+    margin: 0;
+    width: min(100%, 21rem);
+    margin-inline: auto;
+    /* The glow under it is what seats the device on the panel. */
+    filter: drop-shadow(0 26px 50px rgb(0 0 0 / 0.55));
+  }
+
+  .phone__body {
+    border-radius: 2.1rem;
+    padding: 0.5rem;
+    background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 20%, transparent);
+  }
+
+  /* A phone is about twice as tall as it is wide. Without a floor on this the
+     keyboard sets the height and the device comes out square. */
+  .phone__screen {
+    position: relative;
+    border-radius: 1.7rem;
+    background: #04141b;
+    padding: 2.1rem 0.7rem 0.7rem;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 1.1rem;
+    aspect-ratio: 20 / 39;
+    overflow: hidden;
+  }
+
+  .phone__island {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    width: 4.25rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    background: #020c11;
+  }
+
+  .phone__line {
+    align-self: start;
+    font-family: var(--font-bangla);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0;
+    padding-inline: 0.4rem;
+    padding-block: 0.06em;
+    color: var(--color-ink);
+  }
+
+  .phone__keyboard {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.5rem 0.35rem;
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  }
+
+  /* The strip is the point of the picture, so it is the only lit thing in it. */
+  .phone__strip {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding-block-end: 0.45rem;
+    border-block-end: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+
+  .phone__chip {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-family: var(--font-bangla);
+    font-size: 0.8125rem;
+    line-height: 1.9;
+    letter-spacing: 0;
+    border-radius: 0.55rem;
+    color: var(--color-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .phone__chip--on {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    font-weight: 600;
+  }
+
+  .phone__chip--ghost {
+    opacity: 0.25;
+  }
+
+  .phone__keys {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .phone__row {
+    display: flex;
+    justify-content: center;
+    gap: 0.24rem;
+  }
+
+  .phone__key {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    height: 1.65rem;
+    border-radius: 0.35rem;
+    background: color-mix(in srgb, var(--color-ink) 13%, transparent);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1;
+    color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+  }
+
+  .phone__key--wide {
+    flex: 1.6;
+    background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  }
+
+  .phone__key--space {
+    flex: 4;
+  }
+</style>

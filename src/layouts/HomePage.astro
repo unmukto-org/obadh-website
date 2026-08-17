@@ -1,0 +1,518 @@
+---
+import Base from './Base.astro';
+import Composer from '../components/Composer.astro';
+import Glyph from '../components/Glyph.astro';
+import HeroType from '../components/HeroType.astro';
+import InputBadge from '../components/InputBadge.astro';
+import Mark from '../components/Mark.astro';
+import PhoneMock from '../components/PhoneMock.astro';
+import PlatformCta from '../components/PlatformCta.astro';
+import PlatformList from '../components/PlatformList.astro';
+import Alpona from '../components/Alpona.astro';
+import AvroLines from '../components/AvroLines.astro';
+import { LINKS, SITE, localizedPath, type Locale } from '../config';
+import type { HomeContent } from '../copy/types';
+
+interface Props {
+  locale: Locale;
+  content: HomeContent;
+}
+
+const { locale, content } = Astro.props;
+const c = content;
+const path = (route: string) => localizedPath(route, locale);
+
+/* The lead marks one slot with `{badge}`, where the word for the script is set
+   as an input-source badge instead of as type. */
+const [leadBefore, leadAfter] = c.hero.headingLead.split('{badge}');
+
+const schema = [
+  {
+    '@type': 'SoftwareApplication',
+    name: 'Obadh',
+    alternateName: 'অবাধ',
+    applicationCategory: 'UtilitiesApplication',
+    applicationSubCategory: 'Keyboard',
+    operatingSystem: `iOS ${SITE.minOS.ios}+, iPadOS ${SITE.minOS.ios}+, macOS ${SITE.minOS.macos}+`,
+    softwareVersion: SITE.versions.ios,
+    license: 'https://opensource.org/licenses/MIT',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    inLanguage: ['bn', 'en'],
+    author: { '@id': 'https://obadh.unmukto.org/#sayom' },
+  },
+];
+---
+
+<Base
+  locale={locale}
+  route="/"
+  title={c.meta.title}
+  description={c.meta.description}
+  ogImage={c.meta.ogImage}
+  ogImageAlt={c.meta.ogImageAlt}
+  ogTitle={c.meta.ogTitle}
+  ogDescription={c.meta.ogDescription}
+  schema={schema}
+  preloadSerif
+>
+  <!-- ----------------------------------------------------------------- hero -- -->
+  <section class="relative isolate overflow-x-clip pt-14 pb-16 sm:pt-20 lg:pt-24">
+    {/*
+      An alpona — the Bengali courtyard drawing, made freehand with rice paste
+      for a festival, by anyone, belonging to no institution. Set far enough
+      back to be atmosphere rather than decoration, and large enough that its
+      outer rings run off both edges, so it reads as ground rather than as a
+      medallion pasted on the page.
+
+      The wrapper carries the placement and the opacity, not the component: a
+      scoped style here cannot reach a child component's root element, so
+      styling `.alpona` from this file would silently do nothing and the
+      drawing would land at full strength.
+    */}
+    {/*
+      The alpona's centre is the sun. The light and the drawing are children of
+      one box so they share a centre by construction rather than by two sets of
+      offsets that have to be kept in step — move the box and the sunrise moves
+      with it.
+    */}
+    <div class="hero-sunrise" aria-hidden="true">
+      <span class="hero-sunrise__light"></span>
+      <span class="hero-sunrise__art"><Alpona size={990} /></span>
+    </div>
+
+    <div class="relative shell grid justify-items-center gap-6 text-center">
+      <!--
+        The two halves sit on their own lines so the break falls at the colon,
+        where the sentence turns, rather than wherever the measure runs out.
+        The colour change lands on the same seam.
+      -->
+      <h1 class="hero-title leading-[1.05] font-semibold tracking-[-0.035em]" data-reveal>
+        <span class="block">
+          {leadBefore}<InputBadge label={c.hero.badgeWord} /><span class="visually-hidden" lang="bn"
+            >{c.hero.badgeWord}</span
+          >{leadAfter}
+        </span>
+        <span class="block text-brand">{c.hero.headingAccent}</span>
+      </h1>
+
+      <p class="lede max-w-xl" data-reveal style="--reveal-delay: 70ms">{c.hero.lede}</p>
+
+      <div data-reveal style="--reveal-delay: 130ms">
+        <PlatformCta locale={locale} class="px-9 text-base" />
+      </div>
+
+      <div class="relative mt-12 w-full sm:mt-16" data-reveal style="--reveal-delay: 190ms">
+        <HeroType label={c.hero.animationLabel} />
+      </div>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------------- values -- -->
+  <!--
+    Four cards, and the object on each one is the largest thing in it. The text
+    under it is one line: whatever needs a second line belongs on another page.
+  -->
+  <section class="section-tight">
+    <div class="shell">
+      <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          c.values.map((value, index) => (
+            <li
+              class="card value-card grid content-start justify-items-center gap-3 px-6 py-9 text-center sm:[grid-row:span_4] sm:grid-rows-subgrid"
+              id={value.id}
+              data-reveal
+              style={`--reveal-delay: ${index * 70}ms`}
+            >
+              <p class="eyebrow">{value.label}</p>
+              <h2 class="text-lg font-semibold tracking-tight text-balance">{value.heading}</h2>
+              <Glyph name={value.icon} size={104} class="value-card__glyph my-2" />
+              <p class="text-sm text-muted">{value.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- bento -- -->
+  <section class="section-tight">
+    <div class="shell">
+      <div class="mx-auto grid max-w-2xl justify-items-center gap-3 pb-12 text-center" data-reveal>
+        <p class="eyebrow">{c.bento.label}</p>
+        <h2 class="max-w-[20ch] text-2xl font-semibold tracking-tight">{c.bento.heading}</h2>
+      </div>
+
+      <div class="bento">
+        {/* The keyboard, drawn, beside the two things the strip is for. */}
+        <div class="card bento__tile bento__tile--phone" data-reveal>
+          <div class="bento__copy">
+            <h3 class="bento__heading">{c.bento.tiles[0].heading}</h3>
+            <p class="bento__body" set:html={c.bento.tiles[0].body} />
+          </div>
+          <div class="bento__art bento__art--phone">
+            <PhoneMock
+              line={c.bento.phone.line}
+              typed={c.bento.phone.typed}
+              fixed={c.bento.phone.fixed}
+              label={c.bento.phone.label}
+            />
+          </div>
+        </div>
+
+        <div class="card bento__tile" data-reveal style="--reveal-delay: 70ms">
+          <div class="bento__copy">
+            <h3 class="bento__heading">{c.bento.tiles[1].heading}</h3>
+            <p class="bento__body" set:html={c.bento.tiles[1].body} />
+          </div>
+          <div class="bento__art">
+            <Glyph name="private" size={124} />
+          </div>
+        </div>
+
+        <div class="card bento__tile bento__tile--keys" data-reveal style="--reveal-delay: 140ms">
+          <div class="bento__copy">
+            <h3 class="bento__heading">{c.bento.tiles[2].heading}</h3>
+            <p class="bento__body" set:html={c.bento.tiles[2].body} />
+          </div>
+          <div class="bento__art">
+            {/* The strip, as it looks a moment after you type the word: the
+                Bangla it composed, and the emoji offered in its place. */}
+            <div class="strip" role="img" aria-label={c.bento.emoji.label}>
+              <span class="strip__roman">{c.bento.emoji.roman}</span>
+              <span class="strip__row">
+                <span class="strip__chip" lang="bn">{c.bento.emoji.bangla}</span>
+                <span class="strip__chip strip__chip--on">{c.bento.emoji.symbol}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bento__tile bento__tile--wide" data-reveal style="--reveal-delay: 210ms">
+          <div class="bento__copy">
+            <h3 class="bento__heading">{c.bento.tiles[3].heading}</h3>
+            <p class="bento__body" set:html={c.bento.tiles[3].body} />
+          </div>
+          <div class="bento__art">
+            <Glyph name="speed" size={132} />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------------- demo -- -->
+  <section class="section bg-veil" id="try">
+    <div class="shell shell-narrow grid justify-items-center gap-4 text-center">
+      <p class="eyebrow" data-reveal>{c.demo.label}</p>
+      <h2 class="max-w-[18ch] text-2xl font-semibold tracking-tight" data-reveal>
+        {c.demo.heading}
+      </h2>
+      <div class="mt-6 w-full" data-reveal style="--reveal-delay: 80ms">
+        <Composer label={c.demo.boxLabel} noscript={c.demo.noscript} />
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------------- avro -- -->
+  <!--
+    The one lit section on the site, and the place where keeping Avro's scheme
+    alive is the actual subject. The two lines are the whole point of it, so
+    they get a screen to themselves.
+  -->
+  <section class="section relative isolate overflow-clip bg-veil" id="avro">
+    <div class="relative shell shell-narrow grid justify-items-center gap-6 text-center">
+      <p class="eyebrow" data-reveal>{c.avro.label}</p>
+      <h2 class="text-2xl font-semibold tracking-tight" data-reveal>{c.avro.heading}</h2>
+
+      <div class="my-4" data-reveal style="--reveal-delay: 80ms">
+        <AvroLines label={c.avro.markLabel} />
+      </div>
+
+      <div class="grid max-w-2xl gap-5 text-muted" data-reveal style="--reveal-delay: 140ms">
+        {c.avro.body.map((paragraph) => <p set:html={paragraph} />)}
+        <p><a class="arrow" href={path('/about/')}>{c.avro.link}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ platforms -- -->
+  <section class="section-tight" id="platforms">
+    <div class="shell">
+      <div class="mx-auto grid max-w-2xl justify-items-center gap-3 text-center" data-reveal>
+        <p class="eyebrow">{c.platforms.label}</p>
+        <h2 class="max-w-[20ch] text-2xl font-semibold tracking-tight">{c.platforms.heading}</h2>
+      </div>
+
+      <div class="mx-auto mt-12 max-w-4xl" data-reveal>
+        <PlatformList rows={c.platforms.rows} />
+      </div>
+
+      <p class="mt-10 text-center" data-reveal>
+        <a class="arrow" href={path('/download/')}>{c.platforms.link}</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ open band -- -->
+  <section class="section-tight">
+    <div class="shell shell-narrow grid justify-items-center gap-5 text-center" data-reveal>
+      <Mark size={46} />
+      <h2 class="max-w-[22ch] text-2xl font-semibold tracking-tight">{c.open.heading}</h2>
+      <p class="lede max-w-xl">{c.open.lede}</p>
+
+      <ul class="mt-2 flex flex-wrap justify-center gap-2 font-mono text-xs">
+        {
+          [
+            { href: LINKS.github.engine, label: 'obadh_engine' },
+            { href: LINKS.github.ios, label: 'obadh-ios' },
+            { href: LINKS.github.macos, label: 'obadh-macos' },
+          ].map((repo) => (
+            <li>
+              <a
+                class="inline-flex min-h-11 items-center rounded-full border border-hair px-4 text-muted no-underline transition-colors hover:border-brand hover:text-brand"
+                href={repo.href}
+              >
+                {repo.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="mt-2"><a class="arrow" href={path('/contribute/')}>{c.open.link}</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /*
+    One alpona, entering from the left with most of itself off the page — an
+    arc of ornament rather than a medallion pasted on, with the light coming
+    up out of the middle of it.
+
+    The wrapper carries placement, not the component itself: a scoped style in
+    this file cannot reach a child component's root element, so styling
+    `.alpona` from here does nothing at all.
+  */
+  .hero-sunrise {
+    position: absolute;
+    /* Centred on the page's top-left corner — the header is transparent and
+       sits above this, so a quarter of the drawing fans out of the corner and
+       runs up behind the wordmark. -4.5rem is the header's own height, which
+       the hero starts below. */
+    inset-block-start: -4.5rem;
+    inset-inline-start: 0;
+    width: 990px;
+    height: 990px;
+    translate: -50% -50%;
+    z-index: -1;
+    pointer-events: none;
+    line-height: 0;
+  }
+
+  /* Sunrise. Centred on the drawing and much larger than it, so what reaches
+     the middle of the hero is the far edge of the light rather than its
+     middle. Kept faint: it is dawn, not a spotlight. */
+  .hero-sunrise__light {
+    position: absolute;
+    inset: -150%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-deep) 46%, transparent) 0%,
+      color-mix(in srgb, var(--color-deep) 22%, transparent) 34%,
+      transparent 68%
+    );
+  }
+
+  .hero-sunrise__art {
+    position: absolute;
+    inset: 0;
+    display: block;
+    /* Full strength. The pattern is quieted by its colour, not by fading it:
+       opacity takes the outer rim with everything else, and the drawing ends
+       on that rim. */
+    opacity: 1;
+    /*
+      The mask clears the middle and nothing else. The drawing's centre is its
+      densest, most saturated point and it lands exactly where the wordmark
+      sits, so that much has to go — but there is no fade on the way out. The
+      alpona ends on its own outer petals, which is where it is meant to end;
+      fading it there trimmed the one edge that gives it a shape.
+    */
+    -webkit-mask-image: radial-gradient(60% 60% at 50% 50%, transparent 5%, #000 16%);
+    mask-image: radial-gradient(60% 60% at 50% 50%, transparent 5%, #000 16%);
+  }
+
+  /* On a phone the text is where the drawing would be, so it goes quiet and
+     slides further off the edge. */
+  @media (max-width: 60rem) {
+    .hero-sunrise {
+      width: 680px;
+      height: 680px;
+    }
+
+    .hero-sunrise__art {
+      opacity: 0.75;
+    }
+  }
+
+  /* Sized so "Bangla for every device:" holds one line on a laptop. Bigger
+     than this and the colon stops being the break. */
+  .hero-title {
+    font-size: clamp(2.5rem, 1.62rem + 3.7vw, 4.25rem);
+  }
+
+  /* The object is the card's picture, so it gets the light rather than the
+     hairline around it. */
+  .value-card {
+    transition:
+      border-color 220ms var(--ease-out),
+      transform 220ms var(--ease-soft);
+  }
+
+  .value-card:hover {
+    border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-hair));
+    transform: translateY(-3px);
+  }
+
+  .value-card__glyph {
+    transition: transform 320ms var(--ease-soft);
+  }
+
+  .value-card:hover .value-card__glyph {
+    transform: scale(1.06) rotate(-2deg);
+  }
+
+  /*
+    The bento. One wide tile carrying the phone and three that each hold one
+    object, on a grid that collapses to a single column rather than to four
+    squashed ones.
+  */
+  .bento {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .bento__tile {
+    display: grid;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .bento__copy {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    min-width: 0;
+  }
+
+  .bento__heading {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .bento__body {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    max-width: 34ch;
+  }
+
+  .bento__art {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+  }
+
+  /* The phone is the picture, so it gets the room. It sits at the bottom of
+     its tile and runs off the edge, the way a thing photographed on a table
+     does. */
+  .bento__art--phone {
+    align-self: end;
+    width: 100%;
+    margin-block-end: clamp(-5rem, -3rem - 4vw, -2.5rem);
+  }
+
+  /* The suggestion strip, at a size you can read. */
+  .strip {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+    width: min(100%, 17rem);
+  }
+
+  .strip__roman {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-faint);
+  }
+
+  .strip__row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.4rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, #000 28%, transparent);
+  }
+
+  .strip__chip {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 2.6rem;
+    border-radius: 0.6rem;
+    font-family: var(--font-bangla);
+    font-size: var(--text-base);
+    letter-spacing: 0;
+    color: var(--color-muted);
+  }
+
+  .strip__chip--on {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    font-weight: 600;
+    /* The emoji is not Bangla and must not be scaled by the Bangla rules. */
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+  }
+
+  @media (min-width: 48rem) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* The words at the top, and the phone taking whatever height is left —
+       which is what makes it hang off the bottom edge rather than float in the
+       middle of an over-tall box. */
+    .bento__tile--phone {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      grid-template-rows: auto 1fr;
+    }
+
+    .bento__tile--keys {
+      grid-column: 2;
+    }
+
+    .bento__tile--wide {
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+      align-items: center;
+      gap: 2.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .value-card:hover,
+    .value-card:hover .value-card__glyph {
+      transform: none;
+    }
+  }
+</style>

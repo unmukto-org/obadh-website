@@ -1,0 +1,14 @@
+---
+import GuidePage from '../../layouts/GuidePage.astro';
+import { guide, schemeNotesBn } from '../../copy/guide/bn';
+import { ui } from '../../i18n/ui';
+
+const box = ui.bn.typingBox;
+---
+
+<GuidePage
+  locale="bn"
+  content={guide}
+  notes={schemeNotesBn}
+  demo={{ label: box.label, noscript: box.noscript }}
+/>

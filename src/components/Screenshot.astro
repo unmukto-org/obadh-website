@@ -1,0 +1,177 @@
+---
+/**
+ * Screenshots from the app repositories, presented as evidence rather than as
+ * an advertisement.
+ *
+ * No device frame, no bezel, no perspective, no glare gradient, no rounded
+ * mask faking a screen. The captures already contain a real status bar and the
+ * device's own corner radius; adding a mock-up around them would only make
+ * them look less true. The provenance caption is the design element that
+ * replaces the frame.
+ *
+ * The plinth is not decoration either: the light capture's own background is
+ * within a hair of the page background, and without it the phone dissolves
+ * into the page.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption: string;
+  width: number;
+  /** A GIF plays on request, since GIFs ignore prefers-reduced-motion. */
+  motion?: { src: string; poster: ImageMetadata; playLabel: string };
+}
+
+const { src, alt, caption, width, motion } = Astro.props;
+---
+
+<figure class="shot">
+  <div class="shot__plinth" style={`--shot-w: ${width}px`}>
+    {
+      motion ? (
+        /*
+          A toggle, not a one-way door. The GIF used to replace the button
+          outright: it could not be stopped, and the element that had focus
+          left the document under the reader's feet. Pressing it again puts
+          the still frame back, and the name stays the same in both states
+          because the pressed state is what says which one you are in.
+        */
+        <button
+          class="shot__play"
+          type="button"
+          data-gif={motion.src}
+          aria-label={motion.playLabel}
+          aria-pressed="false"
+        >
+          <Image src={motion.poster} alt={alt} width={width} densities={[1, 2]} loading="lazy" />
+          <span class="shot__play-label">{motion.playLabel}</span>
+        </button>
+      ) : (
+        <Image src={src} alt={alt} width={width} densities={[1, 2]} loading="lazy" />
+      )
+    }
+  </div>
+  <figcaption class="shot__caption small">{caption}</figcaption>
+</figure>
+
+<style>
+  /*
+    Two nested boxes that would each rather be as wide as a 420px capture than
+    as wide as a 320px screen. A flex or grid child will not go below its own
+    content's minimum unless it is told it may, so both are told: the plinth
+    then takes the width it is given and the capture scales inside it.
+  */
+  .shot {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .shot__plinth {
+    min-width: 0;
+    /* fit-content rather than max-content: max-content is definite, and a
+       definite width holds its ground against the screen. */
+    width: fit-content;
+    max-width: 100%;
+    padding: 1.25rem;
+    background: var(--color-raise);
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-panel);
+  }
+
+  .shot__plinth :global(img) {
+    display: block;
+    width: min(100%, var(--shot-w));
+    /* A length, so the plinth is sized by the width the capture is shown at
+       rather than by the pixels the file happens to have. The recording is
+       420px wide where its poster is 330: without this, pressing play widened
+       the plinth by 90px. */
+    max-width: var(--shot-w);
+    height: auto;
+  }
+
+  .shot__play {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  .shot__play-label {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-end: 1.25rem;
+    transform: translateX(-50%);
+    /* The chip is centred on a capture that is 232px wide at 320px, so it stays
+       inside it rather than hanging off both ends of the plinth. */
+    max-width: calc(100% - 1rem);
+    background: var(--color-card-hi);
+    color: var(--color-ink);
+    border: 1px solid var(--color-hair-strong);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shot__play:hover .shot__play-label {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /* Playing. The chip is the only thing that says so, so it says it plainly. */
+  .shot__play[aria-pressed='true'] .shot__play-label {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-on-brand);
+  }
+
+  .shot__caption {
+    max-width: 30rem;
+    font-size: var(--text-xs);
+    color: var(--color-faint);
+  }
+</style>
+
+<script>
+  // A GIF starts playing the moment it is decoded and has no way to honor
+  // prefers-reduced-motion, so it is only fetched when someone asks for it —
+  // and it stops when they ask again. The <img> stays put: only its source
+  // changes, so nothing moves, focus stays on the button, and the still frame
+  // is still there to come back to.
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-gif]')) {
+    const source = button.dataset.gif;
+    const image = button.querySelector('img');
+    if (!source || !image) continue;
+
+    const still = { src: image.src, srcset: image.srcset, sizes: image.sizes };
+
+    button.addEventListener('click', () => {
+      const playing = button.getAttribute('aria-pressed') === 'true';
+
+      if (playing) {
+        image.srcset = still.srcset;
+        image.sizes = still.sizes;
+        image.src = still.src;
+      } else {
+        // The poster is a 2x srcset; a srcset left in place would outrank the
+        // src and the recording would never appear.
+        image.srcset = '';
+        image.sizes = '';
+        image.src = source;
+      }
+
+      button.setAttribute('aria-pressed', playing ? 'false' : 'true');
+    });
+  }
+</script>

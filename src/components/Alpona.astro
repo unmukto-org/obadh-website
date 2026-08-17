@@ -1,0 +1,59 @@
+---
+/**
+ * An alpona — the Bengali courtyard drawing, made freehand with rice paste for
+ * a festival or a wedding, by anyone, which is why it is the right piece of
+ * the tradition for this site to borrow: it belongs to no institution and
+ * carries no religion of its own.
+ *
+ * `public/art/alpona.svg` is prepared by `node scripts/alpona.mjs <source.svg>
+ * --mono`, which strips the background, the frame and everything outside the
+ * artwork's own square, and writes the drawing out as a solid-black mask.
+ *
+ * A mask, so the colour lives in CSS. It is used as a background pattern here:
+ * one tone, mixed most of the way to the page's own ground, and drawn at full
+ * strength. That is the opposite of the usual way of quieting something down —
+ * dropping the opacity fades the outer rim away with everything else, and this
+ * drawing ends on that rim.
+ *
+ * Vector, not raster, because line art is the worst case for a lossy codec:
+ * every stroke is a hard edge, so this drawing costs 120 KB as AVIF and 300 KB
+ * as WebP against 23 KB gzipped as SVG — and it stays sharp at any size the
+ * page draws it at.
+ */
+interface Props {
+  /** Rendered size. Placement is the caller's business. */
+  size?: number;
+  class?: string;
+}
+
+const { size = 600, class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['alpona', className]}
+  style={`--alpona-size: ${size}px`}
+  role="presentation"
+  aria-hidden="true"
+>
+</div>
+
+<style>
+  .alpona {
+    /* One tone, matched to the page: the brand teal taken most of the way to
+       the ground, so the pattern is low-contrast rather than faded. */
+    --alpona-ink: color-mix(in srgb, var(--color-brand) 30%, var(--color-ground));
+
+    width: var(--alpona-size);
+    height: var(--alpona-size);
+    background-color: var(--alpona-ink);
+
+    -webkit-mask-image: url('/art/alpona.svg');
+    mask-image: url('/art/alpona.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+</style>

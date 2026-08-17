@@ -1,0 +1,330 @@
+---
+/**
+ * Not a mock-up of the product: the product, running.
+ *
+ * public/wasm/ holds obadh_engine's own pkg output, byte for byte, so what
+ * composes Bangla in this box is the same code the keyboards link against. It
+ * is fetched after first paint and nothing is sent anywhere.
+ *
+ * Server-rendered with the finished pair already in place, so the page is
+ * complete before any script runs and stays complete if none ever does.
+ */
+import { LINKS } from '../config';
+
+interface Props {
+  label: string;
+  noscript: string;
+  /**
+   * The pair the box opens with, and the one it types out by itself. Both
+   * verified against the engine binary; see scripts/verify-scheme.mjs.
+   */
+  seed?: { roman: string; bangla: string };
+  typeOut?: { roman: string; bangla: string };
+}
+
+/*
+  One sentence, not a rack of examples to pick from. Whoever is here came to
+  type something of their own, and a row of chips is three more decisions
+  between them and the field.
+*/
+const {
+  label,
+  noscript,
+  seed = { roman: 'ami banglay gan gai', bangla: 'আমি বাংলায় গান গাই' },
+  typeOut = seed,
+} = Astro.props;
+---
+
+<section class="composer" data-composer data-typeout={typeOut.roman} aria-label={label}>
+  <div class="composer__panel">
+    <label class="composer__label" for="composer-input">{label}</label>
+
+    <div class="composer__field">
+      <input
+        id="composer-input"
+        class="composer__input"
+        type="text"
+        value={seed.roman}
+        placeholder={seed.roman}
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        inputmode="text"
+        aria-label={label}
+        data-input
+      />
+    </div>
+
+    {
+      /* The visible pair is not a live region: it changes on every keystroke,
+         and the scripted type-out changes it thirty times before anyone has
+         touched it. What gets announced is the settled result, once, below. */
+    }
+    <span class="composer__arrow" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14" /><path d="m6 13 6 6 6-6" />
+      </svg>
+    </span>
+
+    <output class="composer__out" for="composer-input" aria-live="off">
+      <span class="composer__bn" lang="bn" data-output>{seed.bangla}</span>
+    </output>
+    <span class="visually-hidden" lang="bn" aria-live="polite" aria-atomic="true" data-settled></span>
+  </div>
+
+  <noscript>
+    <p class="composer__caption small">
+      {noscript}{' '}
+      <a class="link" href={LINKS.playground}>{LINKS.playground.replace('https://', '')}</a>
+    </p>
+  </noscript>
+</section>
+
+<style>
+  .composer {
+    --demo-fs: clamp(1.5rem, 1rem + 2.1vw, 2.75rem);
+    --demo-lh: calc(1.45 * var(--demo-fs));
+    display: grid;
+    gap: 1.25rem;
+    justify-items: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /*
+    Two stacked boxes and an arrow between them: what you type, and what it
+    becomes. The field is a field — it has an edge, an inset ground and a focus
+    ring of its own — because the version without one had to invent an
+    indicator, and the invented one read as a stray line across the panel.
+  */
+  .composer__panel {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    background: var(--color-card);
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-panel);
+    padding: clamp(1.25rem, 0.8rem + 2vw, 2.25rem);
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .composer__label {
+    justify-self: start;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  html[lang='bn'] .composer__label {
+    font-family: var(--font-bangla);
+    letter-spacing: 0;
+    text-transform: none;
+    font-size: var(--text-xs);
+  }
+
+  .composer__field {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, #000 32%, transparent);
+    border: 1px solid var(--color-hair);
+    padding: 0.5rem clamp(0.85rem, 0.5rem + 1.4vw, 1.4rem);
+    transition:
+      border-color 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out);
+  }
+
+  .composer__field:focus-within {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 22%, transparent);
+  }
+
+  .composer__input {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: var(--demo-fs);
+    line-height: var(--demo-lh);
+    color: var(--color-muted);
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: center;
+    caret-color: var(--color-brand);
+  }
+
+  /* The field carries the ring, so the input inside it does not draw a second
+     one on top. Forced colours get the outline back, below. */
+  .composer__input:focus {
+    outline: none;
+  }
+
+  .composer__input::placeholder {
+    color: color-mix(in srgb, var(--color-faint) 60%, transparent);
+  }
+
+  /* The placeholder is a prompt, not a label. Once someone has the caret in
+     the field it is in the way of what they came to do. */
+  .composer__input:focus::placeholder {
+    color: transparent;
+  }
+
+  @media (forced-colors: active) {
+    .composer__input:focus {
+      outline: 2px solid;
+      outline-offset: 2px;
+    }
+  }
+
+  .composer__arrow {
+    color: var(--color-brand);
+    opacity: 0.7;
+  }
+
+  .composer__out {
+    display: block;
+    min-height: calc(var(--demo-lh) * 1.1);
+    min-width: 0;
+    font-size: var(--demo-fs);
+  }
+
+  .composer__bn {
+    display: inline-block;
+    font-family: var(--font-bangla);
+    font-size: 1.06em;
+    font-weight: 500;
+    line-height: var(--demo-lh);
+    letter-spacing: 0;
+    /* ঁ reaches nearly a full em above the baseline, past anything a Latin
+       line box allows for. */
+    padding-block: 0.08em;
+    word-break: normal;
+    max-width: 100%;
+    color: var(--color-brand);
+  }
+
+  .composer__caption {
+    max-width: 42rem;
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--color-faint);
+  }
+</style>
+
+<script>
+  import { loadEngine } from '../scripts/engine';
+
+  type Engine = { transliterate(input: string): string };
+
+  const root = document.querySelector<HTMLElement>('[data-composer]');
+  if (root) {
+    const input = root.querySelector<HTMLInputElement>('[data-input]')!;
+    const output = root.querySelector<HTMLElement>('[data-output]')!;
+    const settled = root.querySelector<HTMLElement>('[data-settled]')!;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let engine: Engine | null = null;
+    let animation: number | null = null;
+    let announcement: number | null = null;
+
+    function render(text: string) {
+      if (!engine) return;
+      // Strict transliteration hands back the original string when it meets a
+      // character no rule claims, which is the honest thing to show.
+      output.textContent = engine.transliterate(text);
+    }
+
+    /**
+     * A screen reader is told what the field composed once the typing stops,
+     * not once per letter. Nothing the script types announces itself at all:
+     * the type-out is an ornament, and the person it would interrupt did not
+     * ask for it.
+     */
+    function announce() {
+      if (announcement !== null) window.clearTimeout(announcement);
+      announcement = window.setTimeout(() => {
+        announcement = null;
+        const text = output.textContent ?? '';
+        if (text && text !== settled.textContent) settled.textContent = text;
+        else if (!text) settled.textContent = '';
+      }, 900);
+    }
+
+    function stopTypeOut() {
+      if (animation === null) return;
+      window.clearTimeout(animation);
+      animation = null;
+    }
+
+    /** Hands the caret over the moment anyone reaches for it. */
+    function surrender() {
+      if (animation === null) return;
+      stopTypeOut();
+      input.value = '';
+      render('');
+    }
+
+    function typeOut(text: string) {
+      let index = 0;
+      input.value = '';
+      render('');
+
+      const step = () => {
+        index += 1;
+        const slice = text.slice(0, index);
+        input.value = slice;
+        render(slice);
+
+        if (index >= text.length) {
+          animation = null;
+          return;
+        }
+
+        // Uneven on purpose. A constant interval reads as a machine typing.
+        const jitter = (index * 2654435761) % 45;
+        const pause = 58 + jitter - 22 + (text[index - 1] === ' ' ? 180 : 0);
+        animation = window.setTimeout(step, pause);
+      };
+
+      animation = window.setTimeout(step, 700);
+    }
+
+    for (const event of ['keydown', 'pointerdown', 'focus', 'paste'] as const) {
+      input.addEventListener(event, surrender, { passive: true });
+    }
+
+    input.addEventListener('input', () => {
+      stopTypeOut();
+      render(input.value);
+      announce();
+    });
+
+    loadEngine()
+      .then((loaded) => {
+        engine = loaded as Engine;
+        root.dataset.state = 'ready';
+
+        const script = root.dataset.typeout;
+        if (!script || reduced.matches || document.activeElement === input) {
+          render(input.value);
+          return;
+        }
+        typeOut(script);
+      })
+      .catch(() => {
+        // The pair rendered on the server stays exactly as it is. No spinner,
+        // no error state, no layout shift.
+        root.dataset.state = 'unavailable';
+        input.readOnly = true;
+      });
+  }
+</script>

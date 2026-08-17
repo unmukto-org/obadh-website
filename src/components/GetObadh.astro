@@ -1,0 +1,290 @@
+---
+/**
+ * The top of /download/: what to press, for the device in front of the reader.
+ *
+ * Every variant is in the HTML. The script reads the platform, shows one panel
+ * and hides the others — so without JavaScript, and to a crawler, this is a
+ * plain block offering both shipping platforms, and the routing is a
+ * convenience laid over a page that already worked.
+ *
+ * Detection order matters. iPadOS 13 and later report themselves as a Mac and
+ * are told apart only by having a touchscreen; Android's user agent contains
+ * the word Linux; ChromeOS's contains CrOS. Each of those has to be settled
+ * before the string it would otherwise be mistaken for.
+ *
+ * The Mac download starts by itself, but only once LINKS.macDmg is a real
+ * release. While it is a marked placeholder the button is there and nothing
+ * fires, because sending someone to a 404 the moment they arrive is worse than
+ * making them click.
+ */
+import InstallSteps from './InstallSteps.astro';
+import { LINKS, PLACEHOLDER_LINKS, type Locale } from '../config';
+import type { DownloadGet, DownloadPlatform } from '../copy/types';
+
+interface Props {
+  locale: Locale;
+  get: DownloadGet;
+  ios: DownloadPlatform;
+  macos: DownloadPlatform;
+}
+
+const { locale, get, ios, macos } = Astro.props;
+
+const macReady = !PLACEHOLDER_LINKS.has(LINKS.macDmg);
+const qrSrc = locale === 'bn' ? '/qr/download-bn.svg' : '/qr/download-en.svg';
+const issues = `${LINKS.github.website}/issues`;
+
+const panel = 'grid justify-items-center gap-5 text-center';
+const heading = 'text-2xl font-semibold tracking-tight text-balance';
+const body = 'max-w-xl text-muted';
+---
+
+<section class="pb-4" data-gate data-dmg={macReady ? LINKS.macDmg : undefined}>
+  <div class="shell">
+    <div
+      class="mx-auto max-w-3xl overflow-clip rounded-hero border border-hair bg-card px-6 py-10 sm:px-10 sm:py-12"
+      data-reveal
+    >
+      {/* ---------------------------------------------------- no script yet -- */}
+      <div class={panel} data-panel="all">
+        <h2 class={heading}>{get.all.heading}</h2>
+        <p class={body}>{get.all.body}</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <a class="btn btn-primary" href={LINKS.appStore}>{get.appStore}</a>
+          <a class="btn btn-ghost" href={LINKS.macDmg}>{get.macButton}</a>
+        </div>
+      </div>
+
+      {/* --------------------------------------------------------------- mac -- */}
+      <div class={panel} data-panel="mac" hidden>
+        <h2 class={heading} data-mac-heading data-started={get.mac.startingHeading}>
+          {get.mac.heading}
+        </h2>
+        <p class={body}>{get.mac.body}</p>
+
+        <div class="grid justify-items-center gap-3">
+          <a class="btn btn-primary" href={LINKS.macDmg} data-mac-button data-again={get.mac.again}>
+            {get.mac.button}
+          </a>
+          {/* Only ever seen once the file is genuinely on its way. */}
+          <p class="text-xs text-faint" data-mac-note hidden>{get.mac.starting}</p>
+          {macos.action?.note && <p class="text-xs text-faint">{macos.action.note}</p>}
+        </div>
+
+        <div class="w-full text-start">
+          <InstallSteps
+            heading={macos.stepsHeading}
+            intro={macos.stepsIntro}
+            steps={macos.steps ?? []}
+            after={macos.stepsAfter}
+          />
+        </div>
+
+        <div class="qr" data-qr>
+          <img class="size-28 shrink-0" src={qrSrc} alt={get.qr.alt} width="112" height="112" />
+          <div class="min-w-0 text-start">
+            <p class="font-semibold tracking-tight">{get.qr.heading}</p>
+            <p class="mt-1 text-sm text-muted">{get.qr.body}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ------------------------------------------------- iPhone and iPad -- */}
+      <div
+        class={panel}
+        data-panel="ios"
+        data-iphone={JSON.stringify(get.iphone)}
+        data-ipad={JSON.stringify(get.ipad)}
+        hidden
+      >
+        <h2 class={heading} data-ios-heading>{get.iphone.heading}</h2>
+        <p class={body} data-ios-body>{get.iphone.body}</p>
+
+        <div class="grid justify-items-center gap-3">
+          <a class="btn btn-primary" href={LINKS.appStore}>{get.appStore}</a>
+          {ios.action?.note && <p class="text-xs text-faint">{ios.action.note}</p>}
+        </div>
+
+        <div class="w-full text-start">
+          <InstallSteps heading={ios.stepsHeading} intro={ios.stepsIntro} steps={ios.steps ?? []} />
+        </div>
+      </div>
+
+      {/* -------------------------------------- named, and not built yet -- */}
+      <div class={panel} data-panel="soon" data-names={JSON.stringify(get.names)} hidden>
+        <span
+          class="rounded-full bg-ember-soft px-3 py-1 text-2xs font-semibold text-ember"
+          data-soon-tag>{get.names.linux}</span
+        >
+        <h2 class={heading} data-soon-heading>{get.soon.heading}</h2>
+        <p class={body} data-soon-body>{get.soon.body}</p>
+
+        <div class="mt-2 grid w-full justify-items-center gap-4 border-t border-hair pt-8">
+          <p class="eyebrow">{get.soon.available}</p>
+          <div class="flex flex-wrap justify-center gap-3">
+            <a class="btn btn-primary" href={LINKS.appStore}>{get.appStore}</a>
+            <a class="btn btn-ghost" href={LINKS.macDmg}>{get.macButton}</a>
+          </div>
+        </div>
+
+        <div class="qr" data-qr>
+          <img class="size-28 shrink-0" src={qrSrc} alt={get.qr.alt} width="112" height="112" />
+          <div class="min-w-0 text-start">
+            <p class="font-semibold tracking-tight">{get.qr.heading}</p>
+            <p class="mt-1 text-sm text-muted">{get.qr.body}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ----------------------------------------------------- not planned -- */}
+      <div class={panel} data-panel="unknown" hidden>
+        <h2 class={heading}>{get.unknown.heading}</h2>
+        <p class={body}>{get.unknown.body}</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <a class="btn btn-primary" href={issues}>{get.unknown.link}</a>
+          <a class="btn btn-ghost" href={LINKS.discord}>Discord</a>
+        </div>
+      </div>
+
+      {/* Shown under whichever panel was picked, never under `all`. */}
+      <p class="mt-8 text-center" data-other hidden>
+        <button class="link text-sm underline" type="button" data-show-all>
+          {get.otherDevice}
+        </button>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* A panel is a grid, and grid beats the UA's [hidden] rule on its own. */
+  [data-panel][hidden],
+  [data-other][hidden],
+  [data-mac-note][hidden] {
+    display: none !important;
+  }
+
+  .qr {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-block-start: 2.5rem;
+    padding: 1.25rem;
+    width: 100%;
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+    background: var(--color-raise);
+  }
+
+  /*
+    A white plate under the code, and not for looks. The SVG is dark modules on
+    a transparent ground; on this page that ground is nearly black, which
+    leaves a code most scanners will not read. Inverting it does not help —
+    plenty of readers only accept dark-on-light.
+  */
+  .qr img {
+    background: #fff;
+    padding: 0.5rem;
+    border-radius: 0.6rem;
+    box-sizing: content-box;
+  }
+
+  @media (max-width: 30rem) {
+    .qr {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .qr > div {
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  import { detectPlatform, DESKTOP, SOON } from '../scripts/platform';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-gate]')) {
+    const panels = new Map<string, HTMLElement>();
+    for (const el of root.querySelectorAll<HTMLElement>('[data-panel]')) {
+      panels.set(el.dataset.panel!, el);
+    }
+
+    const show = (name: string) => {
+      for (const [key, el] of panels) el.hidden = key !== name;
+    };
+
+    const where = detectPlatform();
+    const target =
+      where === 'mac'
+        ? 'mac'
+        : where === 'iphone' || where === 'ipad'
+          ? 'ios'
+          : SOON.has(where)
+            ? 'soon'
+            : 'unknown';
+
+    // --- iPhone or iPad, in that panel's own words -----------------------
+    if (target === 'ios') {
+      const box = panels.get('ios')!;
+      const words = JSON.parse(box.dataset[where === 'ipad' ? 'ipad' : 'iphone'] ?? '{}');
+      const h = box.querySelector<HTMLElement>('[data-ios-heading]');
+      const b = box.querySelector<HTMLElement>('[data-ios-body]');
+      if (h && words.heading) h.textContent = words.heading;
+      if (b && words.body) b.textContent = words.body;
+    }
+
+    // --- a platform we can name and have not built for -------------------
+    if (target === 'soon') {
+      const box = panels.get('soon')!;
+      const names = JSON.parse(box.dataset.names ?? '{}');
+      const name = names[where] ?? where;
+      for (const el of box.querySelectorAll<HTMLElement>('[data-soon-heading], [data-soon-body]')) {
+        el.textContent = (el.textContent ?? '').replaceAll('{platform}', name);
+      }
+      const tag = box.querySelector<HTMLElement>('[data-soon-tag]');
+      if (tag) tag.textContent = name;
+    }
+
+    // --- the QR is for the phone in your other hand ----------------------
+    if (!DESKTOP.has(where)) {
+      for (const el of root.querySelectorAll<HTMLElement>('[data-qr]')) el.hidden = true;
+    }
+
+    show(target);
+
+    // --- someone downloading for a machine they are not sitting at -------
+    const other = root.querySelector<HTMLElement>('[data-other]');
+    if (other) {
+      other.hidden = false;
+      other.querySelector('[data-show-all]')?.addEventListener('click', () => {
+        panels.get('all')!.hidden = false;
+        other.hidden = true;
+      });
+    }
+
+    // --- the Mac download, once there is a file to send ------------------
+    const dmg = root.dataset.dmg;
+    if (target === 'mac' && dmg) {
+      const box = panels.get('mac')!;
+      const words = box.querySelector<HTMLElement>('[data-mac-heading]');
+      const note = box.querySelector<HTMLElement>('[data-mac-note]');
+      const button = box.querySelector<HTMLAnchorElement>('[data-mac-button]');
+
+      // A release asset is served as an attachment, so this downloads the file
+      // and leaves the page where it is.
+      const link = document.createElement('a');
+      link.href = dmg;
+      link.download = '';
+      link.rel = 'noopener';
+      link.style.display = 'none';
+      document.body.append(link);
+      link.click();
+      link.remove();
+
+      if (words) words.textContent = words.dataset.started ?? words.textContent;
+      if (note) note.hidden = false;
+      if (button) button.textContent = button.dataset.again ?? button.textContent;
+    }
+  }
+</script>

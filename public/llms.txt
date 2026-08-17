@@ -1,0 +1,52 @@
+# Obadh
+
+> Obadh (অবাধ) is a free and open-source Bangla typing project: one Rust engine, and above it
+> whatever each platform calls a keyboard. Available on iPhone, iPad and Mac; Linux, Android,
+> Windows and ChromeOS are coming. Everything runs on the device: no network call on the
+> typing path, no account, no telemetry. MIT licensed.
+
+Obadh is built on obadh_engine, a deterministic Roman-to-Bangla transliteration engine written
+in Rust. The core is rule-based and dictionary-free: Roman becomes Bengali because a rule says
+so, not because a dictionary or a model guessed a word. Autocorrect, next-word suggestions, a
+personal overlay that learns on the device, and an optional next-word model running through
+Core ML or ONNX are separable layers above it.
+Obadh continues what Avro Keyboard began in 2003; it is not a fork of Avro or a replacement
+for it.
+
+## Pages
+
+- [Home](https://obadh.unmukto.org/): What Obadh is, and a live box you can type Bangla in.
+- [Download](https://obadh.unmukto.org/download/): Getting Obadh on iPhone, iPad and Mac; status of other platforms.
+- [Writing guide](https://obadh.unmukto.org/guide/): The complete Roman-to-Bangla scheme, including conjuncts, reph and numerals.
+- [About](https://obadh.unmukto.org/about/): Where Obadh came from, what it owes Avro, how it is built.
+- [FAQ](https://obadh.unmukto.org/faq/): Offline use, iOS Full Access, licensing, and keeping another keyboard alongside Obadh.
+- [Contribute](https://obadh.unmukto.org/contribute/): Code, data, testing and translation.
+- [Privacy](https://obadh.unmukto.org/privacy/): What leaves the device, which is nothing.
+
+Every page also exists in Bangla under /bn/, for example https://obadh.unmukto.org/bn/guide/.
+
+## Facts
+
+- License: MIT. Free, no ads, no subscription, no account.
+- Author: NSS Sayom. Repositories under https://github.com/nsssayom.
+- Available: iOS and iPadOS 18 or later, macOS 15 or later. Coming, with no dates and none of
+  them started in the open: Linux (X11 and Wayland), Android, Windows, ChromeOS.
+- Engine version 0.9.1. The iOS and macOS apps are at 0.1.0.
+- Autocorrect lexicon: 845,461 Bangla entries plus 1,776 English loanword keys.
+- Autosuggest corpus: 578,220 documents, 13,344,360 sentences, 161,638,268 tokens.
+- A word takes about three microseconds to compose, and the deterministic core needs no data
+  files.
+- The optimized WebAssembly build of the engine is about 390 KB. It is what the typing box on
+  the site runs.
+- The typing scheme is Obadh's own and is not Avro Phonetic. Every rule is on /guide/.
+
+## Source
+
+- [obadh_engine](https://github.com/nsssayom/obadh_engine): The Rust transliteration engine and runtime SDK.
+- [obadh-ios](https://github.com/nsssayom/obadh-ios): The iPhone and iPad keyboard.
+- [obadh-macos](https://github.com/nsssayom/obadh-macos): The macOS input method.
+- [Engine playground](https://sayom.me/obadh_engine/): Try the engine in a browser.
+
+## Optional
+
+- [Conjuncts, reph, folas and hasant](https://obadh.unmukto.org/guide/#conjuncts): The parts of the scheme people look up.

@@ -1,0 +1,261 @@
+---
+import Base from './Base.astro';
+import GetObadh from '../components/GetObadh.astro';
+import PageHead from '../components/PageHead.astro';
+import PlatformList from '../components/PlatformList.astro';
+import Screenshot from '../components/Screenshot.astro';
+import { shots } from '../i18n/shots';
+import typing from '../assets/shots/typing-poster.png';
+import onboarding from '../assets/shots/onboarding.png';
+import type { DownloadContent } from '../copy/types';
+import { LINKS, SITE, SITE_URL, absoluteUrl, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  content: DownloadContent;
+}
+
+const { locale, content } = Astro.props;
+const c = content;
+const shot = shots[locale];
+
+/** Actions name a key in LINKS rather than a URL, so no page hard-codes one. */
+const href = (key: string) => {
+  const value = (LINKS as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value : key;
+};
+
+const base = absoluteUrl(localizedPath('/download/', locale));
+const author = { '@id': `${SITE_URL}/#sayom` };
+
+const ios = c.platforms.find((p) => p.id === 'ios')!;
+const macos = c.platforms.find((p) => p.id === 'macos')!;
+
+/*
+  No `downloadUrl`. The App Store listing and the DMG are both placeholders
+  until the app is approved and the first release is tagged, and a fabricated
+  download address is the one claim here a crawler would act on by itself. The
+  buttons stay on the page, where a person reads the note beside them.
+*/
+const app = (name: string, os: string, id: string) => ({
+  '@type': 'SoftwareApplication',
+  '@id': `${base}#${id}`,
+  name,
+  alternateName: 'অবাধ',
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: os,
+  softwareVersion: SITE.versions.ios,
+  license: 'https://opensource.org/licenses/MIT',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  inLanguage: ['bn', 'en'],
+  author,
+});
+
+// No aggregateRating and no review, so no software rich result. Writing our own
+// rating for our own software is the sort of thing this project has no business
+// doing; real App Store ratings can be sourced from Apple later.
+const schema = [
+  app('Obadh for iPhone and iPad', `iOS ${SITE.minOS.ios}, iPadOS ${SITE.minOS.ios}`, 'ios'),
+  app('Obadh for Mac', `macOS ${SITE.minOS.macos}`, 'macos'),
+];
+
+/* One reading column down the middle, and the two things that must not be
+   squeezed into it — the screenshots and the platform rows — allowed the whole
+   shell. */
+const col = 'measure';
+---
+
+<Base
+  locale={locale}
+  route="/download/"
+  title={c.meta.title}
+  description={c.meta.description}
+  ogImage={c.meta.ogImage}
+  ogImageAlt={c.meta.ogImageAlt}
+  ogTitle={c.meta.ogTitle}
+  ogDescription={c.meta.ogDescription}
+  schema={schema}
+>
+  <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
+
+  <GetObadh locale={locale} get={c.get} ios={ios} macos={macos} />
+
+  <div class="shell pb-24">
+    <div class={`${col} prose pt-16`} data-reveal>
+      {c.intro.map((paragraph) => <p set:html={paragraph} />)}
+      <p set:html={c.tryFirst} />
+    </div>
+
+    {
+      c.platforms.map((platform) => (
+        <section class="pt-20" id={platform.id}>
+          <div class={col} data-reveal>
+            <h2 class="text-2xl font-semibold tracking-tight" set:html={platform.name} />
+            <p class="mt-3 text-sm text-muted">{platform.requirement}</p>
+
+            {platform.action && (
+              <div class="mt-6 flex flex-wrap items-center gap-3">
+                <a class="btn btn-primary" href={href(platform.action.href)}>
+                  {platform.action.label}
+                </a>
+                {platform.altAction && (
+                  <a class="btn btn-ghost" href={href(platform.altAction.href)}>
+                    {platform.altAction.label}
+                  </a>
+                )}
+                {platform.action.note && (
+                  <p class="basis-full text-xs text-faint">{platform.action.note}</p>
+                )}
+              </div>
+            )}
+
+            <div class="prose mt-6">
+              {platform.body.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+            </div>
+          </div>
+
+          {/* Outside the reading column: these are 2x captures and must not be
+              scaled down to fit a measure meant for reading. */}
+          {platform.id === 'ios' && (
+            <div class="mt-12 flex flex-wrap items-start justify-center gap-10" data-reveal>
+              <Screenshot
+                src={typing}
+                alt={shot.typingAlt}
+                caption={shot.typingCaption}
+                width={330}
+                motion={{ src: '/shots/typing-motion.gif', poster: typing, playLabel: shot.typingPlay }}
+              />
+              <Screenshot
+                src={onboarding}
+                alt={shot.onboardingAlt}
+                caption={shot.onboardingCaption}
+                width={560}
+              />
+            </div>
+          )}
+
+          {platform.steps && (
+            <div class={`${col} mt-14`} id={platform.stepsId} data-reveal>
+              {platform.stepsHeading && (
+                <h3 class="text-xl font-semibold tracking-tight" set:html={platform.stepsHeading} />
+              )}
+              {platform.stepsIntro && (
+                <p class="mt-3 text-muted" set:html={platform.stepsIntro} />
+              )}
+
+              {/* The one place on this site where numbering is right, because
+                  these genuinely are ordered. */}
+              <ol class="mt-8 grid gap-7">
+                {platform.steps.map((step, index) => (
+                  <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-4 gap-y-2">
+                    <span
+                      class="row-span-full grid size-8 place-items-center self-start rounded-full bg-brand/10 font-mono text-xs text-brand"
+                      aria-hidden="true"
+                    >
+                      {index + 1}
+                    </span>
+                    <div class="min-w-0">
+                      <h4 class="text-lg font-semibold tracking-tight" set:html={step.heading} />
+                      <p class="mt-1.5 text-sm text-muted [&_a]:text-brand" set:html={step.body} />
+                      {step.source && (
+                        <p class="mt-2 [overflow-wrap:anywhere] text-xs text-faint">
+                          {step.source}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+
+              {platform.stepsAfter && (
+                <p
+                  class="mt-8 text-sm text-muted [&_a]:text-brand"
+                  set:html={platform.stepsAfter}
+                />
+              )}
+            </div>
+          )}
+
+          {platform.sections?.map((section) => (
+            <div class={`${col} mt-14`} id={section.id} data-reveal>
+              <div class="prose">
+                {section.heading && (
+                  <h3 class="text-xl font-semibold tracking-tight" set:html={section.heading} />
+                )}
+                {section.body.map((paragraph) => (
+                  <p set:html={paragraph} />
+                ))}
+              </div>
+              {section.source && (
+                <p class="mt-4 font-mono [word-break:break-word] text-xs text-faint">
+                  {section.source}
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
+      ))
+    }
+
+    <section class="pt-20" id="other-platforms">
+      <div class={`${col} prose`} data-reveal>
+        <h2 class="text-2xl font-semibold tracking-tight" set:html={c.otherHeading} />
+        <p class="lede" set:html={c.otherLede} />
+        <blockquote
+          class="border-s-2 border-hair-strong ps-5 text-muted italic"
+          set:html={c.otherIntro}
+        />
+        <p set:html={c.otherEngine} />
+      </div>
+
+      <div class="mx-auto mt-10 max-w-4xl" data-reveal>
+        <PlatformList rows={c.others} />
+      </div>
+
+      <p class={`${col} mt-8 text-sm text-muted [&_a]:text-brand`} set:html={c.otherClosing} />
+    </section>
+
+    <section class="pt-20" id="build-from-source">
+      <div class={`${col} prose`} data-reveal>
+        <h2 class="text-2xl font-semibold tracking-tight" set:html={c.sourceHeading} />
+        {c.sourceBody.map((paragraph) => <p set:html={paragraph} />)}
+      </div>
+
+      <ul class="mx-auto mt-10 grid max-w-4xl gap-2" data-reveal>
+        {
+          c.repos.map((repo) => (
+            <li class="grid min-w-0 items-baseline gap-x-6 gap-y-2 rounded-card border border-hair bg-card p-5 sm:grid-cols-[minmax(9rem,14rem)_minmax(0,1fr)] sm:px-6">
+              <a class="font-mono text-sm text-brand" href={LINKS.github[repo.repo]}>
+                {repo.name}
+              </a>
+              <p class="min-w-0 text-sm text-muted [&_a]:text-brand" set:html={repo.body} />
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class={`${col} mt-8 text-sm text-muted [&_a]:text-brand`} set:html={c.sourceClosing} />
+    </section>
+
+    <section class="pt-20" id={c.versions.id}>
+      <div class={`${col} prose`} data-reveal>
+        {
+          c.versions.heading && (
+            <h2 class="text-2xl font-semibold tracking-tight" set:html={c.versions.heading} />
+          )
+        }
+        {c.versions.body.map((paragraph) => <p set:html={paragraph} />)}
+        <p set:html={c.closing} />
+      </div>
+
+      <ul class={`${col} mt-8 grid gap-2 font-mono text-sm`} data-reveal>
+        <li><a class="link" href={LINKS.github.engine}>obadh_engine {SITE.versions.engine}</a></li>
+        <li><a class="link" href={LINKS.github.ios}>obadh-ios {SITE.versions.ios}</a></li>
+        <li><a class="link" href={LINKS.github.macos}>obadh-macos {SITE.versions.macos}</a></li>
+      </ul>
+    </section>
+  </div>
+</Base>

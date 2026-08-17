@@ -1,0 +1,28 @@
+---
+/**
+ * ভাষা হোক আরও উন্মুক্ত — the line shipping inside both apps.
+ *
+ * Avro's line is ভাষা হোক উন্মুক্ত. This one adds আরও, and the added word is
+ * the whole relationship between the two projects. It is the only word on the
+ * site that gets its own colour, and the line is never set with quotation
+ * marks, an attribution, or a translation underneath it.
+ */
+interface Props {
+  size?: 'lg' | 'display';
+  class?: string;
+}
+
+const { size = 'lg', class: className = '' } = Astro.props;
+---
+
+<p
+  class:list={[
+    'font-serif-bn tracking-normal text-ink',
+    size === 'display' ? 'text-mega leading-[1.24]' : 'text-lg leading-[1.4]',
+    className,
+  ]}
+  lang="bn"
+  style="padding-block: 0.08em"
+>
+  ভাষা হোক <span class="text-brand">আরও</span> উন্মুক্ত
+</p>

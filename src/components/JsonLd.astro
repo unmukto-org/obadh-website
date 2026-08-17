@@ -1,0 +1,134 @@
+---
+/**
+ * One `@graph` per page: the identity half is the same everywhere, the page
+ * half is assembled from the route.
+ *
+ * Two omissions on purpose. No `SearchAction`, because the site has no search
+ * and describing a results URL that does not exist is a claim a validator can
+ * catch. No `aggregateRating` or `review` anywhere, because writing our own
+ * rating for our own software is exactly the sort of thing this project has no
+ * business doing. Real App Store ratings can be sourced from Apple later.
+ *
+ * A page that is not routed gets the identity half and nothing else. The 404 is
+ * served at every address that matches no page, so a WebPage or a crumb naming
+ * `/404/` would put a URL that returns 404 into the one part of the document a
+ * crawler acts on without a human reading it first.
+ */
+import { ui } from '../i18n/ui';
+import { LINKS, LOCALE_TAG, SITE, SITE_URL, absoluteUrl, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  route: string;
+  title: string;
+  description: string;
+  /** False on the 404, which is served at addresses that are not its own URL. */
+  routed?: boolean;
+  extra?: Record<string, unknown>[];
+}
+
+const { locale, route, title, description, routed = true, extra = [] } = Astro.props;
+
+const t = ui[locale];
+const pageUrl = absoluteUrl(localizedPath(route, locale));
+const homeUrl = absoluteUrl(localizedPath('/', locale));
+const inLanguage = LOCALE_TAG[locale];
+
+const projectId = `${SITE_URL}/#project`;
+const websiteId = `${SITE_URL}/#website`;
+const personId = `${SITE_URL}/#sayom`;
+
+/**
+ * The author's own site. It is not in LINKS because no page links to it: it is
+ * here so the Person resolves to an identity that already exists elsewhere.
+ */
+const AUTHOR_URL = 'https://sayom.me/';
+
+/**
+ * A crumb names a place, so it carries the label the header uses rather than
+ * the page title, which is written for a result list and reads as keyword
+ * stuffing in a trail. Privacy is not in the nav; the footer names it.
+ */
+const CRUMB: Record<string, string> = {
+  '/download/': t.nav.download,
+  '/guide/': t.nav.guide,
+  '/about/': t.nav.about,
+  '/faq/': t.nav.faq,
+  '/contribute/': t.nav.contribute,
+  '/privacy/': t.footer.privacy,
+};
+
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'WebSite',
+    '@id': websiteId,
+    url: `${SITE_URL}/`,
+    name: SITE.name,
+    alternateName: SITE.nameBn,
+    // The site's one machine-readable self-description, and the one place the old
+    // framing survived longest. It matches the home page's meta description word
+    // for word on purpose: Obadh is a typing project on one engine, not two Apple
+    // apps, and it does not explain phonetic typing to people who already type it.
+    description:
+      'A free and open-source Bangla typing project. One engine behind every platform, everything on your device, no network call at all.',
+    inLanguage: ['en', 'bn'],
+    publisher: { '@id': projectId },
+  },
+  {
+    '@type': 'Organization',
+    '@id': projectId,
+    name: SITE.name,
+    alternateName: SITE.nameBn,
+    url: `${SITE_URL}/`,
+    logo: absoluteUrl('/icons/app-512.png'),
+    founder: { '@id': personId },
+    // The two shipping apps belong here: they are what the site is about. The
+    // crate is the same project under another name, published behind the
+    // repository it is cut from.
+    sameAs: [
+      LINKS.github.org,
+      LINKS.github.engine,
+      LINKS.github.ios,
+      LINKS.github.macos,
+      LINKS.crate,
+    ],
+  },
+  {
+    '@type': 'Person',
+    '@id': personId,
+    name: SITE.author,
+    url: AUTHOR_URL,
+    sameAs: [LINKS.github.org],
+  },
+];
+
+if (routed) {
+  graph.push({
+    '@type': route === '/about/' ? 'AboutPage' : 'WebPage',
+    '@id': `${pageUrl}#page`,
+    url: pageUrl,
+    name: title,
+    description,
+    inLanguage,
+    isPartOf: { '@id': websiteId },
+    about: { '@id': projectId },
+    license: 'https://opensource.org/licenses/MIT',
+  });
+}
+
+const crumb = CRUMB[route];
+if (routed && crumb) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    '@id': `${pageUrl}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: locale === 'bn' ? SITE.nameBn : SITE.name, item: homeUrl },
+      { '@type': 'ListItem', position: 2, name: crumb, item: pageUrl },
+    ],
+  });
+}
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': [...graph, ...extra] };
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

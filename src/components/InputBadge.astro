@@ -1,0 +1,80 @@
+---
+/**
+ * The word "Bangla" in the headline, set as an input-source badge — the little
+ * rounded plate macOS puts in the menu bar to tell you which keyboard you are
+ * typing on. Here it is the Bangla one, and the script is cut out of it.
+ *
+ * A real knockout, not a fake one. The plate is painted through an SVG mask
+ * whose white rectangle is punched by black text, so what shows through the
+ * letters is whatever the page has behind them — the ground, the alpona, the
+ * lift under the hero. Setting the letters to the ground colour instead would
+ * look identical over flat colour and wrong over anything else.
+ *
+ * `textLength` with `lengthAdjust="spacingAndGlyphs"` makes the word fill a
+ * known width, so the badge can have a fixed viewBox and a fixed aspect ratio
+ * without the letters stretching when the font falls back or changes.
+ *
+ * It carries no accessible name of its own: the heading around it supplies the
+ * word, so a screen reader reads the sentence rather than announcing an image
+ * in the middle of it.
+ */
+interface Props {
+  /** The script's own name, as it appears on the badge. */
+  label: string;
+  class?: string;
+}
+
+const { label, class: className = '' } = Astro.props;
+
+// One id per instance, or a second badge on the page reuses the first's mask.
+const id = `badge-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg
+  class:list={['badge', className]}
+  viewBox="0 0 132 52"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <mask id={id}>
+      <rect x="0" y="0" width="132" height="52" rx="13" fill="#fff"></rect>
+      <text
+        lang="bn"
+        x="66"
+        y="27"
+        textLength="106"
+        lengthAdjust="spacingAndGlyphs"
+        text-anchor="middle"
+        dominant-baseline="central"
+        fill="#000">{label}</text
+      >
+    </mask>
+  </defs>
+
+  <rect x="0" y="0" width="132" height="52" rx="13" fill="currentColor" mask={`url(#${id})`}
+  ></rect>
+</svg>
+
+<style>
+  .badge {
+    display: inline-block;
+    /* Sized off the line it sits in, and dropped so its box sits on the
+       baseline rather than hanging under it. */
+    height: 1.02em;
+    width: calc(1.02em * (132 / 52));
+    vertical-align: -0.16em;
+    /* The plate takes the colour of the words either side of it — it is one of
+       them, set as a badge rather than as type. The accent stays on the second
+       line, where the sentence turns. */
+    color: var(--color-ink);
+  }
+
+  .badge text {
+    font-family: var(--font-bangla);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+</style>

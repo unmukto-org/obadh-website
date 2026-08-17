@@ -1,0 +1,127 @@
+---
+/**
+ * The four objects on the value cards.
+ *
+ * Not line icons, and not gradients either. Each one is built from two FLAT
+ * tones — a lit face and a darker side — which is how a screen-printed folk
+ * figure is built and how anything reads as an object without looking like a
+ * stock illustration. Gradients on these made the whole page look cheap.
+ *
+ * All four share one 96-unit grid, one light direction (top-left) and the same
+ * two tones, so they look like a set rather than four drawings.
+ */
+interface Props {
+  name: 'speed' | 'accurate' | 'private' | 'free';
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 96, class: className = '' } = Astro.props;
+
+---
+
+<svg
+  class:list={['glyph', className]}
+  viewBox="0 0 96 96"
+  width={size}
+  height={size}
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+>
+
+  {
+    name === 'speed' && (
+      <>
+        {/* A bolt, and the air moving past it. */}
+        <path
+          d="M13 34h16M7 50h14M13 66h18"
+          stroke="var(--glyph-side)"
+          stroke-width="6"
+          stroke-linecap="round"
+        />
+        <path d="M62 6 34 52h16l-6 38 30-48H58l4-36Z" fill="var(--glyph-face)" />
+      </>
+    )
+  }
+
+  {
+    name === 'accurate' && (
+      <>
+        {/* A tick, seated in a ring that is open where the tick leaves it. */}
+        <circle
+          cx="48"
+          cy="50"
+          r="30"
+          stroke="var(--glyph-side)"
+          stroke-width="9"
+          stroke-linecap="round"
+          stroke-dasharray="150 40"
+          transform="rotate(-42 48 50)"
+        />
+        <path
+          d="M33 51l11 11 22-25"
+          stroke="var(--glyph-face)"
+          stroke-width="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle cx="76" cy="24" r="5" fill="var(--glyph-face)" />
+      </>
+    )
+  }
+
+  {
+    name === 'private' && (
+      <>
+        {/* A padlock, shut. The shackle is behind the body, which is why it is
+            drawn first and stops at the shoulder. */}
+        <path
+          d="M33 45V34a15 15 0 0 1 30 0v11"
+          stroke="var(--glyph-side)"
+          stroke-width="9"
+          stroke-linecap="round"
+        />
+        <rect x="22" y="43" width="52" height="42" rx="13" fill="var(--glyph-face)" />
+        <circle cx="48" cy="61" r="6" fill="var(--glyph-hole)" />
+        <rect x="45" y="63" width="6" height="12" rx="3" fill="var(--glyph-hole)" />
+      </>
+    )
+  }
+
+  {
+    name === 'free' && (
+      <>
+        {/* An open box: lid tilted back, so you can see there is nothing in it
+            you were not told about. */}
+        <path d="M48 46 16 60v20l32 14 32-14V60L48 46Z" fill="var(--glyph-side)" />
+        <path d="M48 46 16 60l32 13 32-13-32-14Z" fill="var(--glyph-face)" />
+        <path
+          d="M48 73v21"
+          stroke="var(--glyph-hole)"
+          stroke-width="3"
+          stroke-linecap="round"
+          />
+        <path
+          d="M26 30l6 10M48 22v12M70 30l-6 10"
+          stroke="var(--glyph-face)"
+          stroke-width="6"
+          stroke-linecap="round"
+        />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .glyph {
+    /* Two tones and the ground the object is cut out of. Tokens rather than
+       literals, so the objects follow the palette. */
+    --glyph-face: var(--color-brand);
+    --glyph-side: color-mix(in srgb, var(--color-brand) 45%, var(--color-ground));
+    --glyph-hole: var(--color-ground);
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+</style>

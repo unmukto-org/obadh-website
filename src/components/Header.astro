@@ -1,0 +1,156 @@
+---
+import Mark from './Mark.astro';
+import LangSwitch from './LangSwitch.astro';
+import { ui } from '../i18n/ui';
+import { SITE, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  route: string;
+  /** The 404 exists once and carries both languages, so it offers no switch. */
+  noSwitch?: boolean;
+}
+
+const { locale, route, noSwitch = false } = Astro.props;
+const t = ui[locale];
+
+const links = [
+  { route: '/download/', label: t.nav.download },
+  { route: '/guide/', label: t.nav.guide },
+  { route: '/about/', label: t.nav.about },
+  { route: '/faq/', label: t.nav.faq },
+  { route: '/contribute/', label: t.nav.contribute },
+];
+---
+
+{/*
+  No band. The header is transparent at the top of the page so the alpona
+  behind the hero runs up through it, and takes the page's own colour once you
+  have scrolled past that — otherwise the words would sit on whatever happened
+  to be underneath them. No border either way. The links are centred on the
+  viewport independently of how wide the wordmark and the button happen to be.
+
+  `site-header` and `wordmark` carry no styles. They are the names the
+  accessibility checks in scripts/smoke.mjs address these two by, and a
+  utility-class chain is not something a test should be reaching into.
+*/}
+<header
+  class="site-header sticky top-0 z-30 bg-transparent transition-colors duration-300 data-stuck:bg-ground"
+  data-header
+>
+  {/*
+    Full width, not the content container. The wordmark and the button belong
+    to the edges of the viewport the way Firefox's do; constraining them to the
+    78rem shell parks them hundreds of pixels inboard on a wide screen and the
+    header stops reading as a frame around the page.
+  */}
+  <div class="relative flex min-h-20 w-full items-center gap-5 px-5 py-2 sm:px-8 lg:px-10">
+    <a
+      class="wordmark relative z-10 mr-auto flex min-h-11 items-center gap-3 no-underline"
+      href={localizedPath('/', locale)}
+      aria-current={route === '/' ? 'page' : undefined}
+    >
+      <Mark size={36} decorative />
+      <span class="text-[1.4rem] font-semibold tracking-tight">{SITE.name}</span>
+    </a>
+
+    <nav
+      class="absolute inset-x-0 hidden items-center justify-center gap-1 lg:flex"
+      aria-label={t.navMenu}
+    >
+      {
+        links.map((link) => (
+          <a
+            href={localizedPath(link.route, locale)}
+            class:list={[
+              'rounded-full px-4 py-2 text-sm no-underline transition-colors hover:text-ink',
+              route === link.route ? 'font-semibold text-ink' : 'font-medium text-muted',
+            ]}
+            aria-current={route === link.route ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="relative z-10 hidden items-center gap-3 lg:flex">
+      {!noSwitch && <LangSwitch locale={locale} route={route} />}
+      {/* The generic label on purpose: this goes to the download page, where
+          you can read what you are installing. The hero's button is the one
+          that links straight at a file. */}
+      <a class="btn btn-primary min-h-12 px-7 py-2 text-base" href={localizedPath('/download/', locale)}>
+        {t.getObadh}
+      </a>
+    </div>
+
+    <details class="site-menu relative ml-auto lg:hidden" data-menu>
+      <summary
+        class="site-menu__button grid size-11 cursor-pointer list-none place-items-center rounded-full text-ink [&::-webkit-details-marker]:hidden"
+      >
+        <span class="grid w-[18px] gap-[5px]" aria-hidden="true">
+          <i class="block h-[1.5px] rounded bg-current transition-transform group-open:translate-y-[3.25px]"></i>
+          <i class="block h-[1.5px] rounded bg-current transition-transform"></i>
+        </span>
+        <span class="visually-hidden">{t.navMenu}</span>
+      </summary>
+
+      <div
+        class="card absolute end-0 top-[calc(100%+0.75rem)] z-10 grid min-w-56 gap-1 rounded-panel p-3 shadow-lift"
+      >
+        <nav class="grid" aria-label={t.navMenu}>
+          {
+            links.map((link) => (
+              <a
+                href={localizedPath(link.route, locale)}
+                class:list={[
+                  'site-menu__link flex min-h-11 items-center rounded-xl px-4 py-3 text-sm no-underline transition-colors hover:bg-raise hover:text-ink',
+                  route === link.route ? 'bg-raise font-semibold text-ink' : 'text-muted',
+                ]}
+                aria-current={route === link.route ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-center gap-2 border-t border-hair pt-3">
+          {!noSwitch && <LangSwitch locale={locale} route={route} />}
+          <a
+            class="btn btn-primary min-h-11 flex-1 px-5 py-2 text-sm"
+            href={localizedPath('/download/', locale)}
+          >
+            {t.getObadh}
+          </a>
+        </div>
+      </div>
+    </details>
+  </div>
+</header>
+
+<script>
+  // Transparent over the hero, the page's own colour past it.
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header) {
+    const mark = () => {
+      if (window.scrollY > 24) header.dataset.stuck = '';
+      else delete header.dataset.stuck;
+    };
+    mark();
+    window.addEventListener('scroll', mark, { passive: true });
+  }
+
+  // Escape closes the sheet, and so does a press outside it.
+  const menu = document.querySelector<HTMLDetailsElement>('[data-menu]');
+  if (menu) {
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !menu.open) return;
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    });
+    document.addEventListener('click', (event) => {
+      if (menu.open && !menu.contains(event.target as Node)) menu.open = false;
+    });
+  }
+</script>

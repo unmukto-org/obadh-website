@@ -1,0 +1,47 @@
+---
+/**
+ * Availability, as a list you can read at a glance.
+ *
+ * Two states and no others, because only two are true. What is out is stated
+ * in the brand colour, what is coming is stated warmly rather than greyed out,
+ * and nothing here is a progress bar, a percentage or a date, because none of
+ * those would be honest.
+ */
+import type { PlatformRow } from '../copy/types';
+
+interface Props {
+  rows: PlatformRow[];
+}
+
+const { rows } = Astro.props;
+---
+
+<ul class="grid gap-2">
+  {
+    rows.map((row) => (
+      <li
+        class:list={[
+          'grid min-w-0 items-center gap-x-6 gap-y-2 rounded-card border p-5 sm:px-6',
+          'grid-cols-[minmax(0,1fr)_auto] [grid-template-areas:"name_state"_"line_line"]',
+          'sm:grid-cols-[minmax(9rem,15rem)_minmax(0,1fr)_auto] sm:[grid-template-areas:"name_line_state"]',
+          row.state === 'shipping' ? 'border-hair bg-card shadow-soft' : 'border-hair/60 bg-transparent',
+        ]}
+      >
+        <span class="[grid-area:name] min-w-0 text-lg font-semibold tracking-tight">{row.name}</span>
+
+        <span
+          class:list={[
+            '[grid-area:state] justify-self-end rounded-full px-2.5 py-1 text-2xs font-semibold whitespace-nowrap',
+            row.state === 'shipping'
+              ? 'bg-brand/10 text-brand'
+              : 'bg-ember-soft text-ember',
+          ]}
+        >
+          {row.stateLabel}
+        </span>
+
+        <span class="[grid-area:line] min-w-0 text-sm text-muted">{row.line}</span>
+      </li>
+    ))
+  }
+</ul>

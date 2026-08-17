@@ -1,0 +1,491 @@
+@import 'tailwindcss';
+
+/*
+  The design system.
+
+  One ground, and it is night. Obadh's own deep teal taken down until it is
+  almost black, with the bright teal from the app icon as the single accent.
+  There is no light mode and no switch: a palette tuned once is worth more than
+  two half-tuned ones.
+
+  Flat. The only gradient anywhere on the site is the wide lift low in the home
+  hero. An earlier pass had them on the headline, the Bangla, the buttons,
+  every card face and four section washes at once, and the effect of that is
+  cheapness rather than depth.
+
+  Four planes, and nothing else. `ground` is the page. `veil` and `raise` are
+  the alternating bands that give a long page rhythm without rules drawn
+  between its parts. `card` is anything that sits on top and casts a shadow.
+
+  Everything here is a Tailwind theme token, so it is available as a utility:
+  `bg-raise`, `text-brand`, `rounded-card`, `text-display`.
+*/
+@theme {
+  /* --- the four planes --------------------------------------------------- */
+  --color-ground: #061a22;
+  --color-veil: #08202a;
+  --color-raise: #0a2530;
+  --color-card: #0d2b37;
+  --color-card-hi: #123846;
+
+  /* --- ink --------------------------------------------------------------- */
+  --color-ink: #eaf5f4;
+  --color-muted: #9db6bb;
+  --color-faint: #7d959b;
+  --color-hair: #16333f;
+  --color-hair-strong: #204a59;
+
+  /* --- the brand, from the app icon -------------------------------------- */
+  /* On night, the accent has to be the bright end of the family: the deep teal
+     that carried links on paper disappears into the ground here. */
+  --color-deep: #16506f;
+  --color-brand: #3cbfbc;
+  --color-brand-hover: #74dcd7;
+  --color-bright: #28b3ae;
+  --color-glow: #3cbfbc;
+  /* What goes on top of a bright teal fill. */
+  --color-on-brand: #04161c;
+
+  /* One warm note, used only where something needs to feel welcoming rather
+     than correct: the community band, and the small "coming" chips. */
+  --color-ember: #f0954a;
+  --color-ember-soft: #2c1e13;
+
+  /* --- type ------------------------------------------------------------- */
+  --font-sans: 'Schibsted Grotesk', 'Schibsted fallback', system-ui, sans-serif;
+  --font-bangla: 'Anek Bangla', 'Anek fallback', system-ui, sans-serif;
+  --font-serif-bn: 'Tiro Bangla', 'Tiro fallback', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Plex fallback', ui-monospace, monospace;
+
+  --text-2xs: clamp(0.75rem, 0.724rem + 0.111vw, 0.8125rem);
+  --text-xs: clamp(0.8125rem, 0.786rem + 0.111vw, 0.875rem);
+  --text-sm: clamp(0.9375rem, 0.885rem + 0.222vw, 1.0625rem);
+  --text-base: clamp(1.0625rem, 1.01rem + 0.222vw, 1.1875rem);
+  --text-lg: clamp(1.25rem, 1.144rem + 0.444vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.315rem + 0.778vw, 1.9375rem);
+  --text-2xl: clamp(1.875rem, 1.558rem + 1.333vw, 2.625rem);
+  --text-3xl: clamp(2.375rem, 1.847rem + 2.222vw, 3.625rem);
+  --text-display: clamp(2.75rem, 1.694rem + 4.444vw, 5.25rem);
+  --text-mega: clamp(3rem, 1.417rem + 6.667vw, 6.75rem);
+
+  /* --- shape and depth --------------------------------------------------- */
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+  --radius-hero: 2.25rem;
+
+  /* On a dark ground a drop shadow is nearly invisible, so depth is mostly the
+     hairline. Just enough cast shadow to seat a card, and no glow: a glowing
+     button reads as a cheap one. */
+  --shadow-soft: 0 10px 24px -18px rgb(0 0 0 / 0.8);
+  --shadow-lift: 0 26px 56px -30px rgb(0 0 0 / 0.9);
+
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ base -- */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    /*
+      Flat. The only gradient left in the design is the one glow behind the
+      hero animation on the home page: the site had gradients on the type, the
+      buttons and every card at once, and the effect of that is cheapness
+      rather than depth.
+    */
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-glow) 30%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /*
+    Bangla is a different script with different vertical metrics, and it is set
+    on the same lines as Latin all over this site. These rules are the ones
+    that cannot be expressed as utilities, so they live here.
+  */
+  :lang(bn) {
+    font-family: var(--font-bangla);
+    /* Each glyph carries its own segment of the matra and consecutive segments
+       abut, so any tracking punches visible gaps into the headline. */
+    letter-spacing: 0;
+    hyphens: none;
+    /* A broken conjunct is a different word, not a hyphenated one. */
+    overflow-wrap: normal;
+    word-break: normal;
+    line-break: strict;
+  }
+
+  /*
+    Anek sets its matra at its own Latin cap height; Schibsted's cap height is
+    taller, so unscaled Bangla inside an English sentence outranks the capitals
+    around it. 1.06 puts the matra just under the cap line.
+
+    Only for Bangla set INSIDE Latin text, and never on a Bangla page, where
+    the base face is already Anek and a blanket rule would flatten every
+    heading to 1.06em of its parent. The `:not([class])` is the contract:
+    inline Bangla in copy is a bare `<span lang="bn">`; a Bangla element that
+    belongs to a component carries a class and sets its own size.
+  */
+  html:not([lang='bn'])
+    :is(p, li, dd, dt, td, th, h1, h2, h3, h4, figcaption, blockquote, summary, label, span)
+    :lang(bn):not([class]) {
+    font-size: 1.06em;
+  }
+
+  html[lang='bn'] body {
+    font-family: var(--font-bangla);
+    line-height: 1.85;
+  }
+
+  html[lang='bn'] :is(h1, h2, h3, h4) {
+    line-height: 1.34;
+    letter-spacing: 0;
+    /* ঁ reaches nearly a full em above the baseline, past anything a Latin
+       line box allows for. */
+    padding-block: 0.06em;
+  }
+
+  /* Latin inside Bangla keeps Anek's own Latin, which Ek Type drew to sit with
+     the Bangla. `.latin` is the opt-out for a run that should read as the
+     site's Latin voice rather than as part of the sentence. */
+  html[lang='bn'] .latin {
+    font-family: var(--font-sans);
+    font-size: calc(1em / 1.06);
+    letter-spacing: normal;
+  }
+
+  code,
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    font-variant-ligatures: none;
+  }
+
+  :not(pre) > code {
+    background: color-mix(in srgb, var(--color-ink) 9%, transparent);
+    border-radius: 5px;
+    padding: 0.12em 0.4em;
+    /* A file path has no break opportunity of its own and will take a narrow
+       page sideways if it is not given one. */
+    overflow-wrap: anywhere;
+  }
+
+  html[lang='bn'] :is(code, kbd) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ------------------------------------------------------------ components -- */
+
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 0.47rem + 3.33vw, 3.25rem);
+  }
+
+  .shell-narrow {
+    max-width: 56rem;
+  }
+
+  /* A section is a screen's worth of one idea; the space around it is what
+     separates it from the next one. */
+  .section {
+    padding-block: clamp(4.5rem, 3rem + 6.5vw, 8.5rem);
+  }
+
+  .section-tight {
+    padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+  }
+
+  .eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  /* Bangla has no case, so an eyebrow in Bangla carries weight and colour
+     instead of case and the tracking that always travels with it. */
+  html[lang='bn'] .eyebrow {
+    font-family: var(--font-bangla);
+    font-size: var(--text-sm);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  html[lang='bn'] .lede {
+    line-height: 1.72;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0.75rem 2rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    max-width: 100%;
+    transition:
+      background-color 140ms var(--ease-out),
+      border-color 140ms var(--ease-out),
+      color 140ms var(--ease-out),
+      transform 140ms var(--ease-out),
+      box-shadow 140ms var(--ease-out);
+  }
+
+  .btn:active {
+    transform: scale(0.985);
+  }
+
+  /* The one bright thing on the page, so it never has to compete to be found.
+     Flat fill: a gradient here reads as a button from a template. */
+  .btn-primary {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-brand-hover);
+  }
+
+  .btn-ghost {
+    border-color: var(--color-hair-strong);
+    color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /*
+    A flat fill one shade off the ground, and a hairline. That hairline is what
+    makes a card read as raised — not a gradient down its face.
+  */
+  .card {
+    background: var(--color-card);
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+  }
+
+  .link {
+    color: var(--color-brand);
+    text-underline-offset: 0.2em;
+  }
+
+  html[lang='bn'] .link,
+  .link:lang(bn) {
+    text-underline-offset: 0.38em;
+    text-decoration-skip-ink: none;
+  }
+
+  /* A quiet call to action at the end of a section. */
+  .arrow {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .arrow::after {
+    content: '→';
+    transition: transform 140ms var(--ease-out);
+  }
+
+  .arrow:hover::after {
+    transform: translateX(0.22em);
+  }
+
+  /* Long-form body copy: the pages that are documents rather than screens. */
+  /*
+    One line of reading. Bangla runs wider per character than Latin at the same
+    size, so the same number of words needs a narrower column.
+  */
+  .measure {
+    max-width: 36rem;
+    margin-inline: auto;
+  }
+
+  html[lang='bn'] .measure {
+    max-width: 32rem;
+  }
+
+  .prose {
+    max-width: 36rem;
+    color: var(--color-ink);
+  }
+
+  html[lang='bn'] .prose {
+    max-width: 32rem;
+  }
+
+  .prose > * + * {
+    margin-block-start: 1.5rem;
+  }
+
+  .prose h2 {
+    font-size: var(--text-xl);
+  }
+
+  .prose h3 {
+    font-size: var(--text-lg);
+  }
+
+  /* A heading that opens the block needs no space above it; the block already
+     has some. Only a heading arriving mid-column does. */
+  .prose > * + h2 {
+    margin-block-start: 3rem;
+  }
+
+  .prose > * + h3 {
+    margin-block-start: 2.25rem;
+  }
+
+  .prose :is(h2, h3) + * {
+    margin-block-start: 1rem;
+  }
+
+  .prose a {
+    color: var(--color-brand);
+  }
+
+  .prose :is(ul, ol) {
+    padding-inline-start: 1.2em;
+  }
+
+  .prose li + li {
+    margin-block-start: 0.5rem;
+  }
+
+  .prose ::marker {
+    color: var(--color-faint);
+  }
+
+  .skip-link {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -100%;
+    z-index: 40;
+    background: var(--color-card-hi);
+    border: 1px solid var(--color-brand);
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    color: var(--color-brand);
+  }
+
+  .skip-link:focus {
+    inset-block-start: 1rem;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---------------------------------------------------------------- motion -- */
+
+/*
+  Blocks arrive as they come into view: fourteen pixels and a fade, once, never
+  reversed. Without JavaScript everything is visible from the start, because
+  the hidden state is added by script and never taken away by it.
+*/
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 700ms var(--ease-soft),
+    transform 700ms var(--ease-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}

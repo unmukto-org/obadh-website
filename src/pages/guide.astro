@@ -1,0 +1,13 @@
+---
+import GuidePage from '../layouts/GuidePage.astro';
+import { guide } from '../copy/guide/en';
+import { ui } from '../i18n/ui';
+
+const box = ui.en.typingBox;
+---
+
+<GuidePage
+  locale="en"
+  content={guide}
+  demo={{ label: box.label, noscript: box.noscript }}
+/>

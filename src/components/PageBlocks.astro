@@ -1,0 +1,479 @@
+---
+/**
+ * The block renderer behind /about/ and /contribute/.
+ *
+ * One rail down the left with the heading in it, one column on the right with
+ * whatever the block is: paragraphs, a spec list, cards, a numbered path, a
+ * shell block, a pulled line. The rail keeps its position from block to block,
+ * so a page of mixed structure still reads as one column of thought.
+ *
+ * Flat surfaces only. Depth here is a hairline and a fill one step off the
+ * ground; there is not a gradient in the file.
+ */
+import type { PageBlock } from '../copy/types';
+
+interface Props {
+  blocks: PageBlock[];
+}
+
+const { blocks } = Astro.props;
+
+const opens = (block: PageBlock) => Boolean(block.eyebrow || block.heading);
+---
+
+<div class="shell pb-24">
+  <div class="blocks">
+    {
+      blocks.map((block, index) => (
+        <section
+          class:list={[
+            'block',
+            opens(block) ? 'block--open' : 'block--run-on',
+            index === 0 && 'block--first',
+            block.id && 'scroll-mt-24',
+          ]}
+          id={block.id}
+          data-reveal
+        >
+          {opens(block) && (
+            <div class="block__head">
+              {block.eyebrow && <p class="eyebrow">{block.eyebrow}</p>}
+              {block.heading && <h2 class="block__heading" set:html={block.heading} />}
+            </div>
+          )}
+
+          <div class="block__body">
+            {block.intro && <p class="block__intro" set:html={block.intro} />}
+
+            {block.kind === 'prose' && (
+              <div class="block__prose">
+                {block.body.map((paragraph) => (
+                  <p set:html={paragraph} />
+                ))}
+              </div>
+            )}
+
+            {block.kind === 'facts' && (
+              <dl class="spec">
+                {block.items.map((item) => (
+                  <div class="spec__row">
+                    <dt class="spec__term" set:html={item.term} />
+                    <dd class="spec__value" set:html={item.value} />
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {block.kind === 'cards' && block.layout === 'rows' && (
+              <ul class="rows">
+                {block.items.map((item) => (
+                  <li class="rows__row">
+                    <div class="rows__name">
+                      {item.href ? (
+                        <a class="rows__link" href={item.href} set:html={item.name} />
+                      ) : (
+                        <span set:html={item.name} />
+                      )}
+                      {item.meta && <span class="rows__meta" set:html={item.meta} />}
+                    </div>
+                    <p class="rows__body" set:html={item.body} />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {block.kind === 'cards' && block.layout !== 'rows' && (
+              <ul class="tiles">
+                {block.items.map((item) => (
+                  <li class="tiles__tile">
+                    <h3 class="tiles__name" set:html={item.name} />
+                    {item.meta && <p class="tiles__meta" set:html={item.meta} />}
+                    <p class="tiles__body" set:html={item.body} />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {block.kind === 'steps' && (
+              <ol class="steps">
+                {block.items.map((item, n) => (
+                  <li class="steps__step">
+                    <span class="steps__number" aria-hidden="true">
+                      {n + 1}
+                    </span>
+                    <div class="min-w-0">
+                      <h3 class="steps__heading" set:html={item.heading} />
+                      <p class="steps__body" set:html={item.body} />
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {/* The block scrolls sideways rather than the page: a command is
+                one line, and wrapping it invents a line break someone would
+                paste. */}
+            {block.kind === 'code' && (
+              <div class="shellblock">
+                <pre class="shellblock__pre"><code>{block.lines.join('\n')}</code></pre>
+              </div>
+            )}
+
+            {block.kind === 'quote' && (
+              <figure class="pull">
+                <blockquote class="pull__line" lang={block.lang} set:html={block.text} />
+                {block.note && <figcaption class="pull__note" set:html={block.note} />}
+              </figure>
+            )}
+
+            {block.after && <p class="block__after" set:html={block.after} />}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  /* --- the rail ---------------------------------------------------------- */
+
+  .blocks {
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+
+  .block {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  /* A block that opens with a heading starts a new thought and gets a screen's
+     worth of air; one that runs on from the block above gets a paragraph's. */
+  .block--open {
+    margin-block-start: clamp(3.5rem, 2.25rem + 4vw, 5.5rem);
+  }
+
+  .block--run-on {
+    margin-block-start: 2rem;
+  }
+
+  .block--first {
+    margin-block-start: 0;
+  }
+
+  /* A grid child is sized by its own contents unless it is allowed not to be,
+     and the shell block holds a command that does not wrap. Without this the
+     whole page goes sideways on a phone instead of the block scrolling. */
+  .block__head,
+  .block__body {
+    min-width: 0;
+  }
+
+  .block__head {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+  }
+
+  /* The heading sits in a rail two hundred pixels wide, so it is set at the
+     size a rail can hold rather than at the size a full-width heading takes. */
+  .block__heading {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .block__intro {
+    color: var(--color-muted);
+    max-width: 36rem;
+  }
+
+  .block__body > * + * {
+    margin-block-start: 1.5rem;
+  }
+
+  .block__prose {
+    max-width: 36rem;
+  }
+
+  .block__prose > * + * {
+    margin-block-start: 1.25rem;
+  }
+
+  .block__prose :global(a),
+  .block__intro :global(a),
+  .block__after :global(a) {
+    color: var(--color-brand);
+  }
+
+  .block__after {
+    max-width: 36rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  :global(html[lang='bn']) .block__prose,
+  :global(html[lang='bn']) .block__intro,
+  :global(html[lang='bn']) .block__after {
+    max-width: 32rem;
+  }
+
+  @media (min-width: 64rem) {
+    .block {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      column-gap: 3.5rem;
+    }
+
+    .block__head {
+      grid-column: 1;
+      position: sticky;
+      top: 6rem;
+    }
+
+    .block__body {
+      grid-column: 2;
+    }
+  }
+
+  /* --- the spec list ----------------------------------------------------- */
+
+  .spec {
+    border-block-end: 1px solid var(--color-hair);
+  }
+
+  .spec__row {
+    display: grid;
+    gap: 0.35rem;
+    padding-block: 1.1rem;
+    border-block-start: 1px solid var(--color-hair);
+  }
+
+  .spec__term {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  /* Bangla has no case, so the term carries weight and colour instead. */
+  :global(html[lang='bn']) .spec__term {
+    font-size: var(--text-sm);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .spec__value {
+    min-width: 0;
+    color: var(--color-ink);
+  }
+
+  .spec__value :global(a) {
+    color: var(--color-brand);
+  }
+
+  @media (min-width: 40rem) {
+    .spec__row {
+      grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+      column-gap: 2rem;
+      align-items: baseline;
+    }
+  }
+
+  /* --- rows -------------------------------------------------------------- */
+
+  .rows {
+    display: grid;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .rows__row {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+    background: var(--color-card);
+  }
+
+  .rows__name {
+    display: grid;
+    gap: 0.15rem;
+    align-content: start;
+    min-width: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* A repository name is one token with no break opportunity in it, so the
+     column is sized to hold the longest one rather than to break it. */
+  .rows__link {
+    color: var(--color-brand);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  .rows__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-faint);
+    overflow-wrap: anywhere;
+  }
+
+  .rows__body {
+    min-width: 0;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .rows__body :global(a) {
+    color: var(--color-brand);
+  }
+
+  @media (min-width: 40rem) {
+    .rows__row {
+      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+      column-gap: 2rem;
+      padding: 1.35rem 1.5rem;
+    }
+  }
+
+  /* --- tiles ------------------------------------------------------------- */
+
+  .tiles {
+    display: grid;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .tiles__tile {
+    min-width: 0;
+    padding: 1.5rem 1.6rem 1.6rem;
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+    background: var(--color-card);
+  }
+
+  .tiles__name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .tiles__meta {
+    margin-block-start: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--color-faint);
+    overflow-wrap: anywhere;
+  }
+
+  .tiles__body {
+    margin-block-start: 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .tiles__body :global(a) {
+    color: var(--color-brand);
+  }
+
+  @media (min-width: 40rem) {
+    .tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* --- steps ------------------------------------------------------------- */
+
+  .steps {
+    display: grid;
+    gap: 1.75rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .steps__step {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: start;
+  }
+
+  .steps__number {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-brand) 12%, transparent);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-brand);
+  }
+
+  .steps__heading {
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .steps__body {
+    margin-block-start: 0.4rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .steps__body :global(a) {
+    color: var(--color-brand);
+  }
+
+  /* --- the shell block --------------------------------------------------- */
+
+  .shellblock {
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+    background: var(--color-veil);
+    overflow-x: auto;
+  }
+
+  .shellblock__pre {
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 2;
+    color: var(--color-ink);
+    white-space: pre;
+  }
+
+  /* --- the pulled line --------------------------------------------------- */
+
+  .pull {
+    border-inline-start: 2px solid var(--color-hair-strong);
+    padding-inline-start: 1.5rem;
+  }
+
+  .pull__line {
+    font-family: var(--font-serif-bn);
+    font-size: var(--text-2xl);
+    line-height: 1.4;
+    letter-spacing: normal;
+    color: var(--color-ink);
+    padding-block: 0.08em;
+  }
+
+  .pull__note {
+    margin-block-start: 0.9rem;
+    font-size: var(--text-sm);
+    color: var(--color-faint);
+  }
+</style>

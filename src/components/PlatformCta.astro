@@ -1,0 +1,91 @@
+---
+/**
+ * The hero's download button. It names the device in front of the reader and
+ * links straight at that platform's release — the Mac disk image, the App
+ * Store listing — rather than at the download page.
+ *
+ * That is the difference between this and the button in the header, which
+ * keeps the generic label and goes to `/download/`, where a person can read
+ * about what they are installing first. This one is for someone who has
+ * already decided.
+ *
+ * It ships as the generic button and is specialised on the client, so a
+ * crawler and a reader without JavaScript get something true for everyone: the
+ * download page. The arrow only appears once the link actually points at a
+ * file, so the button never promises a download it is not going to start.
+ */
+import { ui } from '../i18n/ui';
+import { LINKS, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+
+const { locale, class: className = '' } = Astro.props;
+const t = ui[locale];
+
+const targets = {
+  mac: LINKS.macDmg,
+  iphone: LINKS.appStore,
+  ipad: LINKS.appStore,
+};
+---
+
+<a
+  class:list={['btn btn-primary', className]}
+  href={localizedPath('/download/', locale)}
+  data-platform-cta
+  data-labels={JSON.stringify(t.getFor)}
+  data-targets={JSON.stringify(targets)}
+>
+  <svg
+    class="cta-arrow"
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 3v12"></path>
+    <path d="m7 11 5 5 5-5"></path>
+    <path d="M4 20h16"></path>
+  </svg>
+  <span data-cta-label>{t.getObadh}</span>
+</a>
+
+<style>
+  /* Hidden until the link is a download rather than a page. */
+  .cta-arrow {
+    display: none;
+    flex: none;
+    margin-inline-end: 0.1rem;
+  }
+
+  [data-platform-cta][data-direct] .cta-arrow {
+    display: block;
+  }
+</style>
+
+<script>
+  import { detectPlatform } from '../scripts/platform';
+
+  const where = detectPlatform();
+
+  for (const el of document.querySelectorAll<HTMLAnchorElement>('[data-platform-cta]')) {
+    const labels = JSON.parse(el.dataset.labels ?? '{}') as Record<string, string>;
+    const targets = JSON.parse(el.dataset.targets ?? '{}') as Record<string, string>;
+    const label = labels[where];
+    const target = targets[where];
+    if (!label || !target) continue;
+
+    const text = el.querySelector<HTMLElement>('[data-cta-label]');
+    if (text) text.textContent = label;
+    el.href = target;
+    el.dataset.direct = '';
+  }
+</script>

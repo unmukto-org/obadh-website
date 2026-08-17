@@ -1,0 +1,82 @@
+---
+import Mark from './Mark.astro';
+import Tagline from './Tagline.astro';
+import { ui } from '../i18n/ui';
+import { LINKS, ROUTES, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale];
+const f = t.footer;
+
+const pages = [
+  { route: '/download/', label: t.nav.download },
+  { route: '/guide/', label: t.nav.guide },
+  { route: '/about/', label: t.nav.about },
+  { route: '/faq/', label: t.nav.faq },
+  { route: '/contribute/', label: t.nav.contribute },
+  { route: '/privacy/', label: f.privacy },
+].filter((page) => (ROUTES as readonly string[]).includes(page.route));
+
+const source = [
+  { href: LINKS.github.engine, label: 'obadh_engine' },
+  { href: LINKS.github.ios, label: 'obadh-ios' },
+  { href: LINKS.github.macos, label: 'obadh-macos' },
+  { href: LINKS.playground, label: f.playground },
+  { href: LINKS.discord, label: f.discord },
+];
+---
+
+{/* `site-footer` carries no styles; it is what scripts/smoke.mjs addresses. */}
+<footer class="site-footer mt-auto bg-raise">
+  <div class="shell grid gap-12 py-16 md:grid-cols-[1.5fr_1fr_1fr] md:gap-10">
+    <div class="grid max-w-sm content-start gap-4">
+      <div class="flex items-center gap-2.5">
+        <Mark size={30} decorative />
+        <span class="text-lg font-semibold tracking-tight">Obadh</span>
+      </div>
+      <Tagline size="lg" />
+      <p class="text-xs text-faint">{f.licenseLine}</p>
+      <p class="text-xs text-faint">{f.staticNote}</p>
+    </div>
+
+    <nav class="grid content-start gap-4" aria-label={f.pages}>
+      <h2 class="text-xs font-semibold tracking-wide text-faint">{f.pages}</h2>
+      <ul class="grid gap-3">
+        {
+          pages.map((page) => (
+            <li>
+              <a
+                class="text-sm text-muted no-underline transition-colors hover:text-brand"
+                href={localizedPath(page.route, locale)}
+              >
+                {page.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="grid content-start gap-4">
+      <h2 class="text-xs font-semibold tracking-wide text-faint">{f.source}</h2>
+      <ul class="grid gap-3">
+        {
+          source.map((item) => (
+            <li>
+              <a
+                class="text-sm text-muted no-underline transition-colors hover:text-brand"
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,171 @@
+---
+/**
+ * The section index. A column beside the page on a desktop, a row of chips
+ * above it on a phone, and the same list of links either way.
+ *
+ * The labels are nouns, not the headings they point at: an index you read down
+ * in one second is worth more than one that repeats the sentence you are about
+ * to arrive at. `short` in src/copy/guide/*.ts is where they come from.
+ *
+ * The page script marks the section in view with `aria-current` and dims the
+ * entries the filter has emptied out.
+ */
+interface Props {
+  heading: string;
+  items: { id: string; label: string }[];
+}
+
+const { heading, items } = Astro.props;
+---
+
+<nav class="guide__index" aria-labelledby="guide-index-heading" data-guide-index>
+  <h2 class="guide__index-heading" id="guide-index-heading">{heading}</h2>
+  <ol class="guide__index-list" data-guide-index-list>
+    {
+      items.map((item) => (
+        <li>
+          <a href={`#${item.id}`} data-group={item.id} set:html={item.label} />
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .guide__index-heading {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  :global(html[lang='bn']) .guide__index-heading {
+    font-family: var(--font-bangla);
+    font-size: var(--text-xs);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .guide__index-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .guide__index a {
+    display: block;
+    color: var(--color-faint);
+    font-size: var(--text-xs);
+    text-decoration: none;
+    transition:
+      color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
+  }
+
+  .guide__index a:hover {
+    color: var(--color-ink);
+  }
+
+  /* Set by the page script when the filter has left the section with no rows.
+     The entry stays in place: an index that reorders itself under the reader
+     is harder to use than one with a few grey lines in it. */
+  .guide__index a[data-empty] {
+    opacity: 0.35;
+  }
+
+  /* --- the rail above the page ------------------------------------------- */
+
+  .guide__index {
+    min-width: 0;
+  }
+
+  .guide__index-list {
+    display: flex;
+    gap: 0.375rem;
+    margin-block-start: 0.625rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-block-end: 0.25rem;
+  }
+
+  .guide__index-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .guide__index li {
+    flex: none;
+  }
+
+  .guide__index a {
+    min-width: 3rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .guide__index a[aria-current] {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /* Twenty links on a 24px pitch is a column no thumb can pick from. */
+  @media (pointer: coarse) {
+    .guide__index a {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  /* --- the column beside the page ---------------------------------------- */
+
+  @media (min-width: 60rem) {
+    /* Pinned under the two bars for the length of the page. `--guide-sticky`
+       is set on the page wrapper in GuidePage.astro. */
+    .guide__index {
+      position: sticky;
+      inset-block-start: calc(var(--guide-sticky, 7.5rem) + 1.25rem);
+      max-height: calc(100dvh - var(--guide-sticky, 7.5rem) - 3rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .guide__index-list {
+      display: block;
+      overflow: visible;
+      margin-block-start: 0.875rem;
+      padding-block-end: 0;
+      border-inline-start: 1px solid var(--color-hair);
+    }
+
+    .guide__index a {
+      min-width: 0;
+      padding: 0.3rem 0 0.3rem 0.85rem;
+      border: 0;
+      border-inline-start: 2px solid transparent;
+      margin-inline-start: -1px;
+      border-radius: 0;
+      text-align: start;
+      white-space: normal;
+    }
+
+    .guide__index a[aria-current] {
+      border-inline-start-color: var(--color-brand);
+      color: var(--color-brand);
+    }
+  }
+
+  /* A touch screen wide enough for the column still needs the 44px pitch. */
+  @media (min-width: 60rem) and (pointer: coarse) {
+    .guide__index a {
+      display: block;
+      min-height: 0;
+      padding-block: 0.6rem;
+    }
+  }
+</style>

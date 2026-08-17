@@ -1,0 +1,141 @@
+---
+/**
+ * The install steps, walking themselves.
+ *
+ * A numbered list is easy to skim past. This one advances on a timer with the
+ * line between the markers drawing down as it goes, so the shape of the whole
+ * job is visible before you start it: four steps, one password, done. It stops
+ * the moment you touch it, and under prefers-reduced-motion it is a plain
+ * list with every step already lit.
+ */
+interface Props {
+  heading?: string;
+  intro?: string;
+  steps: { heading: string; body: string }[];
+  after?: string;
+  id?: string;
+}
+
+const { heading, intro, steps, after, id } = Astro.props;
+---
+
+<div class="mt-10" id={id} data-steps>
+  {heading && <h3 class="text-xl font-semibold tracking-tight" set:html={heading} />}
+  {intro && <p class="mt-3 max-w-prose text-muted" set:html={intro} />}
+
+  <ol class="relative mt-8 grid gap-0">
+    {/* The rail the markers sit on, and the part of it that has been walked. */}
+    <span
+      class="pointer-events-none absolute inset-y-4 left-[1.125rem] w-px bg-hair"
+      aria-hidden="true"></span>
+    <span
+      class="pointer-events-none absolute top-4 left-[1.125rem] w-px origin-top bg-brand transition-[height] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+      style="height: var(--walked, 0px)"
+      aria-hidden="true"
+      data-steps-rail></span>
+
+    {
+      steps.map((step, index) => (
+        <li class="group relative grid grid-cols-[2.25rem_1fr] gap-x-5 pb-9 last:pb-0" data-step={index}>
+          <span
+            class="z-10 mt-0.5 grid size-9 place-items-center rounded-full border border-hair bg-card font-mono text-xs text-faint transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] group-data-[on]:scale-110 group-data-[on]:border-brand group-data-[on]:bg-brand group-data-[on]:text-on-brand"
+            aria-hidden="true"
+          >
+            {index + 1}
+          </span>
+
+          <div class="min-w-0 pt-1">
+            <h4
+              class="text-lg font-semibold tracking-tight transition-colors duration-300 group-data-[on]:text-brand"
+              set:html={step.heading}
+            />
+            <p class="mt-1.5 text-sm text-muted" set:html={step.body} />
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  {after && <p class="mt-8 max-w-prose text-sm text-muted [&_a]:text-brand" set:html={after} />}
+</div>
+
+<style>
+  /* The marker for a step already walked keeps a quiet mark, so the list reads
+     as progress rather than as one lit row travelling down a dead one. */
+  [data-step][data-done] > span:first-child {
+    border-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
+    color: var(--color-brand);
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-steps]')) {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
+    const rail = root.querySelector<HTMLElement>('[data-steps-rail]');
+    if (items.length < 2) continue;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const light = (index: number) => {
+      items.forEach((item, i) => {
+        item.toggleAttribute('data-on', i === index);
+        item.toggleAttribute('data-done', i < index);
+      });
+
+      if (!rail) return;
+      // The rail reaches the middle of the marker it has arrived at.
+      const marker = items[index].querySelector('span');
+      if (!marker) return;
+      const top = items[0].getBoundingClientRect().top;
+      const here = marker.getBoundingClientRect();
+      rail.style.setProperty('--walked', `${Math.max(0, here.top + here.height / 2 - top - 16)}px`);
+    };
+
+    if (reduced.matches) {
+      items.forEach((item) => item.setAttribute('data-done', ''));
+      rail?.style.setProperty('--walked', '100%');
+      continue;
+    }
+
+    let at = 0;
+    let timer: number | undefined;
+    let stopped = false;
+
+    const advance = () => {
+      light(at);
+      at = (at + 1) % items.length;
+      timer = window.setTimeout(advance, at === 1 ? 2600 : 2100);
+    };
+
+    /** Any interest of the reader's beats the tour. */
+    const stop = () => {
+      if (stopped) return;
+      stopped = true;
+      window.clearTimeout(timer);
+      items.forEach((item) => {
+        item.removeAttribute('data-on');
+        item.setAttribute('data-done', '');
+      });
+      rail?.style.setProperty('--walked', '100%');
+    };
+
+    for (const event of ['pointerdown', 'focusin', 'wheel'] as const) {
+      root.addEventListener(event, stop, { passive: true, once: true });
+    }
+
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (stopped) return;
+          if (entry.isIntersecting && timer === undefined) advance();
+          else if (!entry.isIntersecting) {
+            window.clearTimeout(timer);
+            timer = undefined;
+          }
+        }
+      },
+      { threshold: 0.25 },
+    );
+    watcher.observe(root);
+  }
+</script>

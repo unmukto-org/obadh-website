@@ -1,0 +1,45 @@
+---
+/**
+ * Switches language without leaving the page. A plain link, so it works with
+ * JavaScript off and so the crawler sees the same alternate the `hreflang`
+ * tags declare.
+ */
+import { ui } from '../i18n/ui';
+import { LOCALES, LOCALE_TAG, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  route: string;
+}
+
+const { locale, route } = Astro.props;
+const other = LOCALES.find((l) => l !== locale)!;
+const t = ui[locale];
+---
+
+{
+  /*
+    The name is built out of two marked-up runs rather than an aria-label,
+    because an attribute carries no language: a single string reading
+    "ভাষা: English" was being spoken by whichever voice the anchor's own lang
+    chose, and one half of it was always in the wrong script for that voice.
+  */
+}
+<a
+  class="lang inline-flex min-h-8 items-center rounded-full px-3 text-sm font-medium whitespace-nowrap text-muted no-underline transition-colors hover:text-brand"
+  href={localizedPath(route, other)}
+  hreflang={LOCALE_TAG[other]}
+  rel="alternate"
+>
+  <span class="visually-hidden" lang={LOCALE_TAG[locale]}>{t.languageLabel}: </span>
+  <span lang={LOCALE_TAG[other]}>{t.otherLanguage}</span>
+</a>
+
+<style>
+  /* A thumb needs a target; a pointer does not need the padding. */
+  @media (pointer: coarse) {
+    .lang {
+      min-height: 44px;
+    }
+  }
+</style>

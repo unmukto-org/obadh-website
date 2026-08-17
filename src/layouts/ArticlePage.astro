@@ -1,0 +1,85 @@
+---
+import Base from './Base.astro';
+import PageHead from '../components/PageHead.astro';
+import PageBlocks from '../components/PageBlocks.astro';
+import Tagline from '../components/Tagline.astro';
+import type { ArticleContent, BlockContent } from '../copy/types';
+import { SITE, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  route: string;
+  /**
+   * Two shapes, because two kinds of page use this layout. /privacy/ is a
+   * document and takes `sections`: one column, read top to bottom. /about/ and
+   * /contribute/ take `blocks`, which is structure — a spec list, cards, a
+   * numbered path — with prose only where prose is the honest form.
+   */
+  content: ArticleContent | BlockContent;
+  /** /about/ ends on the tagline. It is the one display-scale instance there. */
+  endTagline?: boolean;
+  schema?: Record<string, unknown>[];
+  updatedLabel?: string;
+}
+
+const { locale, route, content, endTagline = false, schema = [], updatedLabel } = Astro.props;
+const c = content;
+const built = 'blocks' in c;
+---
+
+<Base
+  locale={locale}
+  route={route}
+  title={c.meta.title}
+  description={c.meta.description}
+  ogImage={c.meta.ogImage}
+  ogImageAlt={c.meta.ogImageAlt}
+  ogTitle={c.meta.ogTitle}
+  ogDescription={c.meta.ogDescription}
+  schema={schema}
+  preloadSerif={endTagline}
+>
+  <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
+
+  {built && <PageBlocks blocks={(c as BlockContent).blocks} />}
+
+  {
+    /* One column, centred on the page, at a width you can read without moving
+       your head. Sections are separated by air; there are no rules. */
+    !built && (
+      <article class="shell pb-24">
+        {(c as ArticleContent).sections.map((section) => (
+          <section class="measure pt-16 first:pt-0" id={section.id} data-reveal>
+            <div class="prose">
+              {section.heading && (
+                <h2 class="mb-5 text-2xl font-semibold tracking-tight" set:html={section.heading} />
+              )}
+              {section.body.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+            </div>
+            {section.source && (
+              <p class="mt-5 font-mono [word-break:break-word] text-xs text-faint">
+                {section.source}
+              </p>
+            )}
+          </section>
+        ))}
+
+        {(c as ArticleContent).updated && (
+          <p class="measure mt-20 border-t border-hair pt-5 text-sm text-faint">
+            {updatedLabel} <time datetime={SITE.privacyUpdated}>{(c as ArticleContent).updated}</time>
+          </p>
+        )}
+      </article>
+    )
+  }
+
+  {
+    endTagline && (
+      <div class="shell pt-8 pb-24 text-center" data-reveal>
+        <Tagline size="display" />
+      </div>
+    )
+  }
+</Base>

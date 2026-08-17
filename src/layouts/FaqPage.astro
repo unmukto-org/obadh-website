@@ -1,0 +1,206 @@
+---
+import Base from './Base.astro';
+import PageHead from '../components/PageHead.astro';
+import type { FaqContent } from '../copy/types';
+import { absoluteUrl, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  content: FaqContent;
+}
+
+const { locale, content } = Astro.props;
+const c = content;
+
+const items = c.groups.flatMap((group) => group.items);
+
+/*
+  Google stopped showing FAQ rich results in May 2026, so this earns nothing
+  there. It stays because it is still valid schema.org, still read by Bing and
+  by the retrieval crawlers that matter for a project like this, and costs
+  nothing. Its answers are the visible answers, word for word — the lead line
+  and the paragraph under it, in that order — which is what Google's guidance
+  requires and what makes it worth emitting at all.
+*/
+const stripTags = (html: string) => html.replace(/<[^>]+>/g, '');
+
+const schema = [
+  {
+    '@type': 'FAQPage',
+    '@id': `${absoluteUrl(localizedPath('/faq/', locale))}#faq`,
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: stripTags(item.question),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: [item.lead, ...(item.answer ?? [])].map(stripTags).join(' '),
+      },
+    })),
+  },
+];
+---
+
+<Base
+  locale={locale}
+  route="/faq/"
+  title={c.meta.title}
+  description={c.meta.description}
+  ogImage={c.meta.ogImage}
+  ogImageAlt={c.meta.ogImageAlt}
+  ogTitle={c.meta.ogTitle}
+  ogDescription={c.meta.ogDescription}
+  schema={schema}
+>
+  <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
+
+  <div class="shell pb-24">
+    <div class="faq">
+      {/* Fifteen cards read as a list. Four named groups read as a page, and
+          the chips are how you get to the one you came for. */}
+      <ul class="faq__jump" data-reveal>
+        {
+          c.groups.map((group) => (
+            <li>
+              <a class="faq__chip" href={`#${group.id}`} set:html={group.heading} />
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        c.groups.map((group) => (
+          <section class="faq__group scroll-mt-24" id={group.id} data-reveal>
+            <div class="faq__head">
+              <h2 class="faq__title" set:html={group.heading} />
+            </div>
+
+            <div class="faq__cards">
+              {group.items.map((item) => (
+                <article class="faq__card scroll-mt-24" id={item.id}>
+                  <h3 class="faq__question">
+                    {/* The heading is the permalink. No pilcrow, no hover-only glyph. */}
+                    <a href={`#${item.id}`} set:html={item.question} />
+                  </h3>
+                  {/* The answer is the first line. Everything under it is support. */}
+                  <p class="faq__lead" set:html={item.lead} />
+                  {item.answer?.map((paragraph) => <p class="faq__more" set:html={paragraph} />)}
+                </article>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</Base>
+
+<style>
+  .faq {
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+
+  .faq__jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin-block-end: 3.5rem;
+  }
+
+  .faq__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition:
+      border-color 140ms var(--ease-out),
+      color 140ms var(--ease-out);
+  }
+
+  .faq__chip:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .faq__group {
+    display: grid;
+    gap: 1.25rem;
+    padding-block-start: 2.5rem;
+    border-block-start: 1px solid var(--color-hair);
+  }
+
+  .faq__group + .faq__group {
+    margin-block-start: 3.5rem;
+  }
+
+  .faq__title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .faq__cards {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .faq__card {
+    min-width: 0;
+    padding: 1.5rem 1.6rem 1.7rem;
+    border: 1px solid var(--color-hair);
+    border-radius: var(--radius-card);
+    background: var(--color-card);
+  }
+
+  .faq__question {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .faq__question a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .faq__question a:hover {
+    color: var(--color-brand);
+  }
+
+  .faq__lead {
+    margin-block-start: 0.9rem;
+    color: var(--color-ink);
+  }
+
+  .faq__more {
+    margin-block-start: 0.65rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .faq__lead :global(a),
+  .faq__more :global(a) {
+    color: var(--color-brand);
+  }
+
+  @media (min-width: 64rem) {
+    .faq__group {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      column-gap: 3.5rem;
+    }
+
+    .faq__head {
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+    }
+  }
+</style>

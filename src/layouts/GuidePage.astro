@@ -1,0 +1,622 @@
+---
+/**
+ * The writing guide: a reference people type from.
+ *
+ * It is laid out as one, not as an article with tables in it. The filter rides
+ * under the site header for the length of the page, the index sits beside it
+ * and marks where you are, and the 176 rows start immediately after the three
+ * rules they rest on. The typing box comes after the tables, because someone
+ * who opened this page came to look something up, not to play.
+ *
+ * Everything the script adds is an accelerator over a page that is already
+ * complete: with no JavaScript the bar is not rendered, every row is visible,
+ * and every section anchor still works.
+ */
+import Base from './Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Composer from '../components/Composer.astro';
+import SchemeTable from '../components/SchemeTable.astro';
+import GuideFilter from '../components/GuideFilter.astro';
+import GuideIndex from '../components/GuideIndex.astro';
+import GuideRules from '../components/GuideRules.astro';
+import { SCHEME_ROWS, type SchemeGroup } from '../data/scheme';
+import type { GuideContent, GuideTools } from '../copy/types';
+import { SITE_URL, absoluteUrl, localizedPath, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  content: GuideContent;
+  /** Bangla row notes, keyed by the row's roman value. */
+  notes?: Record<string, string>;
+  demo: { label: string; noscript: string };
+}
+
+const { locale, content, notes, demo } = Astro.props;
+const c = content;
+
+const groups = new Set(SCHEME_ROWS.map((row) => row.group));
+const sections = c.sections.filter((section) => groups.has(section.group as SchemeGroup));
+
+/* Both locales ship `tools`; the field is optional in the type so that adding
+   it did not force a shape change on every other page's copy. */
+const tools: GuideTools = c.tools ?? {
+  indexHeading: 'On this page',
+  filterLabel: 'Filter the scheme',
+  filterPlaceholder: 'kSh',
+  count: '{shown} of {total}',
+  empty: 'Nothing matches {query}.',
+  clear: 'Clear',
+  copy: 'Copy',
+  copied: 'Copied',
+};
+
+/* A Bangla page counts in Bangla numerals, which is one of the rows below. */
+const BANGLA_DIGITS = '০১২৩৪৫৬৭৮৯';
+const figure = (value: number) =>
+  locale === 'bn'
+    ? String(value).replace(/\d/g, (digit) => BANGLA_DIGITS[Number(digit)])
+    : String(value);
+
+const total = SCHEME_ROWS.length;
+const startingCount = tools.count
+  .replace('{shown}', figure(total))
+  .replace('{total}', figure(total));
+
+const tryId = c.tryIt?.id ?? 'try';
+const strictId = c.strict?.id ?? 'strict';
+
+/* Page order, so the index reads the way the page runs. */
+const indexItems = [
+  ...sections.map((section) => ({ id: section.group, label: section.short ?? section.heading })),
+  ...(c.tryIt ? [{ id: tryId, label: c.tryIt.short ?? c.tryIt.heading ?? tryId }] : []),
+  ...(c.strict ? [{ id: strictId, label: c.strict.short ?? c.strict.heading ?? strictId }] : []),
+  { id: 'from-avro', label: c.fromAvro.short ?? c.fromAvro.heading },
+];
+
+const schema = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${absoluteUrl(localizedPath('/guide/', locale))}#article`,
+    headline: c.heading,
+    description: c.meta.description,
+    inLanguage: locale,
+    about: { '@type': 'Thing', name: 'Bangla transliteration typing scheme' },
+    author: { '@id': `${SITE_URL}/#sayom` },
+    // Without these the article floats: nothing tied it to the site it is on or
+    // to whoever stands behind it.
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#project` },
+  },
+];
+---
+
+<Base
+  locale={locale}
+  route="/guide/"
+  title={c.meta.title}
+  description={c.meta.description}
+  ogImage={c.meta.ogImage}
+  ogImageAlt={c.meta.ogImageAlt}
+  ogTitle={c.meta.ogTitle}
+  ogDescription={c.meta.ogDescription}
+  schema={schema}
+>
+  <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
+
+  <div
+    class="guide"
+    data-guide
+    data-locale={locale}
+    data-count={tools.count}
+    data-empty-text={tools.empty}
+    data-copied={tools.copied}
+  >
+    {
+      /* The two marks every row's copy button points at. Drawn once: inline in
+         all 176 rows they were 74 KB of a reference page. */
+    }
+    <svg class="visually-hidden" aria-hidden="true" focusable="false">
+      <symbol
+        id="guide-copy"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.1"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="9" y="9" width="12" height="12" rx="2.5"></rect>
+        <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+      </symbol>
+      <symbol
+        id="guide-copied"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m4 13 5 5L20 6"></path>
+      </symbol>
+    </svg>
+
+    <GuideFilter tools={tools} total={startingCount} />
+
+    <div class="shell guide__layout">
+      <GuideIndex heading={tools.indexHeading} items={indexItems} />
+
+      <div class="guide__body">
+        <div class="guide__opening" data-aside>
+          <div class="prose">
+            {c.intro.map((paragraph) => <p set:html={paragraph} />)}
+          </div>
+          {c.rules && <GuideRules rules={c.rules} />}
+        </div>
+
+        <p class="guide__empty" data-guide-empty hidden></p>
+
+        {
+          sections.map((section) => (
+            <section class="guide__section" id={section.group} data-section data-spy>
+              <h2 class="guide__h2">
+                <a href={`#${section.group}`} set:html={section.heading} />
+              </h2>
+              <div class="prose guide__note">
+                {section.body.map((paragraph) => (
+                  <p set:html={paragraph} />
+                ))}
+              </div>
+              <SchemeTable
+                group={section.group as SchemeGroup}
+                heads={c.columnHeads}
+                notes={notes}
+                copyLabel={tools.copy}
+              />
+            </section>
+          ))
+        }
+
+        {
+          c.tryIt && (
+            <section class="guide__section" id={tryId} data-aside data-spy>
+              {c.tryIt.heading && (
+                <h2 class="guide__h2">
+                  <a href={`#${tryId}`} set:html={c.tryIt.heading} />
+                </h2>
+              )}
+              <div class="prose guide__note">
+                {c.tryIt.body.map((paragraph) => (
+                  <p set:html={paragraph} />
+                ))}
+              </div>
+              <div class="guide__box">
+                <Composer
+                  label={demo.label}
+                  noscript={demo.noscript}
+                  seed={{ roman: 'jyOt``sna', bangla: 'জ্যোৎস্না' }}
+                />
+              </div>
+            </section>
+          )
+        }
+
+        {
+          c.strict && (
+            <section class="guide__section" id={strictId} data-aside data-spy>
+              {c.strict.heading && (
+                <h2 class="guide__h2">
+                  <a href={`#${strictId}`} set:html={c.strict.heading} />
+                </h2>
+              )}
+              <div class="prose guide__note">
+                {c.strict.body.map((paragraph) => (
+                  <p set:html={paragraph} />
+                ))}
+              </div>
+              {c.strict.source && <p class="guide__source">{c.strict.source}</p>}
+            </section>
+          )
+        }
+
+        <section class="guide__section" id="from-avro" data-aside data-spy>
+          <h2 class="guide__h2">
+            <a href="#from-avro" set:html={c.fromAvro.heading} />
+          </h2>
+          <div class="prose guide__note">
+            {c.fromAvro.body.map((paragraph) => <p set:html={paragraph} />)}
+            <p set:html={c.closing} />
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  /*
+    Two things stick on this page: the site header, and the filter bar under
+    it. Everything that has to clear them reads it from here rather than
+    guessing, including the scheme tables' own column headers.
+  */
+  .guide {
+    --guide-header: 4.0625rem;
+    --guide-bar: 3.5625rem;
+    --guide-sticky: calc(var(--guide-header) + var(--guide-bar));
+    padding-block-end: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  /* Nothing sticks under a bar that was never rendered. */
+  :global(html:not(.js)) .guide {
+    --guide-bar: 0rem;
+  }
+
+  .guide__layout {
+    display: grid;
+    align-items: start;
+    gap: 1.5rem;
+    padding-block-start: 1.75rem;
+  }
+
+  .guide__body {
+    min-width: 0;
+  }
+
+  .guide__opening {
+    display: grid;
+    gap: 1.75rem;
+    max-width: 46rem;
+  }
+
+  /*
+    A grid child will not go narrower than its own contents unless it is
+    allowed to, and neither column here fits a 320px screen on its own: the
+    index is a row of section names, and the body holds 176 rows.
+  */
+  @media (min-width: 60rem) {
+    .guide__layout {
+      grid-template-columns: 12.5rem minmax(0, 52rem);
+      gap: 3rem;
+    }
+  }
+
+  /* --- a section --------------------------------------------------------- */
+
+  .guide__section {
+    scroll-margin-block-start: calc(var(--guide-sticky) + 1.5rem);
+    margin-block-start: clamp(2.75rem, 2rem + 2.5vw, 4rem);
+  }
+
+  .guide__h2 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  /* The heading is its own permalink, which is the whole of the deep-linking
+     affordance: no second icon, no hover-only control. */
+  .guide__h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .guide__h2 a::after {
+    content: '#';
+    margin-inline-start: 0.4em;
+    color: var(--color-hair-strong);
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 120ms var(--ease-out);
+  }
+
+  .guide__h2 a:hover::after,
+  .guide__h2 a:focus-visible::after {
+    opacity: 1;
+  }
+
+  /* The prose under a heading is a note on the table, not an essay above it. */
+  .guide__note {
+    margin-block-start: 0.75rem;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  .guide__note :global(p + p) {
+    margin-block-start: 0.75rem;
+  }
+
+  .guide__note :global(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* Set by the script while the filter has something in it. */
+  .guide[data-filtering] .guide__section .guide__note {
+    display: none;
+  }
+
+  .guide[data-filtering] .guide__section {
+    margin-block-start: 2rem;
+  }
+
+  .guide__box {
+    margin-block-start: 1.75rem;
+  }
+
+  .guide__source {
+    margin-block-start: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-faint);
+    overflow-wrap: anywhere;
+  }
+
+  /* --- nothing matched --------------------------------------------------- */
+
+  .guide__empty {
+    margin-block-start: 2rem;
+    color: var(--color-muted);
+  }
+
+  .guide__empty :global(code) {
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  /*
+    Three behaviours, and they share one set of nodes, which is why they are in
+    one place: the filter narrows every table at once, the index follows the
+    section in view, and a row hands its keystrokes to the clipboard.
+  */
+  const root = document.querySelector<HTMLElement>('[data-guide]');
+
+  if (root) {
+    /* Narrowed once, so the closures below do not each have to re-check it. */
+    const page = root;
+    const BANGLA_DIGITS = '০১২৩৪৫৬৭৮৯';
+    const bangla = root.dataset.locale === 'bn';
+    const figure = (value: number) =>
+      bangla ? String(value).replace(/\d/g, (d) => BANGLA_DIGITS[Number(d)]) : String(value);
+
+    const countTemplate = root.dataset.count ?? '{shown}/{total}';
+    const emptyTemplate = root.dataset.emptyText ?? '';
+    const copiedLabel = root.dataset.copied ?? '';
+
+    const input = root.querySelector<HTMLInputElement>('[data-guide-input]');
+    const clearButton = root.querySelector<HTMLButtonElement>('[data-guide-clear]');
+    const countBox = root.querySelector<HTMLElement>('[data-guide-count]');
+    const live = root.querySelector<HTMLElement>('[data-guide-live]');
+    const emptyBox = root.querySelector<HTMLElement>('[data-guide-empty]');
+    const indexList = root.querySelector<HTMLElement>('[data-guide-index-list]');
+    const indexBox = root.querySelector<HTMLElement>('[data-guide-index]');
+
+    const links = new Map<string, HTMLAnchorElement>(
+      [...root.querySelectorAll<HTMLAnchorElement>('[data-guide-index] a[data-group]')].map(
+        (link) => [link.dataset.group ?? '', link],
+      ),
+    );
+
+    // Read off the cells rather than repeated into data attributes: the same
+    // three strings in two places is 15 KB of a page that already has 176 rows.
+    const rows = [...root.querySelectorAll<HTMLTableRowElement>('tr[data-row]')].map((tr) => {
+      const roman = tr.cells[0]?.textContent?.trim() ?? '';
+      return {
+        tr,
+        roman,
+        lower: roman.toLowerCase(),
+        bangla: tr.cells[1]?.textContent?.trim() ?? '',
+        note: (tr.cells[2]?.textContent ?? '').toLowerCase(),
+      };
+    });
+
+    const tables = [...root.querySelectorAll<HTMLElement>('[data-section]')];
+    const asides = [...root.querySelectorAll<HTMLElement>('[data-aside]')];
+    const total = rows.length;
+
+    /* --- the count, and the one thing that gets announced ---------------- */
+
+    let announcing: number | undefined;
+    let restoring: number | undefined;
+    /** What the count reads now, so a copy confirmation can hand it back. */
+    let counted = countBox?.textContent?.trim() ?? '';
+    /** The section the index is pointing at. Cleared when it is filtered out. */
+    let current = '';
+
+    /** Announced once the keys stop, never once per keystroke. */
+    function announce(text: string) {
+      window.clearTimeout(announcing);
+      announcing = window.setTimeout(() => {
+        if (live) live.textContent = text;
+      }, 400);
+    }
+
+    function showCount(shown: number) {
+      counted = countTemplate
+        .replace('{shown}', figure(shown))
+        .replace('{total}', figure(total));
+      window.clearTimeout(restoring);
+      if (countBox) countBox.textContent = counted;
+      announce(counted);
+    }
+
+    /* --- filtering -------------------------------------------------------- */
+
+    function apply(raw: string) {
+      const query = raw.trim();
+      if (clearButton) clearButton.hidden = query.length === 0;
+      // Filtering is a different mode: headings and rows, no notes on the
+      // sections, because none of that prose is what was asked for.
+      page.toggleAttribute('data-filtering', query.length > 0);
+
+      if (!query) {
+        for (const row of rows) row.tr.hidden = false;
+        for (const block of [...tables, ...asides]) block.hidden = false;
+        for (const link of links.values()) delete link.dataset.empty;
+        if (emptyBox) emptyBox.hidden = true;
+        showCount(total);
+        return;
+      }
+
+      // Smart case, the way every other search field a developer has used
+      // behaves: a capital in the query is a capital the scheme means, so `R`
+      // finds ড় and not every row with an r in it.
+      const cased = /[A-Z]/.test(query);
+      const lower = query.toLowerCase();
+      // Notes join in from three characters. Below that they are noise: `rr`
+      // is a signal in the scheme and a pair of letters inside `carries`.
+      const searchNotes = !cased && query.length > 2;
+      let shown = 0;
+
+      for (const row of rows) {
+        const hit = cased
+          ? row.roman.includes(query) || row.bangla.includes(query)
+          : row.lower.includes(lower) ||
+            row.bangla.includes(query) ||
+            (searchNotes && row.note.includes(lower));
+        row.tr.hidden = !hit;
+        if (hit) shown += 1;
+      }
+
+      for (const block of tables) {
+        const any = block.querySelector('tr[data-row]:not([hidden])') !== null;
+        block.hidden = !any;
+        const link = links.get(block.id);
+        if (!link) continue;
+        if (any) delete link.dataset.empty;
+        else link.dataset.empty = 'true';
+      }
+
+      // Prose blocks have no rows to match, so filtering puts them away and
+      // greys their index entries rather than leaving dead links behind.
+      for (const block of asides) {
+        block.hidden = true;
+        const link = links.get(block.id);
+        if (link) link.dataset.empty = 'true';
+      }
+
+      // Nothing is "where you are" if the section it names is not on screen.
+      for (const [id, link] of links) {
+        if (!link.dataset.empty) continue;
+        link.removeAttribute('aria-current');
+        if (current === id) current = '';
+      }
+
+      if (emptyBox) {
+        emptyBox.hidden = shown > 0;
+        if (shown === 0) {
+          emptyBox.textContent = '';
+          const [before, after] = emptyTemplate.split('{query}');
+          const code = document.createElement('code');
+          code.textContent = query;
+          emptyBox.append(before ?? '', code, after ?? '');
+        }
+      }
+
+      showCount(shown);
+    }
+
+    if (input) {
+      input.addEventListener('input', () => apply(input.value));
+      input.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !input.value) return;
+        input.value = '';
+        apply('');
+      });
+      // A field the browser restored on a back navigation is already filtering.
+      if (input.value) apply(input.value);
+    }
+
+    clearButton?.addEventListener('click', () => {
+      if (!input) return;
+      input.value = '';
+      apply('');
+      input.focus();
+    });
+
+    /* --- where you are ---------------------------------------------------- */
+
+    const spied = [...root.querySelectorAll<HTMLElement>('[data-spy]')].filter((el) =>
+      links.has(el.id),
+    );
+
+    /** Scrolls the index, and only the index, far enough to show the entry. */
+    function keepVisible(container: HTMLElement | null, entry: HTMLElement) {
+      if (!container) return;
+      const box = entry.getBoundingClientRect();
+      const frame = container.getBoundingClientRect();
+      if (container.scrollHeight > container.clientHeight + 1) {
+        if (box.top < frame.top) container.scrollTop -= frame.top - box.top + 12;
+        else if (box.bottom > frame.bottom) container.scrollTop += box.bottom - frame.bottom + 12;
+      }
+      if (container.scrollWidth > container.clientWidth + 1) {
+        if (box.left < frame.left) container.scrollLeft -= frame.left - box.left + 16;
+        else if (box.right > frame.right) container.scrollLeft += box.right - frame.right + 16;
+      }
+    }
+
+    function markCurrent(id: string) {
+      if (id === current) return;
+      current = id;
+      for (const [key, link] of links) {
+        if (key === id) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      }
+      const active = links.get(id);
+      if (!active) return;
+      keepVisible(indexList, active);
+      keepVisible(indexBox, active);
+    }
+
+    if (spied.length && 'IntersectionObserver' in window) {
+      const inView = new Set<Element>();
+      const watcher = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) inView.add(entry.target);
+            else inView.delete(entry.target);
+          }
+          // The topmost section that has cleared the two sticky bars wins. If
+          // none has — a section taller than the window — the last one stands.
+          const first = spied.find((section) => inView.has(section));
+          if (first) markCurrent(first.id);
+        },
+        { rootMargin: '-140px 0px -58% 0px', threshold: 0 },
+      );
+      for (const section of spied) watcher.observe(section);
+    }
+
+    /* --- taking a row away with you --------------------------------------- */
+
+    const copiers = [...root.querySelectorAll<HTMLButtonElement>('[data-copy]')];
+
+    if (navigator.clipboard) {
+      for (const button of copiers) button.disabled = false;
+
+      root.addEventListener('click', (event) => {
+        const target = event.target as Element | null;
+        const button = target?.closest<HTMLButtonElement>('[data-copy]');
+        if (!button) return;
+        const text = button.dataset.copy ?? '';
+
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            button.dataset.copied = 'true';
+            window.setTimeout(() => delete button.dataset.copied, 1500);
+
+            const said = `${copiedLabel} ${text}`;
+            if (countBox) countBox.textContent = said;
+            if (live) live.textContent = said;
+            window.clearTimeout(announcing);
+            window.clearTimeout(restoring);
+            restoring = window.setTimeout(() => {
+              if (countBox) countBox.textContent = counted;
+            }, 1600);
+          })
+          .catch(() => {
+            /* A clipboard that refused is not something to report as done. */
+          });
+      });
+    }
+  }
+</script>

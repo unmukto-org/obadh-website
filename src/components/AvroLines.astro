@@ -1,0 +1,211 @@
+---
+/**
+ * Avro's line, with one word written into it.
+ *
+ * Avro's slogan is ভাষা হোক উন্মুক্ত. Obadh's is the same sentence with আরও
+ * added. Printing both, one under the other, made the relationship a caption
+ * you had to work out. This is a proofreader's insertion instead: the original
+ * line stands, a caret opens between হোক and উন্মুক্ত, and the added word is
+ * written in above it by hand.
+ *
+ * That mark is the whole tribute — the line was already right, and this is one
+ * word added to it rather than a replacement for it. Nothing goes under it and
+ * there is no caption. If a caption feels necessary, the caption is wrong.
+ *
+ * The Bangla is split only at a space. A space is a word boundary and nothing
+ * shapes across it, so the two runs render exactly as the whole sentence would.
+ * Never split Bangla anywhere else.
+ *
+ * omicronlab.com sets the slogan with an exclamation mark. It is set without
+ * one here: silently editing someone's punctuation would be worse than either
+ * choice, and the two halves have to stay typographically parallel.
+ */
+interface Props {
+  /** Read out in place of the mark, since the visual order is not the read order. */
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<div class="avro" data-avro>
+  <p class="visually-hidden" set:html={label} />
+
+  <p class="avro__line" lang="bn" aria-hidden="true">
+    <span>ভাষা হোক </span><span class="avro__insert" data-insert
+      ><span class="avro__word">আরও</span><span class="avro__caret"
+        ><svg viewBox="0 0 28 14" width="28" height="14" aria-hidden="true"
+          ><path
+            d="M2 12 14 3l12 9"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path></svg
+        ></span
+      ></span
+    ><span>উন্মুক্ত</span>
+  </p>
+</div>
+
+<style>
+  @property --written {
+    syntax: '<percentage>';
+    inherits: true;
+    initial-value: 0%;
+  }
+
+  .avro {
+    display: grid;
+    justify-items: center;
+  }
+
+  .avro__line {
+    font-family: var(--font-serif-bn);
+    font-size: var(--text-display);
+    line-height: 1.26;
+    letter-spacing: 0;
+    /* Room above the line for the word written into it. */
+    padding-block: 0.66em 0.06em;
+    color: var(--color-ink);
+    text-align: center;
+  }
+
+  /* The gap the caret opens in the line. It widens to make room for the word,
+     which is what an insertion actually looks like on paper. */
+  .avro__insert {
+    position: relative;
+    display: inline-block;
+    width: var(--gap, 3.2em);
+    vertical-align: baseline;
+    color: var(--color-brand);
+    transition: width 520ms var(--ease-soft);
+  }
+
+  .avro__caret {
+    position: absolute;
+    inset-inline-start: 50%;
+    /* On the baseline, pointing up into the gap. */
+    inset-block-end: 0.08em;
+    translate: -50% 0;
+    display: block;
+  }
+
+  .avro__caret svg {
+    display: block;
+    width: 0.5em;
+    height: auto;
+  }
+
+  /*
+    Tiro Bangla's italic is a true sloped Bengali cut rather than an upright
+    slanted over, so it reads as a hand rather than as the same face leaning.
+    It is already loaded for the tagline, so this costs nothing.
+  */
+  .avro__word {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-end: 0.66em;
+    translate: -50% 0;
+    font-family: var(--font-serif-bn);
+    font-style: italic;
+    font-size: 0.6em;
+    line-height: 1.1;
+    white-space: nowrap;
+    color: var(--color-brand);
+    /* Laid down left to right by a mask, the way a pen lays down ink. */
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      #000 var(--written),
+      transparent var(--written)
+    );
+    mask-image: linear-gradient(90deg, #000 var(--written), transparent var(--written));
+  }
+
+  /*
+    The finished mark is the default, so it is what a reader without
+    JavaScript gets and what is on the page before the script runs. `armed`
+    hands it over to the script, which then plays it.
+  */
+  .avro__word {
+    --written: 100%;
+  }
+
+  [data-insert][data-armed] {
+    width: 0;
+  }
+
+  [data-insert][data-armed] .avro__caret {
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out);
+  }
+
+  [data-insert][data-armed] .avro__word {
+    --written: 0%;
+  }
+
+  [data-insert][data-armed][data-open] {
+    width: var(--gap, 3.2em);
+  }
+
+  [data-insert][data-armed][data-open] .avro__caret {
+    opacity: 1;
+  }
+
+  [data-insert][data-armed][data-written] .avro__word {
+    --written: 100%;
+    transition: --written 620ms var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avro__insert,
+    .avro__caret,
+    .avro__word {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-avro]')) {
+    const insert = root.querySelector<HTMLElement>('[data-insert]');
+    const word = root.querySelector<HTMLElement>('.avro__word');
+    if (!insert || !word) continue;
+
+    /** The gap has to be exactly as wide as the word going into it. */
+    const measure = () => {
+      const armed = insert.hasAttribute('data-armed');
+      insert.removeAttribute('data-armed');
+      const w = word.getBoundingClientRect().width;
+      if (w) insert.style.setProperty('--gap', `${Math.ceil(w) + 14}px`);
+      if (armed) insert.setAttribute('data-armed', '');
+    };
+
+    measure();
+    void document.fonts?.ready.then(measure);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+
+    // Until this attribute is set the CSS shows the finished mark, so nothing
+    // is ever hidden by a script that failed to run.
+    insert.dataset.armed = '';
+
+    let done = false;
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || done) continue;
+          done = true;
+          measure();
+          // Open the gap, then write into it.
+          window.setTimeout(() => (insert.dataset.open = ''), 300);
+          window.setTimeout(() => (insert.dataset.written = ''), 880);
+        }
+      },
+      { threshold: 0.55 },
+    );
+    watcher.observe(root);
+
+    window.addEventListener('resize', measure, { passive: true });
+  }
+</script>

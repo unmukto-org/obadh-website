@@ -274,7 +274,7 @@ export const guide: GuideContent = {
     id: 'try',
     body: [
       'আসল ইঞ্জিনটাই চলছে, আপনার ব্রাউজারে। এই পাতার নিয়ম ছাড়া সে আর কিছু মানে না: অটোকারেক্ট নেই, পরের শব্দের পরামর্শ নেই, আর আপনার লেখা কোথাও যাচ্ছে না।',
-      'ইঞ্জিনের নিজের খেলাঘর, যেখানে অটোকারেক্ট আর পরের শব্দের পরামর্শও যোগ হয়, আছে <a href="https://sayom.me/obadh_engine/"><span class="latin" lang="en">sayom.me/obadh_engine</span></a>-এ। এই পাতার কিছু যদি আপনাকে অপ্রত্যাশিত কোনো অক্ষর দেয়, <a href="/bn/contribute/#reporting-something-that-is-wrong">রিপোর্টে কী থাকলে তা যাচাই করা যায়</a> আছে অবদানের পাতায়।',
+      'ইঞ্জিনের নিজের খেলাঘর, যেখানে অটোকারেক্ট আর পরের শব্দের পরামর্শও যোগ হয়, আছে <a href="https://obadh.unmukto.org/playground/"><span class="latin" lang="en">obadh.unmukto.org/playground</span></a>-এ। এই পাতার কিছু যদি আপনাকে অপ্রত্যাশিত কোনো অক্ষর দেয়, <a href="/bn/contribute/#reporting-something-that-is-wrong">রিপোর্টে কী থাকলে তা যাচাই করা যায়</a> আছে অবদানের পাতায়।',
     ],
   },
 };

@@ -1,6 +1,6 @@
 # obadh.unmukto.org
 
-The website for [Obadh](https://github.com/nsssayom/obadh_engine), a free and open-source Bangla
+The website for [Obadh](https://github.com/unmukto-org/obadh_engine), a free and open-source Bangla
 keyboard for iPhone, iPad and Mac.
 
 Astro 5 and Tailwind 4, static output, no component library. Two languages: English at `/` and

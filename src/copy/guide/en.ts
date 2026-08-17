@@ -267,7 +267,7 @@ export const guide: GuideContent = {
     id: 'try',
     body: [
       'The real engine, running in your browser. It follows the rules on this page and nothing else: no corrections, no next-word suggestions, and nothing you type goes anywhere.',
-      'The engine’s own playground, which adds corrections and next-word suggestions on top, is at <a href="https://sayom.me/obadh_engine/">sayom.me/obadh_engine</a>. If something here gives you a letter you did not expect, <a href="/contribute/#reporting-something-that-is-wrong">what makes a report reproducible</a> is on the contribute page.',
+      'The engine’s own playground, which adds corrections and next-word suggestions on top, is at <a href="https://obadh.unmukto.org/playground/">obadh.unmukto.org/playground</a>. If something here gives you a letter you did not expect, <a href="/contribute/#reporting-something-that-is-wrong">what makes a report reproducible</a> is on the contribute page.',
     ],
   },
 };

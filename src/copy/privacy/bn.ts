@@ -156,7 +156,7 @@ export const privacy: ArticleContent = {
       heading: 'কোথায় প্রশ্ন করবেন, কোথায় ভুল ধরিয়ে দেবেন',
       id: 'questions-corrections-contact',
       body: [
-        'এই পাতার যেকোনো কিছু নিয়ে প্রশ্ন, আর এতে কোনো সংশোধন, যে রিপোজিটরির সঙ্গে সম্পর্ক সেখানেই ইস্যু খুলে বলুন: <a href="https://github.com/nsssayom/obadh_engine"><span class="latin" lang="en">obadh_engine</span></a>, <a href="https://github.com/nsssayom/obadh-ios"><span class="latin" lang="en">obadh-ios</span></a>, কিংবা <a href="https://github.com/nsssayom/obadh-macos"><span class="latin" lang="en">obadh-macos</span></a>। ইস্যু সবার চোখের সামনে থাকে, আর সেটাই দরকার: গোপনীয়তার উত্তর আড়ালে দিলে একজন মানুষের উপকার হয়। এসব প্রশ্নের ছোট উত্তরগুলো আছে <a href="/bn/faq/">প্রশ্ন-উত্তরের পাতায়</a>, আর প্রকল্পের আর কী কী দরকার তা বলা আছে <a href="/bn/contribute/">অবদানের পাতায়</a>।',
+        'এই পাতার যেকোনো কিছু নিয়ে প্রশ্ন, আর এতে কোনো সংশোধন, যে রিপোজিটরির সঙ্গে সম্পর্ক সেখানেই ইস্যু খুলে বলুন: <a href="https://github.com/unmukto-org/obadh_engine"><span class="latin" lang="en">obadh_engine</span></a>, <a href="https://github.com/unmukto-org/obadh-ios"><span class="latin" lang="en">obadh-ios</span></a>, কিংবা <a href="https://github.com/unmukto-org/obadh-macos"><span class="latin" lang="en">obadh-macos</span></a>। ইস্যু সবার চোখের সামনে থাকে, আর সেটাই দরকার: গোপনীয়তার উত্তর আড়ালে দিলে একজন মানুষের উপকার হয়। এসব প্রশ্নের ছোট উত্তরগুলো আছে <a href="/bn/faq/">প্রশ্ন-উত্তরের পাতায়</a>, আর প্রকল্পের আর কী কী দরকার তা বলা আছে <a href="/bn/contribute/">অবদানের পাতায়</a>।',
       ],
     },
   ],

@@ -49,7 +49,7 @@ export const contribute: BlockContent = {
         },
       ],
       after:
-        'Everything is on GitHub under <a href="https://github.com/nsssayom">github.com/nsssayom</a>, and all of it is MIT licensed.',
+        'Everything is on GitHub under <a href="https://github.com/unmukto-org">github.com/unmukto-org</a>, and all of it is MIT licensed.',
     },
 
     {
@@ -91,7 +91,7 @@ export const contribute: BlockContent = {
       heading: 'Find out which part is wrong',
       body: [
         'Type the same thing somewhere else and the answer falls out. If a letter is wrong, use the box on the <a href="/guide/#try">guide page</a>: it runs the deterministic core compiled to WebAssembly, the same rules the keyboard runs, so a wrong letter there is the engine.',
-        'The box stops at the letters. If the letters are right and a correction or a next-word suggestion is wrong, the <a href="https://sayom.me/obadh_engine/">engine playground</a> runs that layer too. If both are right and the app still gets it wrong, it is the app.',
+        'The box stops at the letters. If the letters are right and a correction or a next-word suggestion is wrong, the <a href="https://obadh.unmukto.org/playground/">engine playground</a> runs that layer too. If both are right and the app still gets it wrong, it is the app.',
       ],
       after:
         'Then file it in the repository that owns it. <a href="#the-repositories">The list is at the foot of this page</a>, and if you are not sure, file it against the app you were using. Moving an issue is easier than writing it twice.',
@@ -127,7 +127,7 @@ export const contribute: BlockContent = {
       heading: 'Build the engine in five commands',
       intro: 'The engine is Rust and builds on its own.',
       lines: [
-        'git clone https://github.com/nsssayom/obadh_engine',
+        'git clone https://github.com/unmukto-org/obadh_engine',
         'cd obadh_engine',
         './init.sh',
         'cargo test',
@@ -208,17 +208,17 @@ export const contribute: BlockContent = {
         },
         {
           name: 'obadh_autocorrect_dataset',
-          href: 'https://github.com/nsssayom/obadh_autocorrect_dataset',
+          href: 'https://github.com/unmukto-org/obadh_autocorrect_dataset',
           body: 'The lexicons, the loanword list, and the FST artifacts built from them. A wrong or missing word belongs here. Data only, no code.',
         },
         {
           name: 'obadh_autosuggest_dataset',
-          href: 'https://github.com/nsssayom/obadh_autosuggest_dataset',
+          href: 'https://github.com/unmukto-org/obadh_autosuggest_dataset',
           body: 'The sentence corpus, the vocabulary, and the next-word models.',
         },
       ],
       after:
-        'The <a href="https://sayom.me/obadh_engine/">engine playground</a> runs the autocorrect and suggestion layers as well as the deterministic core, which the box on the guide page does not.',
+        'The <a href="https://obadh.unmukto.org/playground/">engine playground</a> runs the autocorrect and suggestion layers as well as the deterministic core, which the box on the guide page does not.',
     },
 
     {

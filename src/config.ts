@@ -48,16 +48,18 @@ export const LINKS = {
   // TODO(maintainer): replace with the real App Store listing once the app is approved.
   appStore: 'https://apps.apple.com/app/obadh/id0000000000',
   // TODO(maintainer): replace once the first macOS release is tagged.
-  macDmg: 'https://github.com/nsssayom/obadh-macos/releases/download/v0.1.0/Obadh-0.1.0.dmg',
-  macReleases: 'https://github.com/nsssayom/obadh-macos/releases/latest',
+  macDmg: 'https://github.com/unmukto-org/obadh-macos/releases/download/v0.1.0/Obadh-0.1.0.dmg',
+  macReleases: 'https://github.com/unmukto-org/obadh-macos/releases/latest',
   // TODO(maintainer): replace with the real invite once the server exists.
   discord: 'https://discord.gg/obadh',
-  playground: 'https://sayom.me/obadh_engine/',
+  /* Served from this site, at /playground/. The deploy workflow copies the
+     engine's own docs/ folder in, so it tracks the engine rather than a copy. */
+  playground: 'https://obadh.unmukto.org/playground/',
   github: {
-    org: 'https://github.com/nsssayom',
-    engine: 'https://github.com/nsssayom/obadh_engine',
-    ios: 'https://github.com/nsssayom/obadh-ios',
-    macos: 'https://github.com/nsssayom/obadh-macos',
+    org: 'https://github.com/unmukto-org',
+    engine: 'https://github.com/unmukto-org/obadh_engine',
+    ios: 'https://github.com/unmukto-org/obadh-ios',
+    macos: 'https://github.com/unmukto-org/obadh-macos',
     website: 'https://github.com/unmukto-org/obadh-website',
   },
   crate: 'https://crates.io/crates/obadh_engine',

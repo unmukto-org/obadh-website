@@ -102,7 +102,7 @@ export const about: BlockContent = {
       heading: 'Why it never guesses',
       body: [
         'Type a word nobody has ever written down (your friend’s name, your village, a line of Nazrul in the spelling of 1922) and Obadh still gets it right, the same way every time.',
-        'The layer that turns Roman into Bangla holds no dictionary at all. <code>kt</code> becomes <span lang="bn">ক্ত</span> because a rule says a consonant meeting a consonant binds, and that rule is a file in <a href="https://github.com/nsssayom/obadh_engine">the repository</a> with tests over it. Corrections are a separate layer, and they only ever offer; nothing is inserted for you unless you switch that on.',
+        'The layer that turns Roman into Bangla holds no dictionary at all. <code>kt</code> becomes <span lang="bn">ক্ত</span> because a rule says a consonant meeting a consonant binds, and that rule is a file in <a href="https://github.com/unmukto-org/obadh_engine">the repository</a> with tests over it. Corrections are a separate layer, and they only ever offer; nothing is inserted for you unless you switch that on.',
       ],
     },
 

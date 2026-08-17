@@ -154,7 +154,7 @@ export const privacy: ArticleContent = {
       heading: 'Where to ask, and where to correct this page',
       id: 'questions-corrections-contact',
       body: [
-        'Questions about anything on this page, and corrections to it, belong in an issue on the repository they concern: <a href="https://github.com/nsssayom/obadh_engine">obadh_engine</a>, <a href="https://github.com/nsssayom/obadh-ios">obadh-ios</a>, or <a href="https://github.com/nsssayom/obadh-macos">obadh-macos</a>. Issues are public, which is the point: a privacy answer given in private helps one person. The <a href="/faq/">FAQ</a> answers the shorter versions of these questions, and the <a href="/contribute/">contribute page</a> says what else the project needs.',
+        'Questions about anything on this page, and corrections to it, belong in an issue on the repository they concern: <a href="https://github.com/unmukto-org/obadh_engine">obadh_engine</a>, <a href="https://github.com/unmukto-org/obadh-ios">obadh-ios</a>, or <a href="https://github.com/unmukto-org/obadh-macos">obadh-macos</a>. Issues are public, which is the point: a privacy answer given in private helps one person. The <a href="/faq/">FAQ</a> answers the shorter versions of these questions, and the <a href="/contribute/">contribute page</a> says what else the project needs.',
       ],
     },
   ],

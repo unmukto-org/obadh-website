@@ -109,7 +109,7 @@ export const faq: FaqContent = {
           question: 'আমি পশ্চিমবঙ্গে বাংলা লিখি, বাংলাদেশে নয়। এই স্কিম কি আমার জন্য?',
           lead: 'আপনার জন্যই। আপনি যে বানানে লেখেন অবাধ সেটিই সাজিয়ে দেয়, আর আপনার বর্ণকে যে অংশটি বাংলা করে তোলে তাতে কোনো অভিধানই নেই।',
           answer: [
-            'ঝোঁকটা সংশোধনে। শব্দভাণ্ডার দাঁড় করানো হয়েছে বাংলা উইকিপিডিয়া, বেছে নেওয়া কিছু বই আর একটি বাংলাদেশি সংবাদপত্রের সংরক্ষণাগার থেকে। আপনি নিজে চালু না করলে কিছুই নিজে থেকে বসে না, আর পরামর্শের সারি থেকে একবার নিজের বানানটি বেছে নিলে সেটি আগলে রাখা হয়। শব্দভাণ্ডারে যে শব্দ নেই, কিংবা যেটির ক্রম ভুল, সেটি <a href="https://github.com/nsssayom/obadh_autocorrect_dataset"><span class="latin" lang="en">obadh_autocorrect_dataset</span></a>-এ এক লাইনের একটি পুল রিকোয়েস্ট।',
+            'ঝোঁকটা সংশোধনে। শব্দভাণ্ডার দাঁড় করানো হয়েছে বাংলা উইকিপিডিয়া, বেছে নেওয়া কিছু বই আর একটি বাংলাদেশি সংবাদপত্রের সংরক্ষণাগার থেকে। আপনি নিজে চালু না করলে কিছুই নিজে থেকে বসে না, আর পরামর্শের সারি থেকে একবার নিজের বানানটি বেছে নিলে সেটি আগলে রাখা হয়। শব্দভাণ্ডারে যে শব্দ নেই, কিংবা যেটির ক্রম ভুল, সেটি <a href="https://github.com/unmukto-org/obadh_autocorrect_dataset"><span class="latin" lang="en">obadh_autocorrect_dataset</span></a>-এ এক লাইনের একটি পুল রিকোয়েস্ট।',
           ],
         },
       ],
@@ -179,7 +179,7 @@ export const faq: FaqContent = {
           question: 'একটা বাগ পেয়েছি, কিংবা এই কাজে হাত লাগাতে চাই। কোথায় যাব?',
           lead: '<span class="latin" lang="en">GitHub</span>-এ, সমস্যাটি যে রিপোজিটরির সেখানে।',
           answer: [
-            'ভুল অক্ষর কিংবা কোনো নিয়ম বেঠিকভাবে কাজ করলে <a href="https://github.com/nsssayom/obadh_engine"><span class="latin" lang="en">obadh_engine</span></a>, কিবোর্ডের কিছু হলে <a href="https://github.com/nsssayom/obadh-ios"><span class="latin" lang="en">obadh-ios</span></a>, ম্যাকের ইনপুট মেথডের কিছু হলে <a href="https://github.com/nsssayom/obadh-macos"><span class="latin" lang="en">obadh-macos</span></a>। বাকিটা <a href="/bn/contribute/">অবদানের পাতায়</a>, সঙ্গে <a href="/bn/contribute/#reporting-something-that-is-wrong">একটা পরীক্ষা, যা বলে দেয় সমস্যাটা কোন রিপোজিটরির</a>।',
+            'ভুল অক্ষর কিংবা কোনো নিয়ম বেঠিকভাবে কাজ করলে <a href="https://github.com/unmukto-org/obadh_engine"><span class="latin" lang="en">obadh_engine</span></a>, কিবোর্ডের কিছু হলে <a href="https://github.com/unmukto-org/obadh-ios"><span class="latin" lang="en">obadh-ios</span></a>, ম্যাকের ইনপুট মেথডের কিছু হলে <a href="https://github.com/unmukto-org/obadh-macos"><span class="latin" lang="en">obadh-macos</span></a>। বাকিটা <a href="/bn/contribute/">অবদানের পাতায়</a>, সঙ্গে <a href="/bn/contribute/#reporting-something-that-is-wrong">একটা পরীক্ষা, যা বলে দেয় সমস্যাটা কোন রিপোজিটরির</a>।',
           ],
         },
       ],

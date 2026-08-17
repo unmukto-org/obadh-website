@@ -46,7 +46,7 @@ export const contribute: BlockContent = {
         },
       ],
       after:
-        'সবকিছু আছে <a href="https://github.com/nsssayom"><span class="latin" lang="en">github.com/nsssayom</span></a>-এ, আর সবটাই এমআইটি লাইসেন্সে।',
+        'সবকিছু আছে <a href="https://github.com/unmukto-org"><span class="latin" lang="en">github.com/unmukto-org</span></a>-এ, আর সবটাই এমআইটি লাইসেন্সে।',
     },
 
     {
@@ -88,7 +88,7 @@ export const contribute: BlockContent = {
       heading: 'কোন জায়গাটা ভুল, বের করে নিন',
       body: [
         'একই জিনিস অন্য কোথাও লিখে দেখলেই উত্তরটা বেরিয়ে আসে। অক্ষরই যদি ভুল আসে, <a href="/bn/guide/#try">লেখার নিয়মের পাতায়</a> যে বাক্সটি আছে তাতে লিখে দেখুন: ওতে চলে নিয়মভিত্তিক মূল অংশটি, <span class="latin" lang="en">WebAssembly</span>-তে কম্পাইল করা, কিবোর্ডের সেই একই নিয়ম, কাজেই ওখানেও অক্ষর ভুল এলে দোষ ইঞ্জিনের।',
-        'বাক্সটি অক্ষর পর্যন্তই। অক্ষর ঠিক এসে কোনো সংশোধন বা পরের শব্দের পরামর্শ ভুল হলে সেই স্তরটি চলে <a href="https://sayom.me/obadh_engine/">ইঞ্জিন খেলাঘরে</a>। দুই জায়গাতেই ঠিক এসে অ্যাপে ভুল হলে দোষ অ্যাপের।',
+        'বাক্সটি অক্ষর পর্যন্তই। অক্ষর ঠিক এসে কোনো সংশোধন বা পরের শব্দের পরামর্শ ভুল হলে সেই স্তরটি চলে <a href="https://obadh.unmukto.org/playground/">ইঞ্জিন খেলাঘরে</a>। দুই জায়গাতেই ঠিক এসে অ্যাপে ভুল হলে দোষ অ্যাপের।',
       ],
       after:
         'তারপর ইস্যুটি খুলুন সেই রিপোজিটরিতে, সমস্যাটি যার। <a href="#the-repositories">তালিকাটি এই পাতার শেষে</a>; আর নিশ্চিত না হলে যে অ্যাপে লিখছিলেন তার নামেই খুলুন, দুবার লেখার চেয়ে ইস্যু সরিয়ে নেওয়া সহজ।',
@@ -124,7 +124,7 @@ export const contribute: BlockContent = {
       heading: 'পাঁচটি কমান্ডে ইঞ্জিনটি বিল্ড করুন',
       intro: 'ইঞ্জিনটি রাস্টে লেখা, আর সেটি নিজে নিজেই বিল্ড হয়।',
       lines: [
-        'git clone https://github.com/nsssayom/obadh_engine',
+        'git clone https://github.com/unmukto-org/obadh_engine',
         'cd obadh_engine',
         './init.sh',
         'cargo test',
@@ -205,17 +205,17 @@ export const contribute: BlockContent = {
         },
         {
           name: 'obadh_autocorrect_dataset',
-          href: 'https://github.com/nsssayom/obadh_autocorrect_dataset',
+          href: 'https://github.com/unmukto-org/obadh_autocorrect_dataset',
           body: 'শব্দভাণ্ডার, ধার করা শব্দের তালিকা, আর সেগুলো থেকে বানানো <span class="latin" lang="en">FST</span> ফাইল। শব্দভাণ্ডারে কোনো শব্দ ভুল থাকলে বা না থাকলে সেটি এখানে। শুধু ডেটা, কোনো কোড নেই।',
         },
         {
           name: 'obadh_autosuggest_dataset',
-          href: 'https://github.com/nsssayom/obadh_autosuggest_dataset',
+          href: 'https://github.com/unmukto-org/obadh_autosuggest_dataset',
           body: 'বাক্যের কর্পাস, শব্দতালিকা, আর পরের শব্দের মডেল।',
         },
       ],
       after:
-        '<a href="https://sayom.me/obadh_engine/">ইঞ্জিন খেলাঘরে</a> নিয়মভিত্তিক মূল অংশের সঙ্গে অটোকারেক্ট আর পরামর্শের স্তরগুলোও চলে, যেগুলো লেখার নিয়মের পাতার বাক্সে নেই।',
+        '<a href="https://obadh.unmukto.org/playground/">ইঞ্জিন খেলাঘরে</a> নিয়মভিত্তিক মূল অংশের সঙ্গে অটোকারেক্ট আর পরামর্শের স্তরগুলোও চলে, যেগুলো লেখার নিয়মের পাতার বাক্সে নেই।',
     },
 
     {

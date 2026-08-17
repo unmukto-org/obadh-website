@@ -105,7 +105,7 @@ export const faq: FaqContent = {
           question: 'I write Bangla in West Bengal, not Bangladesh. Is this scheme for me?',
           lead: 'Yes. Obadh composes whatever you spell, and the part that turns your letters into Bangla holds no dictionary at all.',
           answer: [
-            'Corrections are the part that leans: they are built from Bangla Wikipedia, curated books and the archive of a Bangladeshi newspaper. Nothing is inserted for you unless you switch that on, and picking your own spelling out of the strip once protects it. A word that is missing, or ranked wrongly, is one line in <a href="https://github.com/nsssayom/obadh_autocorrect_dataset">obadh_autocorrect_dataset</a>.',
+            'Corrections are the part that leans: they are built from Bangla Wikipedia, curated books and the archive of a Bangladeshi newspaper. Nothing is inserted for you unless you switch that on, and picking your own spelling out of the strip once protects it. A word that is missing, or ranked wrongly, is one line in <a href="https://github.com/unmukto-org/obadh_autocorrect_dataset">obadh_autocorrect_dataset</a>.',
           ],
         },
       ],
@@ -177,7 +177,7 @@ export const faq: FaqContent = {
           question: 'I found a bug, or I want to work on this. Where do I go?',
           lead: 'GitHub, in the repository that owns the problem.',
           answer: [
-            '<a href="https://github.com/nsssayom/obadh_engine">obadh_engine</a> for a wrong letter or a rule that misfires, <a href="https://github.com/nsssayom/obadh-ios">obadh-ios</a> for the keyboard, <a href="https://github.com/nsssayom/obadh-macos">obadh-macos</a> for the Mac input method. <a href="/contribute/">Where to start</a> has the rest, including <a href="/contribute/#reporting-something-that-is-wrong">a test that tells you which repository</a> a problem belongs to.',
+            '<a href="https://github.com/unmukto-org/obadh_engine">obadh_engine</a> for a wrong letter or a rule that misfires, <a href="https://github.com/unmukto-org/obadh-ios">obadh-ios</a> for the keyboard, <a href="https://github.com/unmukto-org/obadh-macos">obadh-macos</a> for the Mac input method. <a href="/contribute/">Where to start</a> has the rest, including <a href="/contribute/#reporting-something-that-is-wrong">a test that tells you which repository</a> a problem belongs to.',
           ],
         },
       ],

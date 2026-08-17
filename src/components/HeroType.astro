@@ -284,8 +284,19 @@ const ROWS: Key[][] = [
   */
   .device__cell--emoji {
     grid-auto-flow: column;
+    /*
+      Equal columns that divide the slot rather than sizing to their contents.
+      A fixed minimum per emoji cannot be honoured three times inside a third
+      of the bar: on a phone the three ran 192px wide in a 116px cell, spilled
+      out both sides and were clipped by the slot's own overflow. One emoji
+      still gets the whole slot, because one column of 1fr is the slot.
+    */
     grid-template-columns: none;
-    justify-content: center;
+    grid-auto-columns: minmax(0, 1fr);
+    /* The cell centres its items; these have to fill their column instead, or
+       a lone emoji sits in a 24px box and the tap target it gets is the glyph
+       rather than the slot. */
+    justify-items: stretch;
     gap: 0.2rem;
     padding-inline: 0.2rem;
   }
@@ -293,7 +304,7 @@ const ROWS: Key[][] = [
   .device__emoji {
     display: grid;
     place-items: center;
-    min-width: 2.5em;
+    min-width: 0;
     padding-block: 0.22em;
     /* An emoji is not Bangla and must not take the Bangla face or its scale. */
     font-family: var(--font-sans);

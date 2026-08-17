@@ -21,17 +21,23 @@
  * page draws it at.
  */
 interface Props {
-  /** Rendered size. Placement is the caller's business. */
+  /**
+   * Rendered size in px. Leave it off to fill the parent instead, and set
+   * `--alpona-size` on an ancestor: the drawing then follows its container at
+   * every width. A caller that hard-codes a size here and resizes the box
+   * around it gets a drawing overflowing its own frame, which is what used to
+   * happen to the hero on a phone.
+   */
   size?: number;
   class?: string;
 }
 
-const { size = 600, class: className = '' } = Astro.props;
+const { size, class: className = '' } = Astro.props;
 ---
 
 <div
   class:list={['alpona', className]}
-  style={`--alpona-size: ${size}px`}
+  style={size ? `--alpona-size: ${size}px` : undefined}
   role="presentation"
   aria-hidden="true"
 >
@@ -43,8 +49,8 @@ const { size = 600, class: className = '' } = Astro.props;
        the ground, so the pattern is low-contrast rather than faded. */
     --alpona-ink: color-mix(in srgb, var(--color-brand) 30%, var(--color-ground));
 
-    width: var(--alpona-size);
-    height: var(--alpona-size);
+    width: var(--alpona-size, 100%);
+    height: var(--alpona-size, 100%);
     background-color: var(--alpona-ink);
 
     -webkit-mask-image: url('/art/alpona.svg');

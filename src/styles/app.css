@@ -375,6 +375,17 @@
     color: var(--color-ember-ink);
   }
 
+  /*
+    A link standing on its own as a row, rather than a word inside a sentence.
+    WCAG 2.2 exempts inline links in prose from the target size rule and these
+    are not that: they were 21px tall, under the 24px minimum, on every width.
+  */
+  .link--row {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
   .link {
     color: var(--color-brand-ink);
     text-underline-offset: 0.2em;

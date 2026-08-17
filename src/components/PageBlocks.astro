@@ -311,7 +311,11 @@ const opens = (block: PageBlock) => Boolean(block.eyebrow || block.heading);
 
   /* A repository name is one token with no break opportunity in it, so the
      column is sized to hold the longest one rather than to break it. */
+  /* A row, not a word in a sentence, so it carries a thumb-sized target. */
   .rows__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
     color: var(--color-brand-ink);
     font-family: var(--font-mono);
     font-size: var(--text-xs);

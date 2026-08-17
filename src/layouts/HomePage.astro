@@ -77,7 +77,7 @@ const schema = [
     */}
     <div class="hero-sunrise" aria-hidden="true">
       <span class="hero-sunrise__light"></span>
-      <span class="hero-sunrise__art"><Alpona size={990} /></span>
+      <span class="hero-sunrise__art"><Alpona /></span>
     </div>
 
     <div class="relative shell grid justify-items-center gap-6 text-center">
@@ -285,8 +285,16 @@ const schema = [
        the hero starts below. */
     inset-block-start: -4.5rem;
     inset-inline-start: 0;
-    width: 990px;
-    height: 990px;
+    /*
+      One size, and the drawing inside follows it. The quarter that shows is
+      half this figure wide, so it has to stay under the viewport or the
+      drawing's outer petals get cut by the screen edge and the whole thing
+      reads as a crop rather than a pattern. 115vw keeps that rim inside the
+      page on a phone and reaches full size by about 860px.
+    */
+    --alpona-size: min(990px, 115vw);
+    width: var(--alpona-size);
+    height: var(--alpona-size);
     translate: -50% -50%;
     z-index: -1;
     pointer-events: none;
@@ -328,13 +336,16 @@ const schema = [
   /* On a phone the text is where the drawing would be, so it goes quiet and
      slides further off the edge. */
   @media (max-width: 60rem) {
-    .hero-sunrise {
-      width: 680px;
-      height: 680px;
-    }
-
     .hero-sunrise__art {
       opacity: 0.75;
+    }
+  }
+
+  /* On a phone the headline sits over the densest part of the drawing, so it
+     drops back further still. The pattern is there to be felt, not read. */
+  @media (max-width: 34rem) {
+    .hero-sunrise__art {
+      opacity: 0.55;
     }
   }
 

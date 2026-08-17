@@ -136,7 +136,7 @@ const marked = (code: string) =>
         {
           c.repos.rows.map((repo) => (
             <li class="grid gap-1 rounded-card border border-hair p-5 sm:grid-cols-[16rem_minmax(0,1fr)] sm:items-baseline sm:gap-6">
-              <a class="link font-mono text-sm" href={LINKS.github[repo.repo]}>
+              <a class="link link--row font-mono text-sm" href={LINKS.github[repo.repo]}>
                 {repo.name}
               </a>
               <p class="text-sm text-muted">{repo.body}</p>

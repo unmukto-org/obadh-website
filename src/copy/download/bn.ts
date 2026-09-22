@@ -47,7 +47,7 @@ export const download: DownloadContent = {
 
   setup: {
     heading: 'চালু করা',
-    lede: 'কোনো সিস্টেমই নতুন কিবোর্ড নিজে থেকে চালু করে না, তাই একবার সেটিংসে যেতে হয়।',
+    lede: 'আইফোন ও আইপ্যাডে নতুন কিবোর্ড সেটিংস থেকে চালু করতে হয়। ম্যাকে ইনস্টলার নিজেই চালু করে।',
     ios: {
       heading: 'আইফোন ও আইপ্যাড',
       steps: [
@@ -60,10 +60,10 @@ export const download: DownloadContent = {
     macos: {
       heading: 'ম্যাক',
       steps: [
-        'ডিস্ক ইমেজ খুলে অবাধকে Applications-এ টেনে দিন।',
-        'একবার খুলুন, যাতে ম্যাকওএস ইনপুট সোর্সটি চেনে।',
-        'Settings › Keyboard › Input Sources › Edit, তারপর Bangla-র নিচে অবাধ যোগ করুন।',
-        'Control-Space চেপে অবাধে যান।',
+        '<span class="latin" lang="en">Obadh.dmg</span> খুলে <span class="latin" lang="en">Install Obadh</span>-এ দুবার ক্লিক করুন।',
+        '<span class="latin" lang="en">Get Started</span>, তারপর <span class="latin" lang="en">Add Obadh</span>-এ ক্লিক করে পাসওয়ার্ড দিন।',
+        'ম্যাকওএস বাংলা (অবাধ) চালু করার অনুমতি চাইলে <span class="latin" lang="en">Allow</span>-এ ক্লিক করুন।',
+        'গ্লোব বোতাম বা <span class="latin" lang="en">Control-Space</span> চেপে অবাধে যান।',
       ],
     },
     after:

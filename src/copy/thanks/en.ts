@@ -7,50 +7,28 @@ import type { ThanksContent } from '../types';
 */
 export const thanks: ThanksContent = {
   meta: {
-    title: 'Thanks: installing Obadh on your Mac',
-    description: 'Your download has started. Four steps to install Obadh and start typing Bangla.',
+    title: 'Install Obadh on your Mac',
+    description: 'Obadh.dmg is downloading. Install it in four steps and add Obadh as a Bangla input source on macOS.',
   },
 
-  eyebrow: 'Downloading',
-  heading: 'Thanks. Four steps and you are typing.',
-  standfirst: 'The disk image is on its way. Here is what to do with it.',
+  eyebrow: 'Download',
+  heading: 'Install Obadh',
+  standfirst: 'Obadh.dmg is downloading.',
 
   steps: [
-    {
-      heading: 'Open the disk image',
-      body: 'It is in your Downloads folder. Double-click it.',
-    },
-    {
-      heading: 'Drag Obadh to Applications',
-      body: 'The window that opens shows both. Drag it across.',
-    },
-    {
-      heading: 'Open Obadh once',
-      body: 'This is what registers it with macOS as an input source.',
-    },
-    {
-      heading: 'Add it in Settings',
-      body: 'Settings › Keyboard › Input Sources › Edit, then add Obadh under Bangla.',
-    },
+    { heading: 'Open Obadh.dmg' },
+    { heading: 'Open Install Obadh', body: 'If macOS asks, click Open.' },
+    { heading: 'Click Add Obadh', body: 'Then enter your password.' },
+    { heading: 'Click Allow' },
   ],
 
   check: {
-    heading: 'Check it works',
-    body: 'Press Control-Space to switch to Obadh, then type <code>ami banglay likhchi</code>. You should get <span lang="bn">আমি বাংলায় লিখছি</span>.',
+    heading: 'Switch and type',
+    or: 'or',
+    roman: 'ami banglay likhchi',
+    bangla: 'আমি বাংলায় লিখছি',
   },
 
-  retry: {
-    label: 'Download again',
-    note: 'If nothing started, the disk image is here.',
-  },
-
-  next: [
-    { label: 'Every rule of the scheme', href: '/guide/' },
-    { label: 'Coming from Avro', href: '/guide/#from-avro' },
-    { label: 'What Obadh does with your typing', href: '/privacy/' },
-  ],
-  help: {
-    text: 'Stuck on a step?',
-    label: 'Ask on Discord',
-  },
+  retry: 'Download again',
+  help: 'Ask on Discord',
 };

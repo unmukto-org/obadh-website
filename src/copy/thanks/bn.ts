@@ -2,50 +2,28 @@ import type { ThanksContent } from '../types';
 
 export const thanks: ThanksContent = {
   meta: {
-    title: 'ধন্যবাদ: ম্যাকে অবাধ ইনস্টল করা',
-    description: 'ডাউনলোড শুরু হয়েছে। চারটি ধাপে ম্যাকে অবাধ ইনস্টল করে বাংলা লেখা শুরু করুন, আর ঠিকমতো চলছে কি না তা যাচাই করে নিন।',
+    title: 'ম্যাকে অবাধ ইনস্টল করুন',
+    description: '<span class="latin" lang="en">Obadh.dmg</span> ডাউনলোড হচ্ছে। চারটি ধাপে ইনস্টল করে ম্যাকওএসে অবাধকে বাংলা ইনপুট সোর্স হিসেবে যোগ করুন।',
   },
 
-  eyebrow: 'নামছে',
-  heading: 'ধন্যবাদ। চার ধাপ পরেই লেখা শুরু।',
-  standfirst: 'ডিস্ক ইমেজটি নামছে। এবার এটুকু করতে হবে।',
+  eyebrow: 'ডাউনলোড',
+  heading: 'অবাধ ইনস্টল করুন',
+  standfirst: '<span class="latin" lang="en">Obadh.dmg</span> ডাউনলোড হচ্ছে।',
 
   steps: [
-    {
-      heading: 'ডিস্ক ইমেজটি খুলুন',
-      body: 'ওটি আছে আপনার Downloads ফোল্ডারে। দুবার ক্লিক করুন।',
-    },
-    {
-      heading: 'অবাধকে Applications-এ টানুন',
-      body: 'যে জানালাটি খুলবে তাতে দুটিই আছে। টেনে নিয়ে ছেড়ে দিন।',
-    },
-    {
-      heading: 'একবার অবাধ খুলুন',
-      body: 'এতেই ম্যাকওএস একে ইনপুট সোর্স হিসেবে চেনে।',
-    },
-    {
-      heading: 'সেটিংসে যোগ করুন',
-      body: 'Settings › Keyboard › Input Sources › Edit, তারপর Bangla-র নিচে অবাধ যোগ করুন।',
-    },
+    { heading: '<span class="latin" lang="en">Obadh.dmg</span> খুলুন' },
+    { heading: '<span class="latin" lang="en">Install Obadh</span> খুলুন', body: 'ম্যাকওএস জানতে চাইলে <span class="latin" lang="en">Open</span>-এ ক্লিক করুন।' },
+    { heading: '<span class="latin" lang="en">Add Obadh</span>-এ ক্লিক করুন', body: 'তারপর পাসওয়ার্ড দিন।' },
+    { heading: '<span class="latin" lang="en">Allow</span>-এ ক্লিক করুন' },
   ],
 
   check: {
-    heading: 'ঠিকমতো চলছে কি না দেখুন',
-    body: 'Control-Space চেপে অবাধে যান, তারপর লিখুন <code>ami banglay likhchi</code>। আসার কথা <span lang="bn">আমি বাংলায় লিখছি</span>।',
+    heading: 'অবাধে গিয়ে লিখুন',
+    or: 'অথবা',
+    roman: 'ami banglay likhchi',
+    bangla: 'আমি বাংলায় লিখছি',
   },
 
-  retry: {
-    label: 'আবার নামান',
-    note: 'কিছু শুরু না হলে ডিস্ক ইমেজটি এখানে।',
-  },
-
-  next: [
-    { label: 'স্কিমের প্রতিটি নিয়ম', href: '/guide/' },
-    { label: 'অভ্র থেকে আসছেন?', href: '/guide/#from-avro' },
-    { label: 'আপনার লেখা নিয়ে অবাধ কী করে', href: '/privacy/' },
-  ],
-  help: {
-    text: 'কোনো ধাপে আটকে গেছেন?',
-    label: 'ডিসকর্ডে জিজ্ঞেস করুন',
-  },
+  retry: 'আবার ডাউনলোড করুন',
+  help: 'ডিসকর্ডে জিজ্ঞেস করুন',
 };

@@ -1,4 +1,4 @@
-import type { Locale } from '../config';
+import { SITE, type Locale } from '../config';
 
 /**
  * Strings that appear on more than one page. Page content lives in
@@ -109,7 +109,7 @@ export const ui: Record<Locale, UIStrings> = {
       playground: 'Engine playground',
       discord: 'Discord',
       privacy: 'Privacy',
-      licenseLine: 'MIT licensed. Engine 0.9.3, apps 0.1.0. Built by Unmukto.',
+      licenseLine: `MIT licensed. Engine ${SITE.versions.engine}, Mac app ${SITE.versions.macos}. Built by Unmukto.`,
       staticNote: 'This site is static. No analytics, no cookies.',
     },
     placeholderNote: 'Not live yet',
@@ -189,7 +189,7 @@ export const ui: Record<Locale, UIStrings> = {
       // Latin digits: a version is a string someone compares against a repo tag,
       // and every other page prints these two the same way. This line is rendered
       // as plain text, so the figures cannot take their usual span.
-      licenseLine: 'এমআইটি লাইসেন্স। ইঞ্জিন 0.9.3, অ্যাপ 0.1.0। বানিয়েছে উন্মুক্ত।',
+      licenseLine: `এমআইটি লাইসেন্স। ইঞ্জিন ${SITE.versions.engine}, ম্যাক অ্যাপ ${SITE.versions.macos}। বানিয়েছে উন্মুক্ত।`,
       staticNote: 'এই সাইটটি স্ট্যাটিক। কোনো অ্যানালিটিকস নেই, কুকি নেই।',
     },
     placeholderNote: 'এখনো চালু হয়নি',

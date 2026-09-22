@@ -7,7 +7,7 @@ import { LINKS } from '../../config';
 // Terminology and the Latin-wrapping rules are settled in src/copy/GLOSSARY.bn.md.
 //
 // Latin digits stay wherever the figure is one a maintainer checks against a file
-// (845,461 · 1,815 · 1,776 · 352 · 390 KB · 0.1.0). Ordinary counts in running
+// (845,461 · 1,815 · 1,776 · 352 · 390 KB · 1.0). Ordinary counts in running
 // prose take Bangla numerals or the Bangla word.
 //
 // `working-on-the-code` and `reporting-something-that-is-wrong` are contract

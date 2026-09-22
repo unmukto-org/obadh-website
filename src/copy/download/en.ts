@@ -57,7 +57,7 @@ export const download: DownloadContent = {
 
   setup: {
     heading: 'Turning it on',
-    lede: 'Neither system switches a new keyboard on by itself, so each takes one trip through Settings.',
+    lede: 'On iPhone and iPad, a new keyboard is turned on in Settings. On a Mac, the installer turns it on.',
     ios: {
       heading: 'iPhone and iPad',
       steps: [
@@ -70,10 +70,10 @@ export const download: DownloadContent = {
     macos: {
       heading: 'Mac',
       steps: [
-        'Open the disk image and drag Obadh to Applications.',
-        'Open it once, so macOS registers the input source.',
-        'Settings › Keyboard › Input Sources › Edit, then add Obadh under Bangla.',
-        'Press Control-Space to switch to it.',
+        'Open Obadh.dmg, then double-click Install Obadh.',
+        'Click Get Started, then Add Obadh, and enter your password.',
+        'When macOS asks to enable <span lang="bn">বাংলা (অবাধ)</span>, click Allow.',
+        'Switch to it with the globe key or Control-Space.',
       ],
     },
     after:

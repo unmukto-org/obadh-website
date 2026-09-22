@@ -1,0 +1,287 @@
+---
+/**
+ * The screen macOS shows at each install step, drawn, with the one control to
+ * press lit up and a pointer on it.
+ *
+ * Drawn rather than screenshotted: a screenshot is one appearance, one
+ * language and one resolution, and goes stale the first time the installer
+ * moves a button. The strings are the ones the Mac actually shows, in
+ * English because that is what the Mac shows; the step text beside each
+ * drawing says the same thing in the page's language, so the drawing is
+ * hidden from screen readers.
+ */
+interface Props {
+  kind: 'dmg' | 'open' | 'add' | 'allow';
+}
+
+const { kind } = Astro.props;
+const icon = '/icons/app-192.png';
+/* Inside the lit control, so its tip lands on the control's corner at any
+   size, and the label stays readable. */
+const pointer =
+  '<svg class="shot__pointer" viewBox="0 0 16 22" width="16" height="22"><path d="M1 1v17l4.4-4.1 2.9 6.6 2.7-1.2-2.9-6.5H14z"/></svg>';
+---
+
+<div class={`shot shot--${kind}`} aria-hidden="true">
+  <div class="shot__window">
+    <div class="shot__bar">
+      <i></i><i></i><i></i>
+      {kind === 'dmg' && <span class="shot__title">Obadh</span>}
+    </div>
+
+    {
+      kind === 'dmg' && (
+        <div class="shot__body shot__body--finder">
+          <span class="shot__target shot__target--icon">
+            <img src={icon} alt="" width="56" height="56" loading="lazy" decoding="async" />
+            <Fragment set:html={pointer} />
+          </span>
+          <span class="shot__name">Install Obadh</span>
+          <span class="shot__hint">Double-click to install</span>
+        </div>
+      )
+    }
+
+    {
+      kind === 'open' && (
+        <div class="shot__body shot__body--alert">
+          <img src={icon} alt="" width="36" height="36" loading="lazy" decoding="async" />
+          <span class="shot__text">
+            <b>“Install Obadh” is an app downloaded from the Internet.</b>
+          </span>
+          <span class="shot__buttons">
+            <span class="shot__btn">Cancel</span>
+            <span class="shot__btn shot__target">Open<Fragment set:html={pointer} /></span>
+          </span>
+        </div>
+      )
+    }
+
+    {
+      kind === 'add' && (
+        <div class="shot__body shot__body--alert">
+          <img src={icon} alt="" width="36" height="36" loading="lazy" decoding="async" />
+          <span class="shot__text">
+            <b>Add Obadh to this Mac</b>
+          </span>
+          <span class="shot__field">
+            <span>Password</span>
+            <span class="shot__dots">••••••••</span>
+          </span>
+          <span class="shot__buttons">
+            <span class="shot__btn shot__target">Add Obadh<Fragment set:html={pointer} /></span>
+          </span>
+        </div>
+      )
+    }
+
+    {
+      kind === 'allow' && (
+        <div class="shot__body shot__body--alert">
+          <img src={icon} alt="" width="36" height="36" loading="lazy" decoding="async" />
+          <span class="shot__text">
+            <b>
+              Allow “Obadh” to enable “<span lang="bn">বাংলা (অবাধ)</span>”?
+            </b>
+          </span>
+          <span class="shot__buttons">
+            <span class="shot__btn">Don’t Allow</span>
+            <span class="shot__btn shot__target">Allow<Fragment set:html={pointer} /></span>
+          </span>
+        </div>
+      )
+    }
+  </div>
+
+</div>
+
+<style>
+  /* A desk for the window to sit on, so four of them read as one set. */
+  .shot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 13rem;
+    padding: 1rem;
+    border-radius: calc(var(--radius-card) - 0.35rem);
+    background: var(--color-veil);
+    overflow: hidden;
+  }
+
+  .shot__window {
+    width: 100%;
+    max-width: 15rem;
+    border: 1px solid var(--color-hair-strong);
+    border-radius: 0.7rem;
+    background: var(--color-raise);
+    box-shadow: 0 14px 30px -14px rgb(0 0 0 / 0.7);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+
+  .shot__bar {
+    position: relative;
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .shot__bar i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  }
+
+  .shot__title {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0.32rem;
+    text-align: center;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+
+  .shot__body {
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.9rem 1.1rem;
+    text-align: center;
+  }
+
+  .shot__body--finder {
+    gap: 0.3rem;
+    padding-block: 0.7rem 1.1rem;
+  }
+
+  .shot__name {
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .shot__hint {
+    font-size: 0.62rem;
+    color: var(--color-muted);
+  }
+
+  .shot__text {
+    font-size: 0.68rem;
+    line-height: 1.35;
+  }
+
+  .shot__text [lang='bn'] {
+    font-size: 1.05em;
+  }
+
+  .shot__field {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--color-hair-strong);
+    border-radius: 0.35rem;
+    font-size: 0.62rem;
+    color: var(--color-muted);
+  }
+
+  .shot__dots {
+    letter-spacing: 0.05em;
+    color: var(--color-ink);
+  }
+
+  .shot__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding-block-start: 0.15rem;
+  }
+
+  .shot__btn {
+    flex: 1;
+    max-width: 6.5rem;
+    padding: 0.28rem 0.5rem;
+    border-radius: 0.35rem;
+    background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+    font-size: 0.64rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* The one thing to press. */
+  .shot__btn.shot__target {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+  }
+
+  .shot__target {
+    position: relative;
+  }
+
+  .shot__target::after {
+    content: '';
+    position: absolute;
+    inset: -0.3rem;
+    border: 2px solid var(--color-brand);
+    border-radius: 0.55rem;
+    opacity: 0;
+    animation: shot-ring 2.4s var(--ease-out) infinite;
+  }
+
+  .shot__target--icon {
+    display: block;
+    padding: 0.3rem;
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--color-brand) 22%, transparent);
+  }
+
+  .shot__target--icon img {
+    display: block;
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .shot__target--icon::after {
+    border-radius: 1.1rem;
+  }
+
+  /* On the icon, the pointer sits inside its corner, clear of the name. */
+  .shot .shot__target--icon :global(.shot__pointer) {
+    inset-inline-end: 0.1rem;
+    inset-block-end: 0.1rem;
+  }
+
+  @keyframes shot-ring {
+    0% {
+      opacity: 0.9;
+      transform: scale(0.96);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1.12);
+    }
+  }
+
+  /* Scoped styles do not reach set:html, hence :global. */
+  .shot :global(.shot__pointer) {
+    position: absolute;
+    z-index: 1;
+    inset-inline-end: -0.35rem;
+    inset-block-end: -0.95rem;
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 1;
+    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.5));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shot__target::after {
+      animation: none;
+      opacity: 0.8;
+      transform: none;
+    }
+  }
+</style>

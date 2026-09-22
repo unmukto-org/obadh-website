@@ -95,7 +95,7 @@ export const privacy: ArticleContent = {
       heading: 'Everything it keeps on your Mac',
       id: 'on-mac',
       body: [
-        'The macOS input method stores its settings in its own preferences domain, <code>com.nsssayom.inputmethod.obadh</code>: whether the candidate bar is shown, how many suggestions it offers, whether auto-insert is on. It keeps the same kind of learned-word store as iOS, under the key <code>learnedWords</code> in the same domain, for the same reason. Auto-insert is off by default on both platforms. It does not bundle the next-word suggestion model, so there is no personal snapshot on a Mac at all.',
+        'The macOS input method stores its settings in its own preferences domain, <code>org.unmukto.inputmethod.obadh</code>: whether the candidate bar is shown, how many suggestions it offers, whether auto-insert is on. It keeps the same kind of learned-word store as iOS, under the key <code>learnedWords</code> in the same domain, for the same reason. Auto-insert is off by default on both platforms. It does not bundle the next-word suggestion model, so there is no personal snapshot on a Mac at all.',
       ],
     },
 
@@ -105,7 +105,7 @@ export const privacy: ArticleContent = {
       body: [
         'On iPhone and iPad, open the Obadh app, go to Privacy, and choose Clear Learned Words. That deletes the personal snapshot and empties the learned-word store in one action. Suggestions from the built-in lexicon are unaffected, because they were never yours in the first place.',
         'Two things it does not reach. A keyboard still running holds its own copy of the snapshot and writes it back after the next word you commit, so switch away from the Obadh keyboard before you clear. And it leaves the emoji recents alone. Deleting the app removes its container, which takes those and everything else above with it.',
-        'On a Mac, open Settings from the input source’s menu in the menu bar. Under Autocorrect a row says how many words are currently protected from correction, with a Reset button beside it that empties the whole store. That row is the only place the learning is visible or undoable, which is why the count is shown at all. It counts protected words only, and the button is greyed out when that count is zero, so a store holding nothing but words below the threshold has to be cleared from a terminal: <code>defaults delete com.nsssayom.inputmethod.obadh learnedWords</code> does it.',
+        'On a Mac, open Settings from the input source’s menu in the menu bar. Under Autocorrect a row says how many words are currently protected from correction, with a Reset button beside it that empties the whole store. That row is the only place the learning is visible or undoable, which is why the count is shown at all. It counts protected words only, and the button is greyed out when that count is zero, so a store holding nothing but words below the threshold has to be cleared from a terminal: <code>defaults delete org.unmukto.inputmethod.obadh learnedWords</code> does it.',
       ],
     },
 

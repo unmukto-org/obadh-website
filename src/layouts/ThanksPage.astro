@@ -1,10 +1,16 @@
 ---
 /**
- * Where the Mac button lands after it has started the disk image.
+ * Where the Mac button lands, and where the disk image is started.
  *
- * Someone here is watching a download bar with nothing to do for ten seconds,
- * which is the one moment on this site where install steps are wanted rather
- * than tolerated. So the page is the steps, and nothing else.
+ * The page starts the download itself. The hero button used to start it and
+ * then move here 400 ms later, but GitHub takes about that long to redirect
+ * to the file, and a navigation away cancels a download that has not begun:
+ * on a slow connection the file never came. So the button comes here with
+ * ?download, and this page, which stays open, asks for the file. The query is
+ * removed first, so a reload does not download it twice.
+ *
+ * Each step is a drawing of the screen macOS shows at that point, with the
+ * control to press lit up, and one line of text.
  *
  * noindex: it means nothing to anyone who did not arrive by pressing the
  * button, and a search result landing here would be a dead end.
@@ -12,8 +18,9 @@
 import Base from './Base.astro';
 import PageHead from '../components/PageHead.astro';
 import BrandIcon from '../components/BrandIcon.astro';
+import MacShot from '../components/MacShot.astro';
 import type { ThanksContent } from '../copy/types';
-import { LINKS, localizedPath, type Locale } from '../config';
+import { LINKS, type Locale } from '../config';
 
 interface Props {
   locale: Locale;
@@ -22,6 +29,7 @@ interface Props {
 
 const { locale, content } = Astro.props;
 const c = content;
+const shots = ['dmg', 'open', 'add', 'allow'] as const;
 ---
 
 <Base
@@ -34,69 +42,179 @@ const c = content;
   <PageHead eyebrow={c.eyebrow} heading={c.heading} standfirst={c.standfirst} />
 
   <div class="shell pb-24">
-    <ol class="grid gap-4 pt-10 sm:grid-cols-2">
+    <p class="retry text-sm">
+      <a class="link" href={LINKS.macDmg} data-dmg>{c.retry}</a>
+    </p>
+
+    <ol class="grid gap-4 pt-12 sm:grid-cols-2 lg:grid-cols-4">
       {
         c.steps.map((step, index) => (
           <li
-            class="card step grid content-start gap-2 p-7"
+            class="card step grid content-start gap-4 p-3 pb-6"
             data-reveal
             style={`--reveal-delay: ${index * 60}ms`}
           >
-            <p class="step__n font-mono text-sm">{index + 1}</p>
-            <h2 class="text-lg font-semibold tracking-tight">{step.heading}</h2>
-            <p class="text-sm text-muted" set:html={step.body} />
+            <MacShot kind={shots[index] ?? 'dmg'} />
+            <div class="grid gap-1.5 px-3">
+              <h2 class="step__heading text-base font-semibold tracking-tight" set:html={step.heading} />
+              {step.body && <p class="text-sm text-muted" set:html={step.body} />}
+            </div>
           </li>
         ))
       }
     </ol>
 
-    <section class="card mt-5 grid gap-2 p-7" data-reveal>
-      <h2 class="text-lg font-semibold tracking-tight">{c.check.heading}</h2>
-      <p class="text-sm text-muted" set:html={c.check.body} />
+    <section class="card check mt-4 p-7" data-reveal>
+      <h2 class="text-base font-semibold tracking-tight">{c.check.heading}</h2>
+
+      <p class="check__keys">
+        <kbd class="key">
+          <span class="visually-hidden">Globe</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3 12h18M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9S9.4 5.8 12 3z" />
+          </svg>
+        </kbd>
+        <span class="check__or text-sm text-muted">{c.check.or}</span>
+        <kbd class="key"><span aria-hidden="true">⌃&nbsp;</span>control</kbd>
+        <kbd class="key key--wide">space</kbd>
+      </p>
+
+      <p class="check__sample">
+        <code>{c.check.roman}</code>
+        <span class="check__arrow" aria-hidden="true">→</span>
+        <span class="check__bangla" lang="bn">{c.check.bangla}</span>
+      </p>
     </section>
 
-    <div class="mt-10 grid gap-3" data-reveal>
-      <p class="text-sm text-faint">{c.retry.note}</p>
-      <p>
-        <a class="btn btn-ghost" href={LINKS.macDmg}>{c.retry.label}</a>
-      </p>
-    </div>
-
-    <p class="thanks-help mt-10" data-reveal>
-      <span class="text-sm text-muted">{c.help.text}</span>
-      <a class="thanks-help__link" href={LINKS.discord}>
+    <p class="mt-10 flex justify-center" data-reveal>
+      <a class="after__discord" href={LINKS.discord}>
         <BrandIcon name="discord" size={18} />
-        <span>{c.help.label}</span>
+        <span>{c.help}</span>
       </a>
     </p>
-
-    <ul class="mt-12 grid gap-2" data-reveal>
-      {
-        c.next.map((link) => (
-          <li>
-            <a class="arrow" href={localizedPath(link.href, locale)}>
-              {link.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
   </div>
 </Base>
 
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const file = document.querySelector<HTMLAnchorElement>('[data-dmg]')?.href;
+  if (params.has('download') && file) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+    /* GitHub serves the disk image as an attachment, so this downloads it and
+       the page stays where it is. */
+    window.location.href = file;
+  }
+</script>
+
 <style>
-  .step__n {
+  .retry {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 0.6rem;
+    margin-block-start: -2.5rem;
+  }
+
+  /* A tap target, not a line of text. */
+  .retry a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .step {
+    counter-increment: step;
+  }
+
+  .step__heading::before {
+    content: counter(step) '  ';
+    white-space: pre;
+    font-family: var(--font-mono);
+    font-weight: 500;
     color: var(--color-brand-ink);
   }
 
-  .thanks-help {
+  ol {
+    counter-reset: step;
+  }
+
+  /* One line on a wide screen: the heading, the keys, then the proof. */
+  .check {
+    display: grid;
+    gap: 1.25rem;
+    align-items: center;
+  }
+
+  @media (min-width: 64rem) {
+    .check {
+      grid-template-columns: auto auto minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+  }
+
+  .check__keys {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem 0.9rem;
+    gap: 0.5rem;
   }
 
-  .thanks-help__link {
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding-inline: 0.75rem;
+    border: 1px solid var(--color-hair-strong);
+    border-block-end-width: 3px;
+    border-radius: 0.55rem;
+    background: var(--color-raise);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
+
+  .key svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+  }
+
+  .key--wide {
+    min-width: 6rem;
+  }
+
+  .check__or {
+    padding-inline: 0.25rem;
+  }
+
+  .check__sample {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .check__sample {
+      justify-content: flex-end;
+    }
+  }
+
+  .check__arrow {
+    color: var(--color-brand-ink);
+  }
+
+  .check__bangla {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .after__discord {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -111,7 +229,7 @@ const c = content;
     transition: background-color 140ms var(--ease-out);
   }
 
-  .thanks-help__link:hover {
+  .after__discord:hover {
     background: color-mix(in srgb, var(--color-ink) 8%, transparent);
   }
 </style>

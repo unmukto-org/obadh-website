@@ -219,19 +219,14 @@ export interface DownloadContent extends PageContent {
  * the button.
  */
 export interface ThanksContent extends PageContent {
-  /** Four steps, each one thing to do. */
-  steps: { heading: string; body: string }[];
-  /** The line that proves it worked. */
-  check: { heading: string; body: string };
+  /** Four steps, one per drawn screen. A body only where the drawing needs it. */
+  steps: { heading: string; body?: string }[];
+  /** The keys that switch to Obadh, then a Roman string and its Bangla. */
+  check: { heading: string; or: string; roman: string; bangla: string };
   /** For a download that never started. */
-  retry: { label: string; note: string };
-  /** Where to go once it is typing. */
-  next: { label: string; href: string }[];
-  /**
-   * For someone stuck mid-install, which is the moment on the whole site most
-   * likely to need a person rather than a page.
-   */
-  help: { text: string; label: string };
+  retry: string;
+  /** For someone stuck mid-install. */
+  help: string;
 }
 
 /** A code sample on /developers/. The command is the point of the block. */

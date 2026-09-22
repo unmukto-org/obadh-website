@@ -30,7 +30,10 @@ const CASES = [
     ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15',
     touch: 0,
     label: { en: 'Download for Mac', bn: 'ম্যাকের জন্য ডাউনলোড' },
-    href: /\.dmg$/,
+    /* The permanent address, exactly: it resolves to whichever release is
+       marked latest, so a versioned file name here would go stale on the
+       next release and 404, as the 0.1.0 one did. */
+    href: /^https:\/\/github\.com\/unmukto-org\/obadh-macos\/releases\/latest\/download\/Obadh\.dmg$/,
     direct: true,
   },
   {
@@ -193,6 +196,11 @@ console.log('\nthe Mac hand-off');
   check('a Mac click lands on /thanks/', new URL(page.url()).pathname === '/thanks/', page.url());
   const steps = await page.locator('.step').count();
   check('the steps are there', steps === 4, String(steps));
+  const retry = await page.locator('a[href$=".dmg"]').first().getAttribute('href');
+  check('/thanks/ offers the same file again', CASES[0].href.test(retry ?? ''), retry ?? 'none');
+  await page.goto(`${origin}/download/`, { waitUntil: 'networkidle' });
+  const listed = await page.locator('#macos a.btn-primary').getAttribute('href');
+  check('/download/ links the same file', CASES[0].href.test(listed ?? ''), listed ?? 'none');
   await context.close();
 }
 

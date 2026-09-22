@@ -27,10 +27,11 @@ const c = content;
 const base = absoluteUrl(localizedPath('/download/', locale));
 const author = { '@id': `${SITE_URL}/#unmukto` };
 
-/* No downloadUrl. The App Store listing and the disk image are placeholders
-   until the app is approved and the first release is tagged, and a fabricated
-   download address is the one claim here a crawler would act on by itself. */
-const app = (name: string, os: string, id: string, version: string) => ({
+/* A downloadUrl only where the file exists. The Mac disk image is a real
+   release; the App Store listing is a placeholder until the app is approved,
+   and a fabricated download address is the one claim here a crawler would act
+   on by itself. */
+const app = (name: string, os: string, id: string, version: string, downloadUrl?: string) => ({
   '@type': 'SoftwareApplication',
   '@id': `${base}#${id}`,
   name,
@@ -43,11 +44,12 @@ const app = (name: string, os: string, id: string, version: string) => ({
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   inLanguage: ['bn', 'en'],
   author,
+  ...(downloadUrl && { downloadUrl }),
 });
 
 const schema = [
   app('Obadh for iPhone and iPad', `iOS ${SITE.minOS.ios}, iPadOS ${SITE.minOS.ios}`, 'ios', SITE.versions.ios),
-  app('Obadh for Mac', `macOS ${SITE.minOS.macos}`, 'macos', SITE.versions.macos),
+  app('Obadh for Mac', `macOS ${SITE.minOS.macos}`, 'macos', SITE.versions.macos, LINKS.macDmg),
 ];
 
 const setup = [c.setup.ios, c.setup.macos];
@@ -88,7 +90,11 @@ const setup = [c.setup.ios, c.setup.macos];
             </ul>
 
             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-              <a class="btn btn-primary" href={release.action.href}>
+              <a
+                class="btn btn-primary"
+                href={release.action.href}
+                data-thanks={release.id === 'macos' ? localizedPath('/thanks/', locale) : undefined}
+              >
                 {release.action.label}
               </a>
               {release.altAction && (<a class="link link--row text-sm" href={release.altAction.href}>
@@ -175,6 +181,18 @@ const setup = [c.setup.ios, c.setup.macos];
     </section>
   </div>
 </Base>
+
+<script>
+  /* The same hand-off as the hero button: /thanks/ starts the file and shows
+     the steps. Without this script the link is the file itself. */
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-thanks]')) {
+    link.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      window.location.href = `${link.dataset.thanks}?download`;
+    });
+  }
+</script>
 
 <style>
   /* Each fact gets a tick, so the card reads as a spec rather than a paragraph

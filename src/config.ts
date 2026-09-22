@@ -54,7 +54,7 @@ export const SITE = {
   versions: {
     engine: '0.9.3',
     ios: '0.1.0',
-    macos: '0.1.0',
+    macos: '1.0',
   },
   /** Machine-readable date behind the privacy page's "last updated" line. */
   privacyUpdated: '2026-08-15',
@@ -68,9 +68,11 @@ export const SITE = {
 export const LINKS = {
   // TODO(maintainer): replace with the real App Store listing once the app is approved.
   appStore: 'https://apps.apple.com/app/obadh/id0000000000',
-  // TODO(maintainer): replace once the first macOS release is tagged.
-  macDmg: 'https://github.com/unmukto-org/obadh-macos/releases/download/v0.1.0/Obadh-0.1.0.dmg',
-  macReleases: 'https://github.com/unmukto-org/obadh-macos/releases/latest',
+  /* Always the newest release: GitHub resolves /releases/latest/download/ to
+     the release marked latest, and the asset is named Obadh.dmg in every
+     release, so this never needs editing when a version ships. */
+  macDmg: 'https://github.com/unmukto-org/obadh-macos/releases/latest/download/Obadh.dmg',
+  macReleases: 'https://github.com/unmukto-org/obadh-macos/releases',
   /* Community support. Checked against Discord's invite endpoint on
      2026-09-21: it resolves to the Obadh server and expires_at is null, so it
      does not lapse the way a default seven-day invite would. */
@@ -91,7 +93,7 @@ export const LINKS = {
 } as const;
 
 /** Marks a link whose target does not exist yet, so the UI can say so honestly. */
-export const PLACEHOLDER_LINKS = new Set<string>([LINKS.appStore, LINKS.macDmg]);
+export const PLACEHOLDER_LINKS = new Set<string>([LINKS.appStore]);
 
 /** Page paths, without locale prefix and always trailing-slashed. */
 export const ROUTES = [

@@ -86,12 +86,12 @@ export const home: HomeContent = {
       {
         id: 'emoji',
         heading: 'Emoji, from the word itself',
-        body: 'Type the word and the emoji for it comes up in the strip. Taking it replaces the word, because the word was the search.',
+        body: 'Type a word, and its emoji appears in the suggestion strip.',
       },
       {
         id: 'offline',
         heading: 'It all runs on the device',
-        body: 'Composing, corrections and suggestions happen where you are typing. Airplane mode changes nothing.',
+        body: 'Composing, corrections and suggestions all work offline.',
       },
     ],
     phone: {
@@ -125,23 +125,23 @@ export const home: HomeContent = {
         name: 'iPhone and iPad',
         state: 'shipping',
         stateLabel: 'Available',
-        line: 'Works in every app that accepts text. iOS and iPadOS 18 or later.',
+        line: 'iOS and iPadOS 18 or later',
       },
       {
         name: 'Mac',
         state: 'shipping',
         stateLabel: 'Available',
-        line: 'Types into any Mac app, the same way the built-in input sources do. macOS 15 or later.',
+        line: 'macOS 15 or later',
       },
       {
-        name: 'Linux, X11 and Wayland',
+        name: 'Linux',
         state: 'building',
         stateLabel: 'Coming',
-        line: 'Both display servers, so it works whichever one your desktop uses.',
+        line: 'X11 and Wayland',
       },
-      { name: 'Android', state: 'building', stateLabel: 'Coming', line: 'Not ready to install yet.' },
-      { name: 'Windows', state: 'building', stateLabel: 'Coming', line: 'Not ready to install yet.' },
-      { name: 'ChromeOS', state: 'building', stateLabel: 'Coming', line: 'Not ready to install yet.' },
+      { name: 'Android', state: 'building', stateLabel: 'Coming', line: '' },
+      { name: 'Windows', state: 'building', stateLabel: 'Coming', line: '' },
+      { name: 'ChromeOS', state: 'building', stateLabel: 'Coming', line: '' },
     ],
     link: 'How to install it',
   },
@@ -158,8 +158,8 @@ export const home: HomeContent = {
   },
 
   open: {
-    heading: 'Made in the open, by people who use it.',
-    lede: 'Everything is public and MIT licensed. A word that comes out wrong is worth reporting.',
-    link: 'How to help',
+    heading: 'Open source',
+    lede: 'MIT licensed.',
+    link: 'Contribute',
   },
 };

@@ -110,20 +110,20 @@ const soon = Object.fromEntries(
       el.dataset.direct = '';
 
       /*
-        The Mac release is a file, and a file leaves the reader looking at the
-        page they were already on with no idea what to do next. The browser
-        downloads it without navigating, GitHub serves the disk image as an
-        attachment, so the click starts it and then moves the page on to the
-        steps. Without this script the same link still downloads; only the
-        hand-off to /thanks/ is lost.
+        The Mac release is a file, and a file leaves the reader on the page
+        they were already on with no idea what to do next. So the click goes
+        to /thanks/?download, and that page starts the file. Starting it here
+        and then leaving cancels it whenever GitHub's redirect is slower than
+        the departure, which on a slow connection is always. A modified click
+        (new tab, save link) keeps the plain file link.
       */
       if (where === 'mac') {
         const thanks = el.dataset.thanks;
         if (thanks) {
-          el.addEventListener('click', () => {
-            window.setTimeout(() => {
-              window.location.href = thanks;
-            }, 400);
+          el.addEventListener('click', (event) => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            window.location.href = `${thanks}?download`;
           });
         }
       }

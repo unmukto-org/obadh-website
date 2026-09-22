@@ -6,7 +6,8 @@ import JsonLd from '../components/JsonLd.astro';
 import { ui } from '../i18n/ui';
 import {
   DEFAULT_LOCALE,
-  LOCALES,
+  MULTILINGUAL,
+  PUBLISHED_LOCALES,
   LOCALE_TAG,
   SITE,
   absoluteUrl,
@@ -95,10 +96,11 @@ const routed = !noindex;
 
     {
       /* A dangling alternate is worse than an absent one, so the cluster is
-         only emitted for pages that exist in both languages. */
-      !noindex && (
+         only emitted when more than one language is actually published, and
+         only names the ones that are. A one-language site has no cluster. */
+      !noindex && MULTILINGUAL && (
         <>
-          {LOCALES.map((other) => (
+          {PUBLISHED_LOCALES.map((other) => (
             <link
               rel="alternate"
               hreflang={LOCALE_TAG[other]}
@@ -148,7 +150,7 @@ const routed = !noindex;
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content={isBangla ? 'bn_BD' : 'en_US'} />
-    <meta property="og:locale:alternate" content={isBangla ? 'en_US' : 'bn_BD'} />
+    {MULTILINGUAL && <meta property="og:locale:alternate" content={isBangla ? 'en_US' : 'bn_BD'} />}
     {routed && <meta property="og:url" content={canonical} />}
     <meta property="og:title" content={ogTitle ?? title} />
     <meta property="og:description" content={ogDescription ?? description} />

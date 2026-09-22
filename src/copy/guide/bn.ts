@@ -31,11 +31,12 @@ export const guide: GuideContent = {
     phonetic typing to a reader who has typed this way since school, and it
     does not explain how the engine is put together, that is /bn/about/.
   */
-  standfirst: 'ইংরেজি বর্ণে যা যা লেখা যায়, আর তাতে যে বাংলা পাবেন। ইঞ্জিন থেকে তুলে আনা ১৭৬টি জোড়া।',
+  standfirst:
+    'এখানকার প্রতিটি জোড়া ইঞ্জিন থেকেই তুলে আনা, তাই পাতাটি কিবোর্ড যা করে তা-ই লেখে। <a href="/bn/about/#how-it-is-built">কেন এভাবে বানানো হয়েছে</a> আছে পরিচিতির পাতায়।',
 
-  intro: [
-    'তালিকার প্রতিটি জোড়া ইঞ্জিন থেকেই তুলে আনা, তাই এখানে যা দেখছেন লিখলে তা-ই পাবেন। <a href="/bn/about/#how-it-is-built">কেন এভাবে বানানো হয়েছে</a> আছে পরিচিতির পাতায়।',
-  ],
+  /* No second opening: the heading names the page and the standfirst
+     carries the one fact a reader needs before the tables. */
+  intro: [],
 
   /*
     The three rules that account for most of what surprises people, shown as
@@ -155,7 +156,7 @@ export const guide: GuideContent = {
       heading: 'অনুস্বার, ঙ আর বাকি নাসিক্য বর্ণ',
       short: 'অনুস্বার',
       body: [
-        '<code>ng</code> হলো অনুস্বার ং, আর এটাই বেশি লাগে। <code>Ng</code> হলো ব্যঞ্জন ঙ, তাই <code>baNgali</code> দেয় বাঙালি। <code>ngg</code> আর <code>nggh</code> হলো ঙ্গ আর ঙ্ঘ যুক্তবর্ণের সংক্ষেপ।',
+        '<code>ng</code> ব্যঞ্জনের আগে আর শব্দের শেষে হলো অনুস্বার ং: <code>bangla</code> দেয় বাংলা, <code>rong</code> দেয় রং। স্বরের আগে এটি সেই স্বর বহন করা ঙ, তাই <code>bhanga</code> দেয় ভাঙা আর <code>rongin</code> দেয় রঙিন। <code>Ng</code> সব জায়গাতেই ঙ, আর <code>ngg</code> ও <code>nggh</code> হলো ঙ্গ আর ঙ্ঘ যুক্তবর্ণের সংক্ষেপ।',
         'ওই সংক্ষেপ যেখানে চান না, সেখানে বড় হাতের <code>M</code> জোর করে অনুস্বার বসায়।',
         'ঞ্জ কীভাবে লিখবেন সেটা জানতে এসে থাকলে: <code>nj</code>, কিংবা বর্ণ দুটো আলাদা করে লিখতে চাইলে <code>NGj</code>।',
       ],
@@ -176,7 +177,7 @@ export const guide: GuideContent = {
       short: 'চন্দ্রবিন্দু',
       body: [
         '<code>^</code> লেখে চন্দ্রবিন্দু, আর সে বসে যে স্বরকে নাসিক্য করছে তার পরে। একই চিহ্নে পৌঁছানোর দ্বিতীয় পথ <code>qq</code>।',
-        '<code>:</code> লেখে বিসর্গ। কোলনটা এভাবে দখল হয়ে যাওয়ায় ইঞ্জিনের ভেতর দিয়ে সাধারণ কোলন লেখার উপায় নেই।',
+        'অক্ষরের পাশে বা শব্দের কিনারায় <code>:</code> লেখে বিসর্গ, তাই <code>du:kho</code> দেয় দুঃখ। দুটি অঙ্কের মাঝে এটি সাধারণ কোলনই থাকে, আর তাতেই ঘড়ির সময় টিকে যায়: <code>9:45</code> দেয় ৯:৪৫।',
       ],
     },
 
@@ -198,7 +199,7 @@ export const guide: GuideContent = {
         '<code>q</code> আর <code>x</code>-এর নিজের কোনো বাংলা ধ্বনি নেই, তবু দুটোর একটাও লাতিন চেহারায় বেরিয়ে আসে না। বাংলা লেখা এতদিনে যে রীতিতে থিতু হয়েছে, দুটোই সেই রীতি ধরে।',
         'একা থাকলে <code>w</code> হলো ওয়, আর এভাবেই <code>waTar</code> দেয় ওয়াটার। ধার করা বেশির ভাগ শব্দে যে অ্যা লাগে, সেটা <code>aY</code>: <code>aYp</code> দেয় অ্যাপ।',
         // The two Bangla strings below differ by one U+200C: র‌্য carries the ZWNJ, র্য does not.
-        '<code>rZy</code> সরু একটা সংকেত, কাজ একটাই। র‌্যাব-এর মতো বানানে <span class="latin" lang="en">ZWNJ</span> দিয়ে আলাদা করা যে র‌্য লাগে, এটি সেটাই লেখে, সত্যিকারের যুক্তবর্ণ র্য থেকে যার চেহারা আলাদা। <code>Z</code> আর কিছুই বদলায় না; ইঞ্জিন থেকে লাতিন চেহারাতেই ফিরে আসা একমাত্র বর্ণও এটাই।',
+        '<code>rZy</code> সরু একটা সংকেত, কাজ একটাই। র‌্যাব-এর মতো বানানে <span class="latin" lang="en">ZWNJ</span> দিয়ে আলাদা করা যে র‌্য লাগে, এটি সেটাই লেখে, সত্যিকারের যুক্তবর্ণ র্য থেকে যার চেহারা আলাদা। অন্য জায়গায় একলা <code>Z</code> মিলিয়ে যায় য-তে, তাই <code>namaZ</code> দেয় নামায।',
       ],
     },
 

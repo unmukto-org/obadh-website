@@ -21,6 +21,14 @@ if (!existsSync(DIST)) {
   process.exit(2);
 }
 
+/*
+  Whether Bangla was built. It can be switched off as a whole (PUBLISHED_LOCALES
+  in src/config.ts), and several rules below only make sense while it is on:
+  every page having a Bangla twin, and every page naming an x-default. Read from
+  the output rather than the config, so the audit judges what actually shipped.
+*/
+const bangla = existsSync(join(DIST, 'bn', 'index.html'));
+
 const problems = [];
 const fail = (where, message) => problems.push(`${where}: ${message}`);
 
@@ -92,7 +100,11 @@ for (const file of pages) {
   const ogImageAlt = html.match(/<meta property="og:image:alt" content="([^"]*)"/)?.[1];
   if (!ogImageAlt) fail(where, 'no og:image:alt');
 
-  if (!isNoindex && !html.includes('hreflang="x-default"')) fail(where, 'no x-default hreflang');
+  // x-default names the fallback of a language cluster. With one language
+  // published there is no cluster, so there is nothing for it to name.
+  if (bangla && !isNoindex && !html.includes('hreflang="x-default"')) {
+    fail(where, 'no x-default hreflang');
+  }
 
   if (!html.includes('application/ld+json')) fail(where, 'no structured data');
 
@@ -233,10 +245,15 @@ for (const required of ['/wasm/obadh_engine.js', '/wasm/obadh_engine_bg.wasm']) 
 }
 
 // --- both languages, or neither ----------------------------------------
-for (const route of routes) {
-  if (route.startsWith('/bn/') || route.includes('404')) continue;
-  const bn = route === '/' ? '/bn/' : `/bn${route}`;
-  if (!routes.has(bn)) fail('site', `${route} has no Bangla page at ${bn}`);
+// Only while Bangla is published. It can be switched off as a whole (see
+// PUBLISHED_LOCALES in src/config.ts), and then the rule is the opposite one:
+// no page may point into /bn/ at all, which verify-seo.mjs enforces.
+if (bangla) {
+  for (const route of routes) {
+    if (route.startsWith('/bn/') || route.includes('404')) continue;
+    const bn = route === '/' ? '/bn/' : `/bn${route}`;
+    if (!routes.has(bn)) fail('site', `${route} has no Bangla page at ${bn}`);
+  }
 }
 
 // --- weight ------------------------------------------------------------

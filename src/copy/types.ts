@@ -227,6 +227,11 @@ export interface ThanksContent extends PageContent {
   retry: { label: string; note: string };
   /** Where to go once it is typing. */
   next: { label: string; href: string }[];
+  /**
+   * For someone stuck mid-install, which is the moment on the whole site most
+   * likely to need a person rather than a page.
+   */
+  help: { text: string; label: string };
 }
 
 /** A code sample on /developers/. The command is the point of the block. */

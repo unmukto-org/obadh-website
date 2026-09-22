@@ -44,7 +44,7 @@ export const about: BlockContent = {
             'Linux, Android, Windows and ChromeOS. Nobody has started any of the four, and <a href="/contribute/#the-platforms-that-need-someone">one of them could be yours</a>.',
         },
         { term: 'Price', value: 'Free to use. No ads, nothing to sign in to.' },
-        { term: 'License', value: 'MIT, throughout. Engine 0.9.1, apps 0.1.0.' },
+        { term: 'License', value: 'MIT, throughout. Engine 0.9.3, apps 0.1.0.' },
         { term: 'Built by', value: '<a href="https://unmukto.org">Unmukto</a>, an open source collective.' },
       ],
     },

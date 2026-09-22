@@ -1,0 +1,162 @@
+---
+/**
+ * The source code, one repository per row, grouped by what each one is.
+ *
+ * GitHub's own org page would not do: Unmukto keeps other projects there too,
+ * and someone looking for the keyboard should not have to know it is called
+ * obadh-ios, or wade past an unrelated project to find it. So the panel names
+ * Obadh's repositories only, and says what each one holds.
+ *
+ * It is a native popover. The browser gives it light dismissal, Escape and a
+ * top-layer stacking context, it works with JavaScript off, and any number of
+ * buttons can open it: one in the header on a wide screen, one in the menu
+ * sheet on a phone.
+ */
+import BrandIcon from './BrandIcon.astro';
+import { ui } from '../i18n/ui';
+import { LINKS, type Locale } from '../config';
+
+interface Props {
+  locale: Locale;
+  /** Shared with every `popovertarget` that opens it. */
+  id: string;
+}
+
+const { locale, id } = Astro.props;
+const c = ui[locale].community;
+const g = LINKS.github;
+
+const groups = [
+  { label: c.groups.engine, repos: [{ name: 'obadh_engine', href: g.engine, body: c.repos.engine }] },
+  {
+    label: c.groups.apps,
+    repos: [
+      { name: 'obadh-ios', href: g.ios, body: c.repos.ios },
+      { name: 'obadh-macos', href: g.macos, body: c.repos.macos },
+    ],
+  },
+  {
+    label: c.groups.data,
+    repos: [
+      { name: 'obadh_autocorrect_dataset', href: g.autocorrectData, body: c.repos.autocorrectData },
+      { name: 'obadh_autosuggest_dataset', href: g.autosuggestData, body: c.repos.autosuggestData },
+    ],
+  },
+];
+---
+
+<div class="repo-menu" id={id} popover aria-labelledby={`${id}-title`}>
+  <p class="repo-menu__head" id={`${id}-title`}>
+    <BrandIcon name="github" size={16} />
+    <span>{c.reposTitle}</span>
+  </p>
+
+  {
+    groups.map((group) => (
+      <section class="repo-menu__group" aria-label={group.label}>
+        <p class="repo-menu__label" aria-hidden="true">{group.label}</p>
+        <ul>
+          {group.repos.map((repo) => (
+            <li>
+              <a class="repo-menu__row" href={repo.href}>
+                <span class="repo-menu__name">{repo.name}</span>
+                <span class="repo-menu__body">{repo.body}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+</div>
+
+<style>
+  /*
+    Placed against the top-right of the viewport rather than anchored to the
+    button. The button always sits in the header's right-hand cluster, so the
+    two line up, and it works in every browser the popover attribute does:
+    CSS anchor positioning is not there yet in all of them.
+  */
+  .repo-menu {
+    position: fixed;
+    inset: auto;
+    inset-block-start: 4.75rem;
+    inset-inline-end: clamp(1.25rem, 0.5rem + 2vw, 2.5rem);
+    margin: 0;
+    width: min(26rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 6rem);
+    overflow-y: auto;
+    padding: 1rem;
+    border: 1px solid var(--color-hair-strong);
+    border-radius: var(--radius-panel);
+    background: var(--color-veil);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* On a phone it is a sheet under the header, edge to edge. */
+  @media (max-width: 40rem) {
+    .repo-menu {
+      inset-inline: 1rem;
+      width: auto;
+    }
+  }
+
+  .repo-menu__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .repo-menu__group + .repo-menu__group {
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.5rem;
+    border-block-start: 1px solid var(--color-hair);
+  }
+
+  .repo-menu__label {
+    padding: 0.25rem 0.5rem;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ember-ink);
+  }
+
+  :global(html[lang='bn']) .repo-menu__label {
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .repo-menu__row {
+    display: grid;
+    gap: 0.15rem;
+    min-height: 2.75rem;
+    padding: 0.5rem;
+    border-radius: 0.6rem;
+    text-decoration: none;
+    transition: background-color 120ms var(--ease-out);
+  }
+
+  .repo-menu__row:hover,
+  .repo-menu__row:focus-visible {
+    background: var(--color-raise);
+  }
+
+  .repo-menu__name {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-brand-ink);
+    overflow-wrap: anywhere;
+  }
+
+  .repo-menu__body {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+</style>

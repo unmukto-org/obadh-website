@@ -10,7 +10,7 @@
  * Serving it with a 200 makes a soft 404 and search engines index it.
  */
 import Base from '../layouts/Base.astro';
-import { localizedPath } from '../config';
+import { MULTILINGUAL, localizedPath } from '../config';
 
 const links = [
   { route: '/download/', en: 'Get Obadh for iPhone, iPad and Mac', bn: 'আইফোন, আইপ্যাড ও ম্যাকে অবাধ নিন' },
@@ -24,7 +24,7 @@ const links = [
   locale="en"
   route="/404/"
   title="Page not found, Obadh"
-  description="There is no page at this address. Everything on this site is one of seven pages."
+  description="There is no page at this address. Every page on this site is linked from the header and the footer."
   noindex
   noSwitch
 >
@@ -41,28 +41,34 @@ const links = [
       </p>
     </div>
 
-    <div class="mt-16 grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+    {/* Two columns while both languages are published. With Bangla switched
+        off, its column would be four links to pages that are not there, so it
+        goes, and the English one takes the width. The address above stays: it
+        is the engine saying the thing, not a way into the Bangla site. */}
+    <div class:list={['mt-16 grid items-start gap-12', MULTILINGUAL && 'lg:grid-cols-2 lg:gap-16']}>
       <div class="prose">
         <h1 class="text-2xl font-semibold tracking-tight">There is no page at this address</h1>
         <p>
-          The link may be old, or the address may have picked up a character on the way. Everything
-          on this site is one of seven pages, and they are all in the header and the footer.
+          The link may be old, or the address may have picked up a character on the way. Every
+          page on this site is linked from the header and the footer.
         </p>
         <ul class="list-none ps-0">
           {links.map((link) => <li><a href={localizedPath(link.route, 'en')}>{link.en}</a></li>)}
         </ul>
       </div>
 
+      {MULTILINGUAL && (
       <div class="prose" lang="bn">
         <h2 class="py-[0.06em] text-2xl leading-[1.3] font-semibold">এই ঠিকানায় কোনো পাতা নেই</h2>
         <p>
-          লিংকটি পুরোনো হতে পারে, কিংবা ঠিকানায় বাড়তি একটা অক্ষর ঢুকে গেছে। এই সাইটের সবটাই সাতটি
-          পাতার মধ্যে, আর সাতটিই আছে উপরে আর নিচে, দুই জায়গাতেই।
+          লিংকটি পুরোনো হতে পারে, কিংবা ঠিকানায় বাড়তি একটা অক্ষর ঢুকে গেছে। এই সাইটের প্রতিটি পাতার
+          লিংক আছে উপরে আর নিচে, দুই জায়গাতেই।
         </p>
         <ul class="list-none ps-0">
           {links.map((link) => <li><a href={localizedPath(link.route, 'bn')}>{link.bn}</a></li>)}
         </ul>
       </div>
+      )}
     </div>
   </div>
 </Base>

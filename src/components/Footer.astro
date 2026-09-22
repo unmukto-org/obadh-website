@@ -1,4 +1,5 @@
 ---
+import BrandIcon from './BrandIcon.astro';
 import Mark from './Mark.astro';
 import Tagline from './Tagline.astro';
 import { ui } from '../i18n/ui';
@@ -27,57 +28,138 @@ const source = [
   { href: LINKS.github.ios, label: 'obadh-ios' },
   { href: LINKS.github.macos, label: 'obadh-macos' },
   { href: LINKS.playground, label: f.playground },
-  { href: LINKS.discord, label: f.discord },
 ];
+
+const c = t.community;
 ---
 
-{/* `site-footer` carries no styles; it is what scripts/smoke.mjs addresses. */}
+{/*
+  Three columns and a base line. The two community marks sit under the tagline
+  as icon buttons rather than holding up a column of their own for two links,
+  the page list runs in two columns so the longest list no longer sets the
+  height of the whole footer, and the fine print moves to a single line at the
+  foot where fine print is looked for.
+
+  `site-footer` carries no styles; it is what scripts/smoke.mjs addresses.
+*/}
 <footer class="site-footer mt-auto bg-raise">
-  <div class="shell grid gap-12 py-16 md:grid-cols-[1.5fr_1fr_1fr] md:gap-10">
-    <div class="grid max-w-sm content-start gap-4">
-      <div class="flex items-center gap-2.5">
-        <Mark size={30} decorative />
-        <span class="text-lg font-semibold tracking-tight">Obadh</span>
+  <div class="shell">
+    <div class="grid gap-10 py-12 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1.5fr)_minmax(0,1fr)] md:gap-12">
+      <div class="grid content-start gap-5">
+        <a class="flex w-fit items-center gap-2.5 no-underline" href={localizedPath('/', locale)}>
+          <Mark size={30} decorative />
+          <span class="text-lg font-semibold tracking-tight">Obadh</span>
+        </a>
+        <Tagline size="lg" />
+        <ul class="flex gap-2" aria-label={c.heading}>
+          <li>
+            <a class="footer-social" href={LINKS.discord} aria-label={c.discordLabel} title={c.discordLabel}>
+              <BrandIcon name="discord" size={20} />
+            </a>
+          </li>
+          <li>
+            {/* Opens the same panel as the header's icon, which lives in the
+                header on every page, so there is one copy of it. */}
+            <button
+              class="footer-social"
+              type="button"
+              popovertarget="repo-menu"
+              aria-label={c.githubLabel}
+              title={c.githubLabel}
+            >
+              <BrandIcon name="github" size={18} />
+            </button>
+          </li>
+        </ul>
       </div>
-      <Tagline size="lg" />
-      <p class="text-xs text-faint">{f.licenseLine}</p>
-      <p class="text-xs text-faint">{f.staticNote}</p>
+
+      <nav class="grid content-start gap-4" aria-label={f.pages}>
+        <h2 class="footer-heading">{f.pages}</h2>
+        {/* Fills down, then across, so each column reads in order: a
+            row-first grid put Download, Developers, FAQ and Privacy in one
+            column. Four rows fit the seven pages as four and three. */}
+        <ul class="grid grid-flow-col grid-cols-2 grid-rows-4 gap-x-6 gap-y-2.5">
+          {
+            pages.map((page) => (
+              <li>
+                <a class="footer-link" href={localizedPath(page.route, locale)}>
+                  {page.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="grid content-start gap-4">
+        <h2 class="footer-heading">{f.source}</h2>
+        {/* Two columns on a phone, where it sits under Pages rather than
+            beside it, in equal halves so its second column lines up with
+            Pages' second column; one down the side on a wide screen. */}
+        <ul class="grid grid-flow-col grid-cols-2 grid-rows-2 gap-x-6 gap-y-2.5 md:grid-flow-row md:grid-cols-1 md:grid-rows-none">
+          {
+            source.map((item) => (
+              <li>
+                <a class="footer-link" href={item.href}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
 
-    <nav class="grid content-start gap-4" aria-label={f.pages}>
-      <h2 class="text-xs font-semibold tracking-wide text-faint">{f.pages}</h2>
-      <ul class="grid gap-3">
-        {
-          pages.map((page) => (
-            <li>
-              <a
-                class="text-sm text-muted no-underline transition-colors hover:text-brand-ink"
-                href={localizedPath(page.route, locale)}
-              >
-                {page.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-
-    <div class="grid content-start gap-4">
-      <h2 class="text-xs font-semibold tracking-wide text-faint">{f.source}</h2>
-      <ul class="grid gap-3">
-        {
-          source.map((item) => (
-            <li>
-              <a
-                class="text-sm text-muted no-underline transition-colors hover:text-brand-ink"
-                href={item.href}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+    <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-t border-hair py-5 text-xs text-faint">
+      <p>{f.licenseLine}</p>
+      <p>{f.staticNote}</p>
     </div>
   </div>
 </footer>
+
+<style>
+  /* Small and quiet, and not uppercased in CSS: scripts/smoke.mjs checks that,
+     because an uppercase transform reads a Bangla heading as nothing at all. */
+  .footer-heading {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-faint);
+  }
+
+  .footer-link {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 140ms var(--ease-out);
+  }
+
+  .footer-link:hover {
+    color: var(--color-brand-ink);
+  }
+
+  /* Outlined rather than filled, so they read as buttons against the footer's
+     own surface without competing with the page's one filled button. */
+  .footer-social {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-hair-strong);
+    border-radius: 999px;
+    color: var(--color-muted);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      color 140ms var(--ease-out),
+      background-color 140ms var(--ease-out),
+      border-color 140ms var(--ease-out);
+  }
+
+  .footer-social:hover,
+  .footer-social:focus-visible {
+    color: var(--color-ink);
+    border-color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  }
+</style>

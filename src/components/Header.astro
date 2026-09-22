@@ -1,8 +1,10 @@
 ---
 import Mark from './Mark.astro';
 import LangSwitch from './LangSwitch.astro';
+import BrandIcon from './BrandIcon.astro';
+import RepoMenu from './RepoMenu.astro';
 import { ui } from '../i18n/ui';
-import { SITE, localizedPath, type Locale } from '../config';
+import { LINKS, MULTILINGUAL, SITE, localizedPath, type Locale } from '../config';
 
 interface Props {
   locale: Locale;
@@ -12,7 +14,15 @@ interface Props {
 }
 
 const { locale, route, noSwitch = false } = Astro.props;
+
+/* A switch to a language that is not published would be a link to nothing. */
+const showSwitch = MULTILINGUAL && !noSwitch;
 const t = ui[locale];
+const c = t.community;
+
+/* One panel, opened from the header on a wide screen and from the menu sheet
+   on a phone. */
+const repoMenu = 'repo-menu';
 
 /* Download is not in this list. The Get Obadh button beside it goes to the
    same page, and two controls a thumb-width apart pointing at one page is one
@@ -57,8 +67,13 @@ const links = [
       <span class="text-[1.4rem] font-semibold tracking-tight">{SITE.name}</span>
     </a>
 
+    {/* The full row needs about 1180px once the GitHub and Discord marks are
+        in it: the links are centred on the viewport, and below that width they
+        run into the icons. So the row appears at 75rem and the menu sheet,
+        which carries the same links and both marks, serves everything under
+        it. Measured, not guessed: at 1024px the collision was 50px. */}
     <nav
-      class="absolute inset-x-0 hidden items-center justify-center gap-1 lg:flex"
+      class="absolute inset-x-0 hidden items-center justify-center gap-1 min-[75rem]:flex"
       aria-label={t.navMenu}
     >
       {
@@ -75,8 +90,24 @@ const links = [
       }
     </nav>
 
-    <div class="relative z-10 hidden items-center gap-3 lg:flex">
-      {!noSwitch && <LangSwitch locale={locale} route={route} />}
+    <div class="relative z-10 hidden items-center gap-1 min-[75rem]:flex">
+      {showSwitch && <LangSwitch locale={locale} route={route} />}
+      {/* Icons rather than words: the marks are recognised faster than the
+          names, and two more words would crowd the centred nav. Each carries
+          its name as a label and as a tooltip. */}
+      <button
+        class="header-icon"
+        type="button"
+        popovertarget={repoMenu}
+        aria-label={c.githubLabel}
+        title={c.githubLabel}
+      >
+        <BrandIcon name="github" size={20} />
+      </button>
+      <a class="header-icon" href={LINKS.discord} aria-label={c.discordLabel} title={c.discordLabel}>
+        <BrandIcon name="discord" size={22} />
+      </a>
+      <span class="ms-2" aria-hidden="true"></span>
       {/* The generic label on purpose: this goes to the download page, where
           you can read what you are installing. The hero's button is the one
           that links straight at a file. */}
@@ -85,7 +116,7 @@ const links = [
       </a>
     </div>
 
-    <details class="site-menu relative ml-auto lg:hidden" data-menu>
+    <details class="site-menu relative ml-auto min-[75rem]:hidden" data-menu>
       <summary
         class="site-menu__button grid size-11 cursor-pointer list-none place-items-center rounded-full text-ink [&::-webkit-details-marker]:hidden"
       >
@@ -114,8 +145,19 @@ const links = [
           }
         </nav>
 
+        <div class="mt-2 grid gap-1 border-t border-hair pt-3">
+          <button class="site-menu__link site-menu__community" type="button" popovertarget={repoMenu}>
+            <BrandIcon name="github" size={18} />
+            <span>{c.github}</span>
+          </button>
+          <a class="site-menu__link site-menu__community" href={LINKS.discord}>
+            <BrandIcon name="discord" size={19} />
+            <span>{c.discord}</span>
+          </a>
+        </div>
+
         <div class="mt-2 flex flex-wrap items-center gap-2 border-t border-hair pt-3">
-          {!noSwitch && <LangSwitch locale={locale} route={route} />}
+          {showSwitch && <LangSwitch locale={locale} route={route} />}
           <a
             class="btn btn-primary min-h-11 flex-1 px-5 py-2 text-sm"
             href={localizedPath('/download/', locale)}
@@ -126,6 +168,8 @@ const links = [
       </div>
     </details>
   </div>
+
+  <RepoMenu locale={locale} id={repoMenu} />
 </header>
 
 <script>
@@ -153,3 +197,52 @@ const links = [
     });
   }
 </script>
+
+<style>
+  /* 44px, the same target as every other control in the header. */
+  .header-icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    color: var(--color-muted);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      color 140ms var(--ease-out),
+      background-color 140ms var(--ease-out);
+  }
+
+  /* Lit while its panel is open. Keyed on the panel's own state: browsers give
+     a popover's button its expanded state in the accessibility tree without
+     writing aria-expanded to the element, so a selector on that attribute
+     would never match. */
+  .header-icon:hover,
+  .header-icon:focus-visible,
+  .site-header:has(#repo-menu:popover-open) .header-icon[popovertarget] {
+    color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  }
+
+  .site-menu__community {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    font-size: var(--text-sm);
+    text-align: start;
+    color: var(--color-muted);
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .site-menu__community:hover {
+    background: var(--color-raise);
+    color: var(--color-ink);
+  }
+</style>

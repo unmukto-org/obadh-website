@@ -87,7 +87,7 @@ needs to stop pronouncing the run as Bangla.
   interface shows in English (`Get Started`, `Allow`, `Copy Build Details`). Two names go the
   other way and are written in Bangla script instead: অভ্র কীবোর্ড and অভ্র ফোনেটিক.
 - **Wrapped, without `lang`.** Bare figures a reader copies or checks against a file:
-  `845,461`, `1,776`, `0.9.1`, `8.8 MB`, `29 MB`, `390 KB`, `500`, `32`, `73`. They are read as
+  `845,461`, `1,776`, `0.9.3`, `8.8 MB`, `29 MB`, `390 KB`, `500`, `32`, `73`. They are read as
   numbers in whatever language the page is in, so marking them English would make a screen
   reader spell them out in the wrong one. The two artifact sizes are decimal MB and the WASM
   figure is the file this site serves, `public/wasm/obadh_engine_bg.wasm`; the engine README's

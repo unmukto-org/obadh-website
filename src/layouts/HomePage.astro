@@ -95,7 +95,15 @@ const schema = [
         <span class="block text-brand-ink">{c.hero.headingAccent}</span>
       </h1>
 
-      <p class="lede max-w-xl" data-reveal style="--reveal-delay: 70ms">{c.hero.lede}</p>
+      {
+        /* Optional. The heading and the keyboard under it already say what this
+           is, so the hero carries no paragraph restating it. */
+        c.hero.lede && (
+          <p class="lede max-w-xl" data-reveal style="--reveal-delay: 70ms">
+            {c.hero.lede}
+          </p>
+        )
+      }
 
       <div data-reveal style="--reveal-delay: 130ms">
         <PlatformCta locale={locale} class="px-9 text-base" />

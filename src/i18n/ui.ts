@@ -41,6 +41,27 @@ export interface UIStrings {
   };
   placeholderNote: string;
   /**
+   * Community and source, in the header and the footer. The repositories are
+   * grouped by what they are rather than listed by name, so someone looking
+   * for the keyboard does not have to know it is called obadh-ios.
+   */
+  community: {
+    heading: string;
+    discord: string;
+    discordLabel: string;
+    github: string;
+    githubLabel: string;
+    reposTitle: string;
+    groups: { engine: string; apps: string; data: string };
+    repos: {
+      engine: string;
+      ios: string;
+      macos: string;
+      autocorrectData: string;
+      autosuggestData: string;
+    };
+  };
+  /**
    * The typing box appears twice: in the hero and on the guide. Both run the
    * deterministic core and nothing else, and these strings are shared so that
    * neither can drift into claiming the other's behavior.
@@ -88,10 +109,26 @@ export const ui: Record<Locale, UIStrings> = {
       playground: 'Engine playground',
       discord: 'Discord',
       privacy: 'Privacy',
-      licenseLine: 'MIT licensed. Engine 0.9.1, apps 0.1.0. Built by Unmukto.',
+      licenseLine: 'MIT licensed. Engine 0.9.3, apps 0.1.0. Built by Unmukto.',
       staticNote: 'This site is static. No analytics, no cookies.',
     },
     placeholderNote: 'Not live yet',
+    community: {
+      heading: 'Community',
+      discord: 'Discord',
+      discordLabel: 'Ask on the Obadh Discord',
+      github: 'GitHub',
+      githubLabel: 'Obadh source code on GitHub',
+      reposTitle: 'Source code',
+      groups: { engine: 'Engine', apps: 'Apps', data: 'Data' },
+      repos: {
+        engine: 'Transliteration, correction and suggestion, in Rust',
+        ios: 'The iPhone and iPad keyboard',
+        macos: 'The Mac input method',
+        autocorrectData: 'The correction lexicon and how it is built',
+        autosuggestData: 'The next-word corpus and model',
+      },
+    },
     typingBox: {
       label: 'Type in Roman letters',
       noscript: 'The typing box needs JavaScript. The engine also runs as a full playground at',
@@ -100,7 +137,7 @@ export const ui: Record<Locale, UIStrings> = {
     notFound: {
       eyebrow: '404',
       title: 'There is no page at this address',
-      body: 'The link may be old, or the address may have picked up a character on the way. Everything on this site is one of seven pages, and they are all in the header and the footer.',
+      body: 'The link may be old, or the address may have picked up a character on the way. Every page on this site is linked from the header and the footer.',
       back: 'Back to the home page',
     },
   },
@@ -152,10 +189,26 @@ export const ui: Record<Locale, UIStrings> = {
       // Latin digits: a version is a string someone compares against a repo tag,
       // and every other page prints these two the same way. This line is rendered
       // as plain text, so the figures cannot take their usual span.
-      licenseLine: 'এমআইটি লাইসেন্স। ইঞ্জিন 0.9.1, অ্যাপ 0.1.0। বানিয়েছে উন্মুক্ত।',
+      licenseLine: 'এমআইটি লাইসেন্স। ইঞ্জিন 0.9.3, অ্যাপ 0.1.0। বানিয়েছে উন্মুক্ত।',
       staticNote: 'এই সাইটটি স্ট্যাটিক। কোনো অ্যানালিটিকস নেই, কুকি নেই।',
     },
     placeholderNote: 'এখনো চালু হয়নি',
+    community: {
+      heading: 'কমিউনিটি',
+      discord: 'ডিসকর্ড',
+      discordLabel: 'অবাধের ডিসকর্ডে জিজ্ঞেস করুন',
+      github: 'গিটহাব',
+      githubLabel: 'গিটহাবে অবাধের সোর্স কোড',
+      reposTitle: 'সোর্স কোড',
+      groups: { engine: 'ইঞ্জিন', apps: 'অ্যাপ', data: 'ডেটা' },
+      repos: {
+        engine: 'লিপ্যন্তর, সংশোধন আর পরামর্শ, রাস্টে লেখা',
+        ios: 'আইফোন ও আইপ্যাডের কিবোর্ড',
+        macos: 'ম্যাকের ইনপুট মেথড',
+        autocorrectData: 'সংশোধনের শব্দভাণ্ডার, আর তা যেভাবে তৈরি হয়',
+        autosuggestData: 'পরের শব্দের কর্পাস আর মডেল',
+      },
+    },
     typingBox: {
       label: 'ইংরেজি বর্ণে লিখুন',
       noscript: 'এই বাক্সটি চলতে জাভাস্ক্রিপ্ট লাগে। ইঞ্জিনের পূর্ণ খেলাঘর আছে এখানে:',
@@ -167,7 +220,7 @@ export const ui: Record<Locale, UIStrings> = {
     notFound: {
       eyebrow: '৪০৪',
       title: 'এই ঠিকানায় কোনো পাতা নেই',
-      body: 'লিংকটি পুরোনো হতে পারে, কিংবা ঠিকানায় বাড়তি একটা অক্ষর ঢুকে গেছে। এই সাইটের সবটাই সাতটি পাতার মধ্যে, আর সাতটিই আছে উপরে আর নিচে, দুই জায়গাতেই।',
+      body: 'লিংকটি পুরোনো হতে পারে, কিংবা ঠিকানায় বাড়তি একটা অক্ষর ঢুকে গেছে। এই সাইটের প্রতিটি পাতার লিংক আছে উপরে আর নিচে, দুই জায়গাতেই।',
       back: 'প্রথম পাতায় ফিরুন',
     },
   },

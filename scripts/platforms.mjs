@@ -110,10 +110,11 @@ const check = (label, ok, detail = '') => {
   console.log(`  ${ok ? '✓' : '✗'} ${label}${detail ? `  ${detail}` : ''}`);
 };
 
-for (const [route, locale] of [
-  ['/', 'en'],
-  ['/bn/', 'bn'],
-]) {
+/* Bangla can be switched off as a whole (PUBLISHED_LOCALES in src/config.ts),
+   and then there is no /bn/ hero to drive. */
+const bangla = existsSync(new URL('../dist/bn/index.html', import.meta.url));
+
+for (const [route, locale] of [['/', 'en'], ...(bangla ? [['/bn/', 'bn']] : [])]) {
   console.log(`\n${route}`);
 
   for (const testCase of CASES) {

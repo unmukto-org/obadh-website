@@ -17,6 +17,27 @@ export const LOCALE_TAG: Record<Locale, string> = { en: 'en', bn: 'bn' };
 
 export const LOCALE_NAME: Record<Locale, string> = { en: 'English', bn: 'বাংলা' };
 
+/**
+ * The languages this site publishes, as opposed to the ones it has copy for.
+ *
+ * Bangla is switched off for now. Its copy is kept and still type-checked, but
+ * no /bn/ page is built, nothing links to one, and no page claims a Bangla
+ * alternate: an hreflang pointing at a page that does not exist is worse than
+ * none, because a crawler follows it.
+ *
+ * To turn it back on, do both:
+ *   1. add 'bn' here
+ *   2. rename src/pages/_bn back to src/pages/bn (Astro skips a folder whose
+ *      name starts with an underscore, which is what keeps it unbuilt)
+ *
+ * scripts/verify-seo.mjs reads the built site and fails if those two disagree,
+ * in either direction, so a half-done switch cannot ship.
+ */
+export const PUBLISHED_LOCALES: readonly Locale[] = ['en'];
+
+/** More than one language is live, so pages name each other as alternates. */
+export const MULTILINGUAL = PUBLISHED_LOCALES.length > 1;
+
 export const SITE = {
   name: 'Obadh',
   nameBn: 'অবাধ',
@@ -31,7 +52,7 @@ export const SITE = {
   license: 'MIT',
   /** Keep in step with the repos. */
   versions: {
-    engine: '0.9.1',
+    engine: '0.9.3',
     ios: '0.1.0',
     macos: '0.1.0',
   },
@@ -50,8 +71,10 @@ export const LINKS = {
   // TODO(maintainer): replace once the first macOS release is tagged.
   macDmg: 'https://github.com/unmukto-org/obadh-macos/releases/download/v0.1.0/Obadh-0.1.0.dmg',
   macReleases: 'https://github.com/unmukto-org/obadh-macos/releases/latest',
-  // TODO(maintainer): replace with the real invite once the server exists.
-  discord: 'https://discord.gg/obadh',
+  /* Community support. Checked against Discord's invite endpoint on
+     2026-09-21: it resolves to the Obadh server and expires_at is null, so it
+     does not lapse the way a default seven-day invite would. */
+  discord: 'https://discord.gg/DHFxV8dzCy',
   /* Served from this site, at /playground/. The deploy workflow copies the
      engine's own docs/ folder in, so it tracks the engine rather than a copy. */
   playground: 'https://obadh.unmukto.org/playground/',
@@ -60,13 +83,15 @@ export const LINKS = {
     engine: 'https://github.com/unmukto-org/obadh_engine',
     ios: 'https://github.com/unmukto-org/obadh-ios',
     macos: 'https://github.com/unmukto-org/obadh-macos',
+    autocorrectData: 'https://github.com/unmukto-org/obadh_autocorrect_dataset',
+    autosuggestData: 'https://github.com/unmukto-org/obadh_autosuggest_dataset',
     website: 'https://github.com/unmukto-org/obadh-website',
   },
   crate: 'https://crates.io/crates/obadh_engine',
 } as const;
 
 /** Marks a link whose target does not exist yet, so the UI can say so honestly. */
-export const PLACEHOLDER_LINKS = new Set<string>([LINKS.appStore, LINKS.macDmg, LINKS.discord]);
+export const PLACEHOLDER_LINKS = new Set<string>([LINKS.appStore, LINKS.macDmg]);
 
 /** Page paths, without locale prefix and always trailing-slashed. */
 export const ROUTES = [

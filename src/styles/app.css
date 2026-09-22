@@ -81,6 +81,10 @@
   --font-sans: 'Schibsted Grotesk', 'Schibsted fallback', system-ui, sans-serif;
   --font-bangla: 'Anek Bangla', 'Anek fallback', system-ui, sans-serif;
   --font-serif-bn: 'Tiro Bangla', 'Tiro fallback', Georgia, serif;
+  /* A hand, for the one line the site writes rather than sets: ভাষা হোক আরও
+     উন্মুক্ত. Subset to that sentence, so anything else asked of it falls
+     through to Tiro rather than into a brush face. */
+  --font-hand: 'Galada', 'Tiro Bangla', 'Tiro fallback', serif;
   --font-mono: 'IBM Plex Mono', 'Plex fallback', ui-monospace, monospace;
 
   --text-2xs: clamp(0.75rem, 0.724rem + 0.111vw, 0.8125rem);

@@ -51,7 +51,7 @@ licensed.
 
 ## For developers
 
-- Crate: `obadh_engine` 0.9.1 on crates.io, documented at
+- Crate: `obadh_engine` 0.9.3 on crates.io, documented at
   https://docs.rs/obadh_engine
 - The default feature set is empty. `cabi` exposes a stable C ABI, `wasm`
   builds wasm-bindgen bindings, `cli` builds the `obadh` binary.

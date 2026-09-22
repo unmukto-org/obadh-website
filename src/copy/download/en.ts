@@ -33,7 +33,7 @@ export const download: DownloadContent = {
 
   eyebrow: 'Download',
   heading: 'Get Obadh',
-  standfirst: 'Free, on every platform it has reached. Pick yours.',
+  standfirst: 'Every platform Obadh has reached, and what each one needs to run it.',
 
   releasesHeading: 'Available now',
 

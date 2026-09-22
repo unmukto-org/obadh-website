@@ -56,7 +56,10 @@ const { label } = Astro.props;
   @property --drawn {
     syntax: '<percentage>';
     inherits: false;
-    initial-value: 100%;
+    /* Past the end, not at it. The mask fades over its last 4%, so a resting
+       value of 100% left the tail of উন্মুক্ত washed out for anyone who never
+       saw the animation: reduced motion, scripts off, a crawler's render. */
+    initial-value: 110%;
   }
 
   @property --written {
@@ -71,12 +74,25 @@ const { label } = Astro.props;
   }
 
   .avro__line {
-    font-family: var(--font-serif-bn);
-    font-size: var(--text-display);
+    /* One hand for the whole sentence, the word written in included. A brush
+       face on the line and another on the word read as two people; this is
+       one line, marked up by the person who wrote it. */
+    font-family: var(--font-hand);
+    /*
+      One line at every width. The sentence is the whole point of the mark, and
+      broken across two lines on a phone the caret no longer sits between the
+      two words it separates. In Galada the words measure 6.26em and the caret
+      opens 0.62em between them, so the size is capped at a seventh of the
+      viewport less the page gutters, which leaves a little air either side:
+      40px on a 320px phone, the full display size from about 630px up.
+      Measured with the font loaded. Change the face and re-measure.
+    */
+    font-size: min(var(--text-display), calc((100vw - 2.5rem) / 7));
+    white-space: nowrap;
     line-height: 1.26;
     letter-spacing: 0;
     /* Room above the line for the word written into it. */
-    padding-block: 0.66em 0.06em;
+    padding-block: 1.66em 0.06em;
     color: var(--color-ink);
     text-align: center;
 
@@ -94,6 +110,18 @@ const { label } = Astro.props;
       #000 calc(var(--drawn) - 4%),
       transparent var(--drawn));
     mask-image: linear-gradient(90deg, #000 calc(var(--drawn) - 4%), transparent var(--drawn));
+  }
+
+  /*
+    The words take the line's face. They would not by themselves: the global
+    :lang(bn) rule in app.css sets the Bangla face on every Bangla element
+    directly, which beats anything inherited, so the sentence rendered in Anek
+    whatever .avro__line asked for. For a long time this line was believed to
+    be in Tiro and never was. This makes the line's font-family the one that
+    counts.
+  */
+  .avro__line > span {
+    font-family: inherit;
   }
 
   [data-avro][data-armed] .avro__line {
@@ -129,12 +157,21 @@ const { label } = Astro.props;
     }
   }
 
-  /* The gap the caret opens in the line. It widens to make room for the word,
-     which is what an insertion actually looks like on paper. */
+  /*
+    The gap the caret opens in the line: room for the caret and no more.
+
+    It used to widen to the full width of the word going in, which pushed হোক
+    and উন্মুক্ত apart and left the caret alone in a hole, pointing at nothing.
+    A proofreader's insertion does the opposite. The line stays as it was
+    written, the caret squeezes in at the baseline, and the word is written
+    above, overhanging the words either side. The caret is the mark; the words
+    do not step aside for it.
+  */
   .avro__insert {
+    --gap: 0.62em;
     position: relative;
     display: inline-block;
-    width: var(--gap, 3.2em);
+    width: var(--gap);
     vertical-align: baseline;
     color: var(--color-brand);
     transition: width 520ms var(--ease-soft);
@@ -156,17 +193,22 @@ const { label } = Astro.props;
   }
 
   /*
-    Tiro Bangla's italic is a true sloped Bengali cut rather than an upright
-    slanted over, so it reads as a hand rather than as the same face leaning.
-    It is already loaded for the tagline, so this costs nothing.
+    The same hand as the line, smaller and in the brand colour, so it reads as
+    a word added to the sentence rather than a second voice. It used to be
+    Tiro's italic under a Tiro line: the same family, but thin and sloped
+    beside an upright line, so it read as a stranger to it.
   */
   .avro__word {
     position: absolute;
     inset-inline-start: 50%;
-    inset-block-end: 0.66em;
+    /* High enough to clear উ, whose head rises above the headline: with the
+       words no longer parted, the word overhangs উন্মুক্ত. Galada's উ curls up
+       higher than Anek's did, and at 1.35em its ও touched that curl; 1.6em
+       leaves clear air and still reads as written just above the line, which
+       is where a proofreader writes an insertion. */
+    inset-block-end: 1.6em;
     translate: -50% 0;
-    font-family: var(--font-serif-bn);
-    font-style: italic;
+    font-family: var(--font-hand);
     font-size: 0.6em;
     line-height: 1.1;
     white-space: nowrap;
@@ -201,7 +243,7 @@ const { label } = Astro.props;
   }
 
   [data-insert][data-armed][data-open] {
-    width: var(--gap, 3.2em);
+    width: var(--gap);
   }
 
   [data-insert][data-armed][data-open] .avro__caret {
@@ -229,18 +271,6 @@ const { label } = Astro.props;
     const word = root.querySelector<HTMLElement>('.avro__word');
     if (!insert || !word) continue;
 
-    /** The gap has to be exactly as wide as the word going into it. */
-    const measure = () => {
-      const armed = insert.hasAttribute('data-armed');
-      insert.removeAttribute('data-armed');
-      const w = word.getBoundingClientRect().width;
-      if (w) insert.style.setProperty('--gap', `${Math.ceil(w) + 14}px`);
-      if (armed) insert.setAttribute('data-armed', '');
-    };
-
-    measure();
-    void document.fonts?.ready.then(measure);
-
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
 
     // Until this attribute is set the CSS shows the finished mark, so nothing
@@ -253,8 +283,7 @@ const { label } = Astro.props;
         for (const entry of entries) {
           if (!entry.isIntersecting || done) continue;
           done = true;
-          measure();
-          // Write the line, then open the gap in it, then write into that.
+          // Write the line, then part it for the caret, then write above it.
           root.dataset.drawing = '';
           window.setTimeout(() => (insert.dataset.open = ''), 1500);
           window.setTimeout(() => (insert.dataset.written = ''), 2050);
@@ -263,7 +292,5 @@ const { label } = Astro.props;
       { threshold: 0.55 },
     );
     watcher.observe(root);
-
-    window.addEventListener('resize', measure, { passive: true });
   }
 </script>

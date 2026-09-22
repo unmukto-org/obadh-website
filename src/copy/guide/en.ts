@@ -23,11 +23,13 @@ export const guide: GuideContent = {
     phonetic typing to a person who has typed this way since school, and
     nothing here explains how the engine is put together, that is /about/.
   */
-  standfirst: '176 pairs, straight out of the engine. Filter them, or read the group you need.',
+  standfirst:
+    'Every pair here comes out of the engine itself, so the page documents what the keyboard does. <a href="/about/#how-it-is-built">Why the scheme is built this way</a> is on the about page.',
 
-  intro: [
-    'Every pair below came out of the engine itself, so what you read here is what you get. <a href="/about/#how-it-is-built">Why it works that way</a> is on the about page.',
-  ],
+  /* No second opening. The heading names the page and the standfirst carries
+     the one fact a reader needs before the tables; anything more is a paragraph
+     between them and what they came to look up. */
+  intro: [],
 
   /*
     The three rules that account for most of what surprises people, shown as
@@ -47,7 +49,7 @@ export const guide: GuideContent = {
       heading: 'Start with these nine',
       short: 'First nine',
       body: [
-        'Type these and you can type Bangla. The rest of this page is detail, for the day you need it.',
+        'These nine cover most ordinary typing. The rest of the page is reference.',
       ],
     },
 
@@ -147,8 +149,8 @@ export const guide: GuideContent = {
       heading: 'Anusvar, <span lang="bn">ঙ</span>, and the rest of the nasals',
       short: 'Nasals',
       body: [
-        '<code>ng</code> is the anusvar <span lang="bn">ং</span>, and it is the common case. <code>Ng</code> is the consonant <span lang="bn">ঙ</span>. <code>ngg</code> and <code>nggh</code> are shorthand for the clusters <span lang="bn">ঙ্গ</span> and <span lang="bn">ঙ্ঘ</span>.',
-        'Where that shorthand is not what you want, a capital <code>M</code> forces a literal anusvar. And <span lang="bn">ঞ্জ</span>, if that is what you came for, is <code>nj</code>.',
+        '<code>ng</code> is the anusvar <span lang="bn">ং</span> before a consonant and at the end of a word: <code>bangla</code> gives <span lang="bn">বাংলা</span> and <code>rong</code> gives <span lang="bn">রং</span>. Before a vowel it is the velar nasal carrying that vowel, so <code>bhanga</code> gives <span lang="bn">ভাঙা</span> and <code>rongin</code> gives <span lang="bn">রঙিন</span>. <code>Ng</code> is <span lang="bn">ঙ</span> in every position, and <code>ngg</code> and <code>nggh</code> are shorthand for the clusters <span lang="bn">ঙ্গ</span> and <span lang="bn">ঙ্ঘ</span>.',
+        'Where that shorthand is not what you want, a capital <code>M</code> forces a literal anusvar. <span lang="bn">ঞ্জ</span> is <code>nj</code>.',
       ],
     },
 
@@ -167,7 +169,7 @@ export const guide: GuideContent = {
       short: 'Chandrabindu',
       body: [
         '<code>^</code> writes the chandrabindu and goes after the vowel it nasalizes. <code>qq</code> is a second route to the same mark.',
-        '<code>:</code> writes the bisarga. The colon is claimed, so there is no way to type an ASCII colon through the engine.',
+        '<code>:</code> writes the bisarga beside a letter or at a word edge, so <code>du:kho</code> gives <span lang="bn">দুঃখ</span>. Between two digits it stays an ordinary colon, which is what lets a clock time survive: <code>9:45</code> gives <span lang="bn">৯:৪৫</span>.',
       ],
     },
 
@@ -189,7 +191,7 @@ export const guide: GuideContent = {
         '<code>q</code> and <code>x</code> have no Bangla sound of their own, and neither is left as Latin. Each takes the convention Bangla writing already settled on: <code>q</code> is <span lang="bn">ক</span> and <code>x</code> is the <span lang="bn">ক্স</span> cluster.',
         'Standing alone, <code>w</code> is the <span lang="bn">ওয়</span> glide, and <code>aY</code> is the <span lang="bn">অ্যা</span> most borrowed words need.',
         // The two Bangla strings below differ by one U+200C: র‌্য carries the ZWNJ, র্য does not.
-        '<code>rZy</code> is a narrow signal with one job. It writes the ZWNJ-separated <span lang="bn">র‌্য</span> used in spellings like <span lang="bn">র‌্যাব</span>, which is a different shape from the true conjunct <span lang="bn">র্য</span>. <code>Z</code> rewrites nothing else, and it is the one letter the engine hands back as Latin.',
+        '<code>rZy</code> is a narrow signal with one job. It writes the ZWNJ-separated <span lang="bn">র‌্য</span> used in spellings like <span lang="bn">র‌্যাব</span>, which is a different shape from the true conjunct <span lang="bn">র্য</span>. Elsewhere a stray <code>Z</code> folds to <span lang="bn">য</span>, so <code>namaZ</code> gives <span lang="bn">নামায</span>.',
       ],
     },
 

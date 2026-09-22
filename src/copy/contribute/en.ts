@@ -226,8 +226,6 @@ export const contribute: BlockContent = {
       id: 'where-to-talk',
       heading: 'Before you file, and after',
       body: [
-        // LINKS.discord is a marked placeholder in src/config.ts. The invite is
-        // created before launch; the copy below already says the room is new.
         `Some questions are faster asked than filed: whether something is a bug or a typing habit, what a rule was supposed to do, whether anyone has started on Android. Ask them in the <a href="${LINKS.discord}">Discord</a>. The server is new and the apps are at 0.1.0, so expect a quiet room rather than a crowd.`,
         'GitHub issues are the record, and questions are fine there too. An issue that turns out not to be a bug has still told the project that something was unclear, and unlike a message in a chat it is still findable in a year.',
         'Reviews can be slow. An issue can sit for a month, usually because the person who read it was deep in something else. What you get back is a project that fits in your head: one engine, two apps so far, a couple of data repositories, and no framework you have to learn before you can read the code. A rule you fix reaches every platform at once, because there is one implementation of it.',

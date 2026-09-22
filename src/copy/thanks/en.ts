@@ -49,4 +49,8 @@ export const thanks: ThanksContent = {
     { label: 'Coming from Avro', href: '/guide/#from-avro' },
     { label: 'What Obadh does with your typing', href: '/privacy/' },
   ],
+  help: {
+    text: 'Stuck on a step?',
+    label: 'Ask on Discord',
+  },
 };

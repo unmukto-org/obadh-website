@@ -30,7 +30,7 @@ export const faq: FaqContent = {
   eyebrow: 'FAQ',
   heading: 'Questions about typing Bangla with Obadh',
   standfirst:
-    'Fifteen questions, each answered in its first line. If yours is not here, the <a href="/guide/">writing guide</a> has the whole scheme and <a href="/download/">the download page</a> has the install steps.',
+    'Each question is answered in its first line, with the detail underneath. If yours is not here, the <a href="/guide/">writing guide</a> covers the scheme and <a href="/download/">the download page</a> covers installation.',
 
   groups: [
     {

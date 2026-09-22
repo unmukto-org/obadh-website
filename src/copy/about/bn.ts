@@ -6,7 +6,7 @@ import type { BlockContent } from '../types';
 // Terminology is settled in src/copy/GLOSSARY.bn.md.
 //
 // Bangla numerals in running prose; Latin digits for versions, sizes and figures
-// a maintainer checks against a file (0.9.1 · 0.1.0 · 845,461 · 390 KB · 29 MB).
+// a maintainer checks against a file (0.9.3 · 0.1.0 · 845,461 · 390 KB · 29 MB).
 //
 // This page does not gloss অবাধ: telling a Bangla reader what their own everyday
 // word means is an insult with good manners. The English page glosses because it
@@ -40,7 +40,7 @@ export const about: BlockContent = {
             'লিনাক্স, অ্যান্ড্রয়েড, উইন্ডোজ আর ক্রোমওএস। চারটির কোনোটিই কেউ শুরু করেনি, আর <a href="/bn/contribute/#the-platforms-that-need-someone">একটি আপনারও হতে পারে</a>।',
         },
         { term: 'দাম', value: 'ব্যবহার করতে খরচ নেই। বিজ্ঞাপন নেই, সাইন ইন করার কিছু নেই।' },
-        { term: 'লাইসেন্স', value: 'পুরোটাই এমআইটি। ইঞ্জিন 0.9.1, অ্যাপ 0.1.0।' },
+        { term: 'লাইসেন্স', value: 'পুরোটাই এমআইটি। ইঞ্জিন 0.9.3, অ্যাপ 0.1.0।' },
         {
           term: 'বানিয়েছে',
           value: '<a href="https://unmukto.org">উন্মুক্ত</a>, একটি ওপেন সোর্স সমষ্টি।',

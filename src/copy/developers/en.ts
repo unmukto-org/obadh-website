@@ -25,7 +25,7 @@ export const developers: DevelopersContent = {
   eyebrow: 'Developers',
   heading: 'The engine is a library first',
   standfirst:
-    'Everything the keyboard does, your program can do. One Rust crate, no word list inside it, and the same output on every platform.',
+    'The transliteration, correction and suggestion layers the keyboard runs are one Rust crate, with no word list in the core and the same output on every platform.',
 
   rust: {
     heading: 'The Rust crate',

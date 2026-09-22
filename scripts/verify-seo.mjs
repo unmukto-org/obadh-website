@@ -30,17 +30,32 @@ const fail = (where, message) => {
   console.error(`  ✗ ${where}: ${message}`);
 };
 
-/** Every built page. */
+/**
+ * Every built page, including the ones that are not an index.html. The 404 is
+ * a page too, and it is where four links into an unbuilt /bn/ hid while this
+ * walked index files only.
+ */
 async function pages(dir = DIST, found = []) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) await pages(full, found);
-    else if (entry.name === 'index.html') found.push(full);
+    else if (entry.name.endsWith('.html')) found.push(full);
   }
   return found;
 }
 
 const files = (await pages()).sort();
+
+/*
+  Which languages were actually built. Bangla can be switched off as a whole
+  (PUBLISHED_LOCALES in src/config.ts, with src/pages/bn renamed to _bn), and
+  the two halves of that switch live in different places. Rather than trust
+  either, read what came out: if /bn/ was built, every page must name it as an
+  alternate; if it was not, no page may point into it. A switch done halfway
+  fails here in whichever direction it was left.
+*/
+const banglaBuilt = existsSync(join(DIST, 'bn', 'index.html'));
+console.log(`languages built: ${banglaBuilt ? 'English and Bangla' : 'English only'}\n`);
 const attr = (html, re) => html.match(re)?.[1];
 
 // --- per page -------------------------------------------------------------
@@ -123,8 +138,14 @@ for (const file of files) {
   } else {
     if (!canonical) fail(route, 'no canonical');
     else if (canonical !== `${SITE}${route}`) fail(route, `canonical is ${canonical}`);
-    for (const lang of ['en', 'bn', 'x-default']) {
-      if (!html.includes(`hreflang="${lang}"`)) fail(route, `no hreflang=${lang}`);
+    if (banglaBuilt) {
+      for (const lang of ['en', 'bn', 'x-default']) {
+        if (!html.includes(`hreflang="${lang}"`)) fail(route, `no hreflang=${lang}`);
+      }
+    } else if (html.includes('hreflang=')) {
+      // One language, so no cluster: an alternate here names a page that
+      // either does not exist or is this page again.
+      fail(route, 'declares hreflang alternates, but only one language is built');
     }
   }
 
@@ -140,6 +161,13 @@ for (const file of files) {
     }
   }
   if (!noindex && !html.includes('application/ld+json')) fail(route, 'no structured data');
+
+  // Nothing may point into a language that was not built.
+  if (!banglaBuilt) {
+    const into = html.match(/href="\/bn\/[^"]*"/g) ?? [];
+    if (into.length) fail(route, `links into /bn/, which is not built: ${into[0]}`);
+    if (get('og:locale:alternate')) fail(route, 'names an og:locale:alternate that is not built');
+  }
 
   checked += 1;
 }
@@ -159,6 +187,11 @@ for (const file of files) {
   const inSitemap = listed.includes(`${SITE}${route}`);
   if (noindex && inSitemap) fail(route, 'noindex, yet listed in the sitemap');
   if (!noindex && !inSitemap && !route.includes('404')) fail(route, 'indexable, yet not in the sitemap');
+}
+if (!banglaBuilt) {
+  const stray = listed.filter((url) => url.startsWith(`${SITE}/bn/`));
+  if (stray.length) fail('sitemap', `lists ${stray.length} /bn/ URLs, which are not built`);
+  if (sitemap.includes('hreflang="bn"')) fail('sitemap', 'pairs pages with a Bangla alternate that is not built');
 }
 console.log(`  ${listed.length} URLs listed`);
 

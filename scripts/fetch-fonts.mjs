@@ -25,6 +25,12 @@ const FAMILIES = [
   { query: 'Tiro+Bangla:ital@0;1', slug: 'tiro-bangla' },
   // The Roman side of every input example.
   { query: 'IBM+Plex+Mono:ital,wght@0,400;0,500;1,400', slug: 'ibm-plex-mono' },
+  // The Avro line, written by hand: ভাষা হোক আরও উন্মুক্ত, one face for the whole
+  // sentence. Subset to exactly that sentence, 8.6 KB against 54 KB for the
+  // full font. A subset can lose the rules that join a conjunct, so it was
+  // rendered against the full font before it was used: ন্ম and ক্ত shape the
+  // same, to the pixel. Change the sentence and that check has to be redone.
+  { query: 'Galada', slug: 'galada', text: 'ভাষা হোক আরও উন্মুক্ত' },
 ];
 
 const seen = new Map();
@@ -52,8 +58,9 @@ const sheets = [];
 
 for (const family of FAMILIES) {
   console.log(`\n${family.slug}`);
+  const subset = family.text ? `&text=${encodeURIComponent(family.text)}` : '';
   const css = await fetchText(
-    `https://fonts.googleapis.com/css2?family=${family.query}&display=swap`,
+    `https://fonts.googleapis.com/css2?family=${family.query}&display=swap${subset}`,
   );
 
   let index = 0;
@@ -61,11 +68,17 @@ for (const family of FAMILIES) {
   // Google emits one @font-face per unicode-range subset. Keep that split: it is
   // why a Latin-only page never downloads the Bengali glyph blocks.
   for (const block of css.split('@font-face').slice(1)) {
-    const url = block.match(/url\((https:\/\/[^)]+\.woff2)\)/)?.[1];
+    // Matched by the format rather than the extension: a `text=` subset is
+    // served from a URL with no .woff2 in it, and matching on the extension
+    // skipped it without a word.
+    const url = block.match(/url\((https:\/\/[^)]+)\)\s*format\(['"]woff2['"]\)/)?.[1];
     if (!url) continue;
     const filename = await download(url, `${family.slug}-${index++}.woff2`);
     rewritten.push(`@font-face${block.replace(url, `/fonts/${filename}`)}`.trim());
   }
+  // A family that yields no faces is a mistake, not an empty result: the header
+  // would still name it and nothing would render in it.
+  if (!rewritten.length) throw new Error(`${family.slug}: the response held no woff2 face`);
   sheets.push(rewritten.join('\n'));
 }
 

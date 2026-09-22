@@ -44,4 +44,8 @@ export const thanks: ThanksContent = {
     { label: 'অভ্র থেকে আসছেন?', href: '/guide/#from-avro' },
     { label: 'আপনার লেখা নিয়ে অবাধ কী করে', href: '/privacy/' },
   ],
+  help: {
+    text: 'কোনো ধাপে আটকে গেছেন?',
+    label: 'ডিসকর্ডে জিজ্ঞেস করুন',
+  },
 };

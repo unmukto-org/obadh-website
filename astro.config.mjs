@@ -2,8 +2,17 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@tailwindcss/vite';
+import { existsSync } from 'node:fs';
 
 const site = (process.env.SITE_URL ?? 'https://obadh.unmukto.org').replace(/\/$/, '');
+
+/*
+  Whether the Bangla pages are built at all. The sitemap describes what was
+  published, so it asks the folder rather than a flag: src/pages/_bn is skipped
+  by Astro, and while it is, the sitemap lists English only and pairs nothing.
+  See PUBLISHED_LOCALES in src/config.ts for how to switch Bangla back on.
+*/
+const bangla = existsSync(new URL('./src/pages/bn', import.meta.url));
 
 export default defineConfig({
   site,
@@ -20,7 +29,7 @@ export default defineConfig({
     // No priority or changefreq: search engines ignore both, and inventing
     // values for fourteen static pages is noise in the file.
     sitemap({
-      i18n: { defaultLocale: 'en', locales: { en: 'en', bn: 'bn' } },
+      ...(bangla ? { i18n: { defaultLocale: 'en', locales: { en: 'en', bn: 'bn' } } } : {}),
       /* /thanks/ is noindex: it means nothing to anyone who did not arrive by
          pressing the download button, and a sitemap entry for a page that asks
          not to be indexed is two published statements contradicting each

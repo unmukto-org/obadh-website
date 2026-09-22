@@ -16,7 +16,8 @@
     "build:qr": "node scripts/qr.mjs",
     "verify:copy": "node scripts/verify-copy.mjs",
     "verify": "npm run verify:pairs && npm run verify:copy && npm run verify:seo",
-    "verify:seo": "node scripts/verify-seo.mjs"
+    "verify:seo": "node scripts/verify-seo.mjs",
+    "responsive": "node scripts/responsive.mjs"
   },
   "author": "",
   "type": "module",

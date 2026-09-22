@@ -3,9 +3,28 @@
 The website for [Obadh](https://github.com/unmukto-org/obadh_engine), a free and open-source Bangla
 keyboard for iPhone, iPad and Mac.
 
-Astro 5 and Tailwind 4, static output, no component library. Two languages: English at `/` and
-Bangla at `/bn/`. The JavaScript on the page is the hero animation, the mobile menu, the platform
-routing on `/download/`, and the typing box, which runs the real engine.
+Astro 5 and Tailwind 4, static output, no component library. English at `/`. Bangla is written
+for `/bn/` but switched off for now; see below. The JavaScript on the page is the hero animation,
+the mobile menu, the platform routing on the hero's download button, and the typing box on the
+writing guide, which runs the real engine.
+
+### Bangla is switched off
+
+Every page has its Bangla copy in `src/copy/<page>/bn.ts`, and all of it is still type-checked and
+still verified against the engine by `npm run verify`. It is only unpublished: no `/bn/` page is
+built, nothing links to one, and no page names a Bangla alternate, because an `hreflang` pointing at
+a page that does not exist is worse than none.
+
+Turning it back on takes two changes, and both are needed:
+
+1. add `'bn'` to `PUBLISHED_LOCALES` in `src/config.ts`
+2. rename `src/pages/_bn` to `src/pages/bn`. Astro skips a folder whose name starts with an
+   underscore, which is what keeps it unbuilt.
+
+The two halves live in different places, so `scripts/verify-seo.mjs` reads the built site and fails
+if they disagree in either direction: Bangla built but unannounced, or announced but unbuilt. The
+audit, smoke, platform and responsive checks all read the same thing from `dist/` and test whichever
+state was actually built.
 
 Design tokens live in one place, `src/styles/app.css`, in a Tailwind `@theme` block: colour, the
 fluid type scale, radii, shadows and easings. Nothing hard-codes a hex value.

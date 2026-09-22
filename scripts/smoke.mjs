@@ -8,6 +8,11 @@
 
 import { chromium } from 'playwright-core';
 import { serve, findExecutable } from './browser.mjs';
+import { existsSync } from 'node:fs';
+
+/* Bangla can be switched off as a whole (PUBLISHED_LOCALES in src/config.ts).
+   While it is, there are no /bn/ pages and no language switch to test. */
+const bangla = existsSync(new URL('../dist/bn/index.html', import.meta.url));
 
 const { origin, close } = await serve();
 const browser = await chromium.launch({ executablePath: findExecutable() });
@@ -178,27 +183,35 @@ check(
 );
 check('the home link is named once', wordmark.text === 'Obadh', wordmark.text);
 
-const switcher = await page
-  .locator('.site-header .lang')
-  .first()
-  .evaluate((link) => ({
-    aria: link.getAttribute('aria-label'),
-    langs: [...link.querySelectorAll('span')].map((span) => span.getAttribute('lang')).join(','),
-    href: link.getAttribute('href'),
-  }));
-check('the switcher has no two-language aria-label', switcher.aria === null, switcher.aria ?? '');
-check('each run of the name carries its own language', switcher.langs === 'en,bn', switcher.langs);
-
-await page.goto(`${origin}/bn/`, { waitUntil: 'domcontentloaded' });
-check(
-  'and the other way round on a Bangla page',
-  (await page
+if (bangla) {
+  const switcher = await page
     .locator('.site-header .lang')
     .first()
-    .evaluate((link) =>
-      [...link.querySelectorAll('span')].map((span) => span.getAttribute('lang')).join(','),
-    )) === 'bn,en',
-);
+    .evaluate((link) => ({
+      aria: link.getAttribute('aria-label'),
+      langs: [...link.querySelectorAll('span')].map((span) => span.getAttribute('lang')).join(','),
+      href: link.getAttribute('href'),
+    }));
+  check('the switcher has no two-language aria-label', switcher.aria === null, switcher.aria ?? '');
+  check('each run of the name carries its own language', switcher.langs === 'en,bn', switcher.langs);
+
+  await page.goto(`${origin}/bn/`, { waitUntil: 'domcontentloaded' });
+  check(
+    'and the other way round on a Bangla page',
+    (await page
+      .locator('.site-header .lang')
+      .first()
+      .evaluate((link) =>
+        [...link.querySelectorAll('span')].map((span) => span.getAttribute('lang')).join(','),
+      )) === 'bn,en',
+  );
+} else {
+  // Switched off: a switch would be a link to a page that is not there.
+  check(
+    'no language switch while only English is published',
+    (await page.locator('.site-header .lang').count()) === 0,
+  );
+}
 
 const eyebrows = await page.goto(`${origin}/`, { waitUntil: 'domcontentloaded' }).then(() =>
   page
@@ -217,10 +230,12 @@ check(
 );
 
 // --- language ------------------------------------------------------------
-console.log('\nlanguage');
-await page.goto(`${origin}/faq/`, { waitUntil: 'domcontentloaded' });
-const target = await page.locator('.site-header .lang').first().getAttribute('href');
-check('the switcher stays on the page', target === '/bn/faq/', target ?? 'missing');
+if (bangla) {
+  console.log('\nlanguage');
+  await page.goto(`${origin}/faq/`, { waitUntil: 'domcontentloaded' });
+  const target = await page.locator('.site-header .lang').first().getAttribute('href');
+  check('the switcher stays on the page', target === '/bn/faq/', target ?? 'missing');
+}
 
 // --- the scheme table ----------------------------------------------------
 console.log('\nthe scheme table');
@@ -273,11 +288,12 @@ check('a press outside closes it', !(await menu.evaluate((details) => details.op
 // sentence.
 console.log('\nreachable with a thumb');
 await summary.click();
-const targets = await small.evaluate(() => {
+// The language switch is only a target while there is a language to switch to.
+const targets = await small.evaluate((withSwitch) => {
   const wanted = [
     '.wordmark',
     '.site-menu__button',
-    '.site-menu .lang',
+    ...(withSwitch ? ['.site-menu .lang'] : []),
     '.guide__index a',
     '#composer-input',
   ];
@@ -287,7 +303,7 @@ const targets = await small.evaluate(() => {
     const box = el.getBoundingClientRect();
     return { selector, w: Math.round(box.width), h: Math.round(box.height) };
   });
-});
+}, bangla);
 for (const target of targets) {
   check(
     `${target.selector} is at least 44px`,
@@ -313,10 +329,7 @@ for (const width of [320, 380]) {
     '/contribute/',
     '/privacy/',
     '/404.html',
-    '/bn/',
-    '/bn/guide/',
-    '/bn/download/',
-    '/bn/privacy/',
+    ...(bangla ? ['/bn/', '/bn/guide/', '/bn/download/', '/bn/privacy/'] : []),
   ]) {
     await narrowPage.goto(`${origin}${route}`, { waitUntil: 'networkidle' });
     const over = await narrowPage.evaluate(() => {
@@ -328,6 +341,79 @@ for (const width of [320, 380]) {
   await context.close();
 }
 await narrow.close();
+
+// --- source and community ------------------------------------------------
+// The GitHub panel is a native popover, so these are checks that the markup
+// is right rather than that a script ran: it has to open, name the five
+// repositories that make up Obadh, and close on Escape.
+console.log('\nsource and community');
+{
+  const wide = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const tab = await wide.newPage();
+  tab.on('pageerror', (error) => errors.push(error.message));
+  await tab.goto(`${origin}/`, { waitUntil: 'networkidle' });
+
+  const openButton = tab.locator('header .header-icon[popovertarget]');
+  await openButton.click();
+  const opened = await tab.evaluate(() => document.querySelector('#repo-menu').matches(':popover-open'));
+  check('the GitHub icon opens the repository panel', opened);
+  const repos = await tab.locator('#repo-menu .repo-menu__row').count();
+  check('the panel names all five repositories', repos === 5, String(repos));
+  await tab.keyboard.press('Escape');
+  check(
+    'and Escape closes it',
+    await tab.evaluate(() => !document.querySelector('#repo-menu').matches(':popover-open')),
+  );
+
+  const discord = await tab.locator('header a.header-icon').getAttribute('href');
+  check('the Discord icon goes to the invite', discord === 'https://discord.gg/DHFxV8dzCy', discord ?? '');
+
+  const icons = await tab.evaluate(() =>
+    [...document.querySelectorAll('header .header-icon')].map((el) => {
+      const r = el.getBoundingClientRect();
+      return Math.min(r.width, r.height);
+    }),
+  );
+  check(
+    'both header icons are at least 44px',
+    icons.length === 2 && icons.every((size) => size >= 44),
+    icons.join(', '),
+  );
+
+  /*
+    The links are centred on the viewport, not laid out beside the icons, so
+    nothing stops them running into each other. Adding the GitHub and Discord
+    icons did exactly that below about 1180px, 50px of overlap at 1024, which
+    is why the full row now waits for 75rem. Check the narrowest width it
+    appears at, and a common laptop width.
+  */
+  // Every width the row might appear at, down to the narrowest desktop, and
+  // only judged where it is showing: a check at a width that is already wide
+  // enough would pass whether or not the breakpoint was right.
+  const crowded = [];
+  let shownFrom = null;
+  for (const width of [1024, 1100, 1150, 1200, 1280, 1440]) {
+    await tab.setViewportSize({ width, height: 900 });
+    const row = await tab.evaluate(() => {
+      const nav = document.querySelector('header > div > nav');
+      if (getComputedStyle(nav).display === 'none') return null;
+      const links = [...nav.querySelectorAll('a')];
+      const navRight = Math.max(...links.map((a) => a.getBoundingClientRect().right));
+      const cluster = [...document.querySelectorAll('header .header-icon')];
+      const clusterLeft = Math.min(...cluster.map((el) => el.getBoundingClientRect().left));
+      return Math.round(clusterLeft - navRight);
+    });
+    if (row === null) continue;
+    shownFrom ??= width;
+    if (row < 16) crowded.push(`${width}px: ${row}px`);
+  }
+  check(
+    'wherever the full row shows, the links clear the icons',
+    crowded.length === 0 && shownFrom !== null,
+    crowded.length ? crowded.join(', ') : `shown from ${shownFrom}px`,
+  );
+  await wide.close();
+}
 
 // --- no JavaScript -------------------------------------------------------
 console.log('\nno javascript');

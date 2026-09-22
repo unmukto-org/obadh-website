@@ -15,7 +15,7 @@ export const home: HomeContent = {
       'A modern Bangla keyboard for iPhone, iPad and Mac. Composes a word in three microseconds, corrects as you type, and nothing you type leaves the device.',
     ogTitle: 'Obadh: a modern Bangla keyboard',
     ogDescription:
-      'Fast, accurate Bangla typing that feels native on every device it reaches, with corrections that come from 845,461 words and nothing leaving your phone.',
+      'Bangla typing that uses the controls your device already has, corrects as you type, and keeps every word on the device.',
     ogImage: 'default.png',
     ogImageAlt:
       'The Roman string ami banglay gan gai above the Bangla it composes, আমি বাংলায় গান গাই',
@@ -25,7 +25,7 @@ export const home: HomeContent = {
     headingLead: '{badge} for every device:',
     badgeWord: 'বাংলা',
     headingAccent: 'fast, accurate, modern',
-    lede: 'Free, open source, and nothing you type ever leaves your device.',
+    lede: '',
     cta: 'Get Obadh',
     // Read out in place of the animation, so the two scripts have to be marked:
     // an unmarked Bangla run here is spoken by an English voice.
